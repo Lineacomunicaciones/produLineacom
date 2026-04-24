@@ -2176,7 +2176,7 @@
         <div id="tp-resumen" class="tp on" style="padding:10px 18px; display:flex; flex-direction:column; height:100%; box-sizing:border-box; overflow:hidden">
 
           <!-- Section 1: ESTADO GENERAL COMPAÑÍA Hero Banner -->
-          <div class="estado-hero fu" style="margin-bottom:12px">
+          <div class="estado-hero fu" style="margin-bottom:8px; padding: 12px 20px">
             <div class="estado-hero-header">
               <div class="estado-hero-title">
                 <div class="estado-hero-dot"></div>
@@ -2203,13 +2203,13 @@
           </div>
 
           <!-- Section 2: Mosaic Summary Layout -->
-          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; align-items: stretch; flex: 1; min-height: 0; margin-bottom: 8px">
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1.3fr 1fr; gap:10px; align-items: stretch; flex: 1; min-height: 0; margin-bottom: 4px">
             <div id="res-grid-banca"></div>
             <div id="res-grid-cirion"></div>
             <div id="res-grid-liberty"></div>
             
             <!-- Row 2: Distribution Chart (Col 1) and Trend Graph (Col 2-3) -->
-            <div class="card fu fu4" style="display:flex; flex-direction:column; min-height: 280px; margin-bottom: 0">
+            <div class="card fu fu4" style="display:flex; flex-direction:column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding:6px 14px">
                 <div class="ct" style="font-size:11px">Distribución %</div>
               </div>
@@ -2218,7 +2218,7 @@
               </div>
             </div>
             
-            <div class="card fu fu3" style="grid-column: span 2; display:flex; flex-direction:column; min-height: 280px; margin-bottom: 0">
+            <div class="card fu fu3" style="grid-column: span 2; display:flex; flex-direction:column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding:6px 14px">
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
                   <div class="ct" style="font-size:11px">Tendencia Mensual</div>
@@ -3468,7 +3468,6 @@
           </div>
         </div>
       </div>`;
-    }
     }
     function kpi(lbl, val, sub, cls = '', ico = '', p = null, delay = 0) {
       return `<div class="kc" style="animation-delay:${delay}s">
