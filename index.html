@@ -592,7 +592,7 @@
     }
 
     .sidebar {
-      width: 210px;
+      width: 180px;
       flex-shrink: 0;
       background: var(--white);
       border-right: 1px solid var(--border);
@@ -2166,10 +2166,7 @@
             class="nl">Liberty</span><span class="nc" id="nc-l">—</span></button>
         <button class="nav" id="n-banca" onclick="gotoTab('banca')"> <span class="ni">🏦</span><span
             class="nl">Banca</span><span class="nc" id="nc-b">—</span></button>
-        <div class="sb-sec" style="margin-top:6px">Datos</div>
 
-        <button class="nav" id="n-carga" onclick="gotoTab('carga')"> <span class="ni">📂</span><span class="nl">Cargar
-            JSON</span></button>
         <div class="sb-bot">Lineacom · v3.0<br><span id="sb-rows">0 registros</span></div>
       </nav>
 
@@ -2206,9 +2203,17 @@
           </div>
 
           <!-- Section 2: Unified Summary Layout -->
-          <div style="display:grid; grid-template-columns: 1.5fr 2fr; gap:12px; align-items:start">
-            <!-- Col 1: Banca Card -->
-            <div id="res-col-banca"></div>
+          <div style="display:grid; grid-template-columns: 1fr 2fr; gap:12px; align-items:start">
+            <!-- Col 1: Banca Card + Distribution Chart -->
+            <div style="display:flex; flex-direction:column; gap:12px">
+              <div id="res-col-banca"></div>
+              <div class="card fu fu4" style="display:flex; flex-direction:column">
+                <div class="ch" style="padding:6px 14px">
+                  <div class="ct" style="font-size:11px">Distribución %</div>
+                </div>
+                <div class="cw" style="height:220px; padding:0 10px 6px"><canvas id="ch-res-dona"></canvas></div>
+              </div>
+            </div>
             
             <!-- Col 2: Cirion + Liberty (top) and Trend (bottom) -->
             <div style="display:flex; flex-direction:column; gap:12px">
