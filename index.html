@@ -1105,7 +1105,7 @@
       flex-direction: column;
       overflow: hidden;
       width: 100%;
-      /* Asegurar ancho total */
+      height: calc(100vh - 64px);
     }
 
     /* ── DASHBOARD 2.0 MINI METRICS ── */
@@ -2082,158 +2082,7 @@
     .estado-metric.highlight .estado-metric-lbl {
       color: rgba(197, 211, 54, 0.75);
     }
-    .sidebar {
-      width: 164px;
-    }
-
-    .main {
-      padding: 16px 18px;
-    }
-
-    .resumen-shell {
-      height: calc(100vh - 64px);
-      padding: 8px 12px 10px !important;
-      overflow: hidden !important;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .resumen-grid {
-      flex: 1;
-      min-height: 0;
-      display: grid;
-      grid-template-columns: minmax(360px, 1.08fr) minmax(620px, 1.92fr);
-      gap: 10px;
-      align-items: stretch;
-    }
-
-    .resumen-stack {
-      min-height: 0;
-      display: grid;
-      gap: 10px;
-      align-content: stretch;
-    }
-
-    .resumen-stack-main {
-      grid-template-rows: minmax(0, 1.18fr) minmax(0, .82fr);
-    }
-
-    .resumen-stack-side {
-      grid-template-rows: minmax(0, auto) minmax(0, 1fr);
-    }
-
-    .resumen-top-cards {
-      min-height: 0;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      align-items: stretch;
-    }
-
-    .resumen-card,
-    .resumen-card .cw,
-    .resumen-card .kpi-modern,
-    .resumen-chart-card,
-    .resumen-chart-card .cw {
-      min-height: 0;
-    }
-
-    .resumen-card > .kpi-modern,
-    .resumen-chart-card {
-      height: 100%;
-    }
-
-    .resumen-chart-card {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .resumen-chart-card .cw {
-      flex: 1;
-      padding: 0 10px 8px !important;
-    }
-
-    .resumen-chart-card canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
-    .resumen-donut-card .cw {
-      padding: 4px 10px 10px !important;
-    }
-
-    .resumen-trend-card .ch,
-    .resumen-donut-card .ch {
-      padding: 6px 12px !important;
-    }
-
-    .resumen-trend-card .ct,
-    .resumen-donut-card .ct {
-      font-size: 11px !important;
-    }
-
-    @media(max-width:1280px) {
-      .sidebar {
-        width: 156px;
-      }
-
-      .main {
-        padding: 16px 18px;
-      }
-
-      .sidebar {
-      width: 164px;
-    }
-
-    .main {
-      padding: 16px 18px;
-    }
-
-    .resumen-shell {
-        padding: 6px 8px 8px !important;
-      }
-
-      .estado-hero {
-        padding: 12px 16px 14px;
-      }
-
-      .estado-hero-metrics {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .resumen-grid {
-        grid-template-columns: minmax(320px, 1fr) minmax(520px, 1.45fr);
-      }
-    }
-
-    @media(max-width:1100px) {
-      .sidebar {
-      width: 164px;
-    }
-
-    .main {
-      padding: 16px 18px;
-    }
-
-    .resumen-shell {
-        height: auto;
-        overflow: auto !important;
-      }
-
-      .resumen-grid,
-      .resumen-top-cards {
-        grid-template-columns: 1fr;
-      }
-
-      .resumen-stack-main,
-      .resumen-stack-side {
-        grid-template-rows: none;
-      }
-    }
-
-    /* ?????? DIARIO KPI mejorado ?????? */
+    /* ── DIARIO KPI mejorado ── */
     #tp-diario .sband {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -2324,7 +2173,7 @@
       <main class="main">
 
         <!-- ═══ RESUMEN ═══ -->
-        <div id="tp-resumen" class="tp on resumen-shell">
+        <div id="tp-resumen" class="tp on" style="padding:10px 18px; display:flex; flex-direction:column; height:100%; box-sizing:border-box; overflow:hidden">
 
           <!-- Section 1: ESTADO GENERAL COMPAÑÍA Hero Banner -->
           <div class="estado-hero fu" style="margin-bottom:12px">
@@ -2353,39 +2202,40 @@
             <div id="res-band" class="estado-hero-metrics"></div>
           </div>
 
-          <!-- Section 2: Unified Summary Layout -->
-          <div class="resumen-grid">
-            <!-- Col 1: Banca Card + Distribution Chart -->
-            <div class="resumen-stack resumen-stack-side">
-              <div id="res-col-banca" class="resumen-card"></div>
-              <div class="card fu fu4 resumen-chart-card resumen-donut-card">
-                <div class="ch">
-                  <div class="ct">Distribucion %</div>
-                </div>
-                <div class="cw"><canvas id="ch-res-dona"></canvas></div>
+          <!-- Section 2: Mosaic Summary Layout -->
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; align-items: stretch; flex: 1; min-height: 0; margin-bottom: 8px">
+            <div id="res-grid-banca"></div>
+            <div id="res-grid-cirion"></div>
+            <div id="res-grid-liberty"></div>
+            
+            <!-- Row 2: Distribution Chart (Col 1) and Trend Graph (Col 2-3) -->
+            <div class="card fu fu4" style="display:flex; flex-direction:column; min-height: 280px; margin-bottom: 0">
+              <div class="ch" style="padding:6px 14px">
+                <div class="ct" style="font-size:11px">Distribución %</div>
+              </div>
+              <div class="cw" style="flex:1; padding:0 10px 10px; display:flex; align-items:center; justify-content:center">
+                <canvas id="ch-res-dona"></canvas>
               </div>
             </div>
             
-            <!-- Col 2: Cirion + Liberty (top) and Trend (bottom) -->
-            <div class="resumen-stack resumen-stack-main">
-               <div id="res-row-compact" class="resumen-top-cards"></div>
-               <div class="card fu fu3 resumen-chart-card resumen-trend-card">
-                 <div class="ch">
-                   <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
-                     <div class="ct">Tendencia Mensual</div>
-                     <div class="pills" id="res-trend-pills" style="padding:2px; scale:0.85; transform-origin:right">
-                       <button class="pill on" onclick="setTrendGer('TODOS')">Consolidado</button>
-                       <button class="pill" onclick="setTrendGer('CIRION')">Cirion</button>
-                       <button class="pill" onclick="setTrendGer('LIBERTY')">Liberty</button>
-                       <button class="pill" onclick="setTrendGer('BANCA')">Banca</button>
-                     </div>
-                   </div>
-                 </div>
-                 <div class="cw"><canvas id="ch-res-tend"></canvas></div>
-               </div>
+            <div class="card fu fu3" style="grid-column: span 2; display:flex; flex-direction:column; min-height: 280px; margin-bottom: 0">
+              <div class="ch" style="padding:6px 14px">
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
+                  <div class="ct" style="font-size:11px">Tendencia Mensual</div>
+                  <div class="pills" id="res-trend-pills" style="padding:2px; scale:0.8; transform-origin:right">
+                    <button class="pill on" onclick="setTrendGer('TODOS')">Consolidado</button>
+                    <button class="pill" onclick="setTrendGer('CIRION')">Cirion</button>
+                    <button class="pill" onclick="setTrendGer('LIBERTY')">Liberty</button>
+                    <button class="pill" onclick="setTrendGer('BANCA')">Banca</button>
+                  </div>
+                </div>
+              </div>
+              <div class="cw" style="flex:1; padding:0 10px 10px"><canvas id="ch-res-tend"></canvas></div>
             </div>
           </div>
         </div>
+
+        <!-- ═══ DIARIO ═══ -->
         <div id="tp-diario" class="tp">
           <div class="ph fu">
             <div>
@@ -3210,12 +3060,13 @@
           <div class="estado-metric"><span class="estado-metric-val" style="color:${cumpAcumTotal >= 95 ? '#4ade80' : cumpAcumTotal >= 75 ? '#fbbf24' : '#f87171'}">${cumpAcumTotal}%</span><span class="estado-metric-lbl">%Cump Año</span></div>`;
       }
 
-      const colBanca = document.getElementById('res-col-banca');
-      const rowCompact = document.getElementById('res-row-compact');
-      if (colBanca && rowCompact) {
-        colBanca.innerHTML = renderUnifiedProjectCard('BANCA', range, resD1, resD2);
-        rowCompact.innerHTML = renderCompactProjectCard('CIRION', range, resD1, resD2) + 
-                               renderCompactProjectCard('LIBERTY', range, resD1, resD2);
+      const gBanca = document.getElementById('res-grid-banca');
+      const gCirion = document.getElementById('res-grid-cirion');
+      const gLiberty = document.getElementById('res-grid-liberty');
+      if (gBanca && gCirion && gLiberty) {
+        gBanca.innerHTML = renderUnifiedProjectCard('BANCA', range, resD1, resD2);
+        gCirion.innerHTML = renderCompactProjectCard('CIRION', range, resD1, resD2);
+        gLiberty.innerHTML = renderCompactProjectCard('LIBERTY', range, resD1, resD2);
       }
 
       // Tendencia — Siempre 12 meses, filtrable por proyecto
@@ -3447,41 +3298,42 @@
       const colorBg       = bgColor;
 
       return `
-        <div style="background:${colorBg}; border-radius:10px; padding:10px 11px; border:1px solid ${accentColor}33">
-          <!-- Header -->
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
-            <span style="font-size:11px; font-weight:800; color:${accentColor}">${emoji} ${label}</span>
-          </div>
-          <!-- Métricas 2x2 -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:8px">
-            <div style="background:#fff; border-radius:6px; padding:5px 7px">
-              <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase; letter-spacing:.5px">Prod. Periodo</div>
-              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${accentColor}; margin-top:1px">${fmtCOP(prodPeriodo)}</div>
+        <div style="background:${colorBg}; border-radius:8px; padding:8px 10px; border:1px solid ${accentColor}25; height: 100%; display: flex; flex-direction: column; justify-content: space-between">
+          <div>
+            <!-- Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px">
+              <span style="font-size:10px; font-weight:800; color:${accentColor}">${emoji} ${label}</span>
             </div>
-            <div style="background:#fff; border-radius:6px; padding:5px 7px">
-              <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase; letter-spacing:.5px">Meta Periodo</div>
-              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2); margin-top:1px">${fmtCOP(metaPeriodo)}</div>
-            </div>
-            <div style="background:#fff; border-radius:6px; padding:5px 7px">
-              <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase; letter-spacing:.5px">Prod. Acumulada</div>
-              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--tx); margin-top:1px">${fmtCOP(prodAcum)}</div>
-            </div>
-            <div style="background:#fff; border-radius:6px; padding:5px 7px">
-              <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase; letter-spacing:.5px">Meta Acumulada</div>
-              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2); margin-top:1px">${fmtCOP(metaAcum)}</div>
+            <!-- Métricas 2x2 -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:6px">
+              <div style="background:#fff; border-radius:5px; padding:4px 6px">
+                <div style="font-size:7px; color:var(--txl); font-weight:700; text-transform:uppercase">Producción</div>
+                <div style="font-family:'DM Mono',monospace; font-size:10px; font-weight:800; color:${accentColor}">${fmtCOP(prodPeriodo)}</div>
+              </div>
+              <div style="background:#fff; border-radius:5px; padding:4px 6px">
+                <div style="font-size:7px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta</div>
+                <div style="font-family:'DM Mono',monospace; font-size:10px; font-weight:800; color:var(--lima2)">${fmtCOP(metaPeriodo)}</div>
+              </div>
+              <div style="background:#fff; border-radius:5px; padding:4px 6px">
+                <div style="font-size:7px; color:var(--txl); font-weight:700; text-transform:uppercase">Acumulado</div>
+                <div style="font-family:'DM Mono',monospace; font-size:10px; font-weight:800; color:var(--tx)">${fmtCOP(prodAcum)}</div>
+              </div>
+              <div style="background:#fff; border-radius:5px; padding:4px 6px">
+                <div style="font-size:7px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acum.</div>
+                <div style="font-family:'DM Mono',monospace; font-size:10px; font-weight:800; color:var(--lima2)">${fmtCOP(metaAcum)}</div>
+              </div>
             </div>
           </div>
 
           <!-- Meta anual -->
-          <div style="border-top:1px solid ${accentColor}22; padding-top:6px; margin-top:3px">
-            <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:2px">
+          <div style="border-top:1px solid ${accentColor}15; padding-top:5px">
+            <div style="display:flex; justify-content:space-between; font-size:8px; font-weight:700; color:var(--txm); margin-bottom:2px">
               <span>Avance Anual</span>
-              <span style="color:var(--txm)">${progrAnual}%</span>
+              <span>${progrAnual}%</span>
             </div>
-            <div style="height:4px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+            <div style="height:3.5px; background:#e2e8f0; border-radius:4px; overflow:hidden">
               <div style="height:100%; width:${Math.min(progrAnual,100)}%; background:${accentColor}55; border-radius:4px"></div>
             </div>
-            <div style="font-size:7.5px; color:var(--txl); text-align:right; margin-top:2px; font-weight:700">META: ${fmtCOP(metaAnualSub)}</div>
           </div>
         </div>`;
     }
@@ -3490,24 +3342,22 @@
       const color = GC[ger];
       const prod = prodReal(ger, range, d1, d2);
       const meta = metaMes(ger, range);
-      const cm = pct(prod, meta);
       const lastMonth = range[range.length - 1];
       const prodA = prodAcumYTD(ger, lastMonth);
       const metaA = metaAcumYTD(ger, lastMonth);
-      const ca = pct(prodA, metaA);
       const metaAnualVal = metaAnual(ger);
       const progresoAnual = pct(prodA, metaAnualVal);
       const faltantePeriodo = Math.max(0, meta - prod);
       const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
 
-      // Sub-proyectos Banca con datos reales — horizontal row
+      // Sub-proyectos Banca con datos reales
       let subProyHtml = '';
       if (ger === 'BANCA') {
-        const wHtml = renderSubProyectoCard('Wompi',  '💳', '#166534', 'rgba(22,101,52,.06)',  isWompi,  range, d1, d2, lastMonth);
-        const rHtml = renderSubProyectoCard('Redeban','🏦', '#0847a3', 'rgba(8,71,163,.06)',   isRedeban,range, d1, d2, lastMonth);
+        const wHtml = renderSubProyectoCard('Wompi', '💳', '#166534', 'rgba(22,101,52,.06)', isWompi, range, d1, d2, lastMonth);
+        const rHtml = renderSubProyectoCard('Redeban', '🏦', '#0847a3', 'rgba(8,71,163,.06)', isRedeban, range, d1, d2, lastMonth);
         subProyHtml = `
-          <div style="margin-top:10px; border-top:1.5px solid var(--border); padding-top:10px">
-            <div style="font-size:9px; font-weight:800; color:var(--txl); text-transform:uppercase; letter-spacing:.8px; margin-bottom:8px">📦 Sub-proyectos</div>
+          <div style="margin-top:8px; border-top:1.5px solid var(--border); padding-top:8px">
+            <div style="font-size:9px; font-weight:800; color:var(--txl); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px">📦 Sub-proyectos</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
               ${rHtml}
               ${wHtml}
@@ -3516,122 +3366,109 @@
       }
 
       return `
-    <div class="kpi-modern" style="--hover-color:${color}; overflow:visible">
-      <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0">
-        <span class="km-title">${ger}</span>
-        <span class="km-icon">${icons[ger] || '📈'}</span>
-      </div>
-      <div style="padding:12px 12px 14px; display:flex; flex-direction:column; gap:8px">
+      <div class="kpi-modern" style="--hover-color:${color}; overflow:visible; height: 100%; display: flex; flex-direction: column">
+        <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 8px 12px">
+          <span class="km-title">${ger}</span>
+          <span class="km-icon">${icons[ger] || '📈'}</span>
+        </div>
+        <div style="padding:10px 12px; flex: 1; display:flex; flex-direction:column; gap:6px; justify-content: space-between">
+          <div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom: 4px">
+              <div>
+                <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:1px">Producción</div>
+                <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
+              </div>
+              <div>
+                <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:1px">Meta</div>
+                <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
+              </div>
+            </div>
+            ${faltantePeriodo > 0 ? `<div style="font-size:8px; color:var(--bad); font-family:'DM Mono',monospace; font-weight:700; margin-bottom: 4px">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:8px; color:var(--ok); font-weight:700; margin-bottom: 4px">✓ Meta superada</div>`}
 
-        <!-- Producción vs Meta -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
-          <div>
-            <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.7px; margin-bottom:2px">Producción Periodo</div>
-            <div style="font-family:'DM Mono',monospace; font-size:14px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
+            <div style="border-top:1px solid var(--border); padding-top:6px; display:grid; grid-template-columns:1fr 1fr; gap:6px">
+              <div>
+                <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Acumulada</div>
+                <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div>
+              </div>
+              <div>
+                <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acum.</div>
+                <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div>
+              </div>
+            </div>
           </div>
-          <div>
-            <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.7px; margin-bottom:2px">Meta Periodo</div>
-            <div style="font-family:'DM Mono',monospace; font-size:14px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
+
+          ${subProyHtml}
+
+          <div style="border-top:1px solid var(--border); padding-top:6px">
+            <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:2px">
+              <span>Avance Anual</span>
+              <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
+            </div>
+            <div style="height:4px; background:#e2e8f0; border-radius:3px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:3px"></div>
+            </div>
           </div>
         </div>
-
-          ${faltantePeriodo>0 ? `<div style="font-size:8px; color:var(--bad); margin-top:2px; font-family:'DM Mono',monospace; font-weight:700">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:8px; color:var(--ok); margin-top:2px; font-weight:700">✓ Meta superada</div>`}
-
-        <!-- Acumulados -->
-        <div style="border-top:1px solid var(--border); padding-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:6px">
-          <div>
-            <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Prod. Acumulada</div>
-            <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div>
-          </div>
-          <div>
-            <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acumulada</div>
-            <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div>
-          </div>
-        </div>
-
-
-
-        <!-- Progreso anual -->
-        <div style="border-top:1px solid var(--border); padding-top:8px">
-          <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:3px">
-            <span>Avance vs Meta Anual</span>
-            <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
-          </div>
-          <div style="height:4px; background:#e2e8f0; border-radius:3px; overflow:hidden">
-            <div style="height:100%; width:${Math.min(progresoAnual,100)}%; background:${color}88; border-radius:3px"></div>
-          </div>
-          <div style="font-size:7.5px; color:var(--txl); text-align:right; margin-top:2px; font-weight:700">META ANUAL: ${fmtCOP(metaAnualVal)}</div>
-        </div>
-
-        ${subProyHtml}
-      </div>
-    </div>`;
+      </div>`;
     }
 
-
-
-
-    // ══════════════════════════════════════════════
-    // COMPACT PROJECT CARD (Cirion & Liberty in Resumen)
-    // ══════════════════════════════════════════════
     function renderCompactProjectCard(ger, range, d1, d2) {
       const color = GC[ger];
       const prod = prodReal(ger, range, d1, d2);
       const meta = metaMes(ger, range);
-      const cm = pct(prod, meta);
       const lastMonth = range[range.length - 1];
       const prodA = prodAcumYTD(ger, lastMonth);
       const metaA = metaAcumYTD(ger, lastMonth);
-      const ca = pct(prodA, metaA);
       const metaAnualVal = metaAnual(ger);
       const progresoAnual = pct(prodA, metaAnualVal);
       const faltantePeriodo = Math.max(0, meta - prod);
       const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
 
       return `
-    <div class="kpi-modern" style="--hover-color:${color}; overflow:visible">
-      <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0">
-        <span class="km-title">${ger}</span>
-        <span class="km-icon">${icons[ger] || '📈'}</span>
-      </div>
-      <div style="padding:12px 12px 14px; display:flex; flex-direction:column; gap:8px">
-        <!-- Producción vs Meta -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
-          <div>
-            <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:2px">Producción</div>
-            <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
-          </div>
-          <div>
-            <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:2px">Meta</div>
-            <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
-          </div>
+      <div class="kpi-modern" style="--hover-color:${color}; overflow:visible; height: 100%; display: flex; flex-direction: column">
+        <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 8px 12px">
+          <span class="km-title">${ger}</span>
+          <span class="km-icon">${icons[ger] || '📈'}</span>
         </div>
-          ${faltantePeriodo>0 ? `<div style="font-size:8px; color:var(--bad); margin-top:2px; font-family:'DM Mono',monospace; font-weight:700">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:8px; color:var(--ok); margin-top:2px; font-weight:700">✓ Meta superada</div>`}
-        <!-- Acumulados -->
-        <div style="border-top:1px solid var(--border); padding-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:6px">
+        <div style="padding:10px 12px; flex: 1; display:flex; flex-direction:column; gap:6px; justify-content: space-between">
           <div>
-            <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Acumulado</div>
-            <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div>
-          </div>
-          <div>
-            <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acumulada</div>
-            <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div>
-          </div>
-        </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom: 6px">
+              <div>
+                <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:1px">Producción</div>
+                <div style="font-family:'DM Mono',monospace; font-size:14px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
+              </div>
+              <div>
+                <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:1px">Meta</div>
+                <div style="font-family:'DM Mono',monospace; font-size:14px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
+              </div>
+            </div>
+            ${faltantePeriodo > 0 ? `<div style="font-size:8px; color:var(--bad); font-family:'DM Mono',monospace; font-weight:700; margin-bottom: 8px">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:8px; color:var(--ok); font-weight:700; margin-bottom: 8px">✓ Meta superada</div>`}
 
-        <!-- Progreso anual -->
-        <div style="border-top:1px solid var(--border); padding-top:8px">
-          <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:3px">
-            <span>Avance vs Meta Anual</span>
-            <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
+            <div style="border-top:1px solid var(--border); padding-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:6px">
+              <div>
+                <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Acumulada</div>
+                <div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div>
+              </div>
+              <div>
+                <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acum.</div>
+                <div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div>
+              </div>
+            </div>
           </div>
-          <div style="height:5px; background:#e2e8f0; border-radius:3px; overflow:hidden">
-            <div style="height:100%; width:${Math.min(progresoAnual,100)}%; background:${color}88; border-radius:3px"></div>
+
+          <div style="border-top:1px solid var(--border); padding-top:8px">
+            <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--txm); margin-bottom:4px">
+              <span>Avance Anual</span>
+              <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
+            </div>
+            <div style="height:5px; background:#e2e8f0; border-radius:3px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:3px"></div>
+            </div>
+            <div style="font-size:7.5px; color:var(--txl); text-align:right; margin-top:3px; font-weight:700">META ANUAL: ${fmtCOP(metaAnualVal)}</div>
           </div>
-          <div style="font-size:7.5px; color:var(--txl); text-align:right; margin-top:3px; font-weight:700">META ANUAL: ${fmtCOP(metaAnualVal)}</div>
         </div>
-      </div>
-    </div>`;
+      </div>`;
+    }
     }
     function kpi(lbl, val, sub, cls = '', ico = '', p = null, delay = 0) {
       return `<div class="kc" style="animation-delay:${delay}s">
