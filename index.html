@@ -1,0 +1,4284 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Dashboard Producción · Línea Comunicaciones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&amp;family=DM+Mono:ital,wght@0,400;0,500;1,400&amp;display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+  <style>
+    :root {
+      --azul: #001D62;
+      --azul2: #052c8a;
+      --azul3: #0a3bb6;
+      --lima: #166534;
+      /* Más oscuro para legibilidad */
+      --lima2: #166534;
+      /* Esmeralda profundo */
+      --lima3: rgba(22, 101, 52, .08);
+      --bg: #edf2f7;
+      /* Background más premium */
+      --white: #fff;
+      --border: #d1d9e6;
+      --tx: #1a202c;
+      --txm: #4a5568;
+      --txl: #718096;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --r: 20px;
+      --rs: 12px;
+      --glass: rgba(255, 255, 255, 0.9);
+      --sh: 0 10px 25px rgba(0, 0, 0, 0.05);
+      --sh2: 0 20px 48px rgba(0, 29, 98, 0.12);
+      --grad: linear-gradient(135deg, #001D62 0%, #0847a3 100%);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      min-height: 100vh;
+      overflow-x: hidden
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #e4e8f3
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #b0bbd6;
+      border-radius: 3px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--azul2)
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0
+      }
+
+      100% {
+        background-position: 200% 0
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: .45
+      }
+
+      50% {
+        opacity: .9
+      }
+    }
+
+    @keyframes countIn {
+      from {
+        opacity: 0;
+        transform: scale(.82)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    .fu {
+      animation: fadeUp .4s ease both
+    }
+
+    .fu1 {
+      animation-delay: .05s
+    }
+
+    .fu2 {
+      animation-delay: .1s
+    }
+
+    .fu3 {
+      animation-delay: .15s
+    }
+
+    .fu4 {
+      animation-delay: .2s
+    }
+
+    /* ── LOGIN ── */
+    #login {
+      position: fixed;
+      inset: 0;
+      background: var(--azul);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      overflow: hidden;
+      transition: opacity .45s, visibility .45s
+    }
+
+    #login.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none
+    }
+
+    #login::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 65% 70% at 10% 20%, rgba(197, 211, 54, .16) 0%, transparent 60%), radial-gradient(ellipse 55% 60% at 90% 80%, rgba(197, 211, 54, .10) 0%, transparent 60%);
+      pointer-events: none
+    }
+
+    #login::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(197, 211, 54, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(197, 211, 54, .05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none
+    }
+
+    .login-orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: pulse 5s ease-in-out infinite
+    }
+
+    .orb1 {
+      width: 480px;
+      height: 480px;
+      right: -140px;
+      top: -140px;
+      background: radial-gradient(circle, rgba(197, 211, 54, .13) 0%, transparent 70%)
+    }
+
+    .orb2 {
+      width: 320px;
+      height: 320px;
+      left: -80px;
+      bottom: -80px;
+      background: radial-gradient(circle, rgba(197, 211, 54, .08) 0%, transparent 70%);
+      animation-delay: 2.5s
+    }
+
+    .lcard {
+      background: rgba(255, 255, 255, .97);
+      border-radius: 22px;
+      padding: 48px 44px 40px;
+      width: 440px;
+      max-width: 94vw;
+      position: relative;
+      z-index: 2;
+      animation: fadeUp .55s cubic-bezier(.34, 1.56, .64, 1);
+      box-shadow: 0 28px 72px rgba(0, 0, 0, .28), 0 6px 20px rgba(0, 0, 0, .18);
+      overflow: hidden
+    }
+
+    .lcard::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--azul) 0%, var(--lima) 50%, var(--azul) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite
+    }
+
+    .llogo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px
+    }
+
+    .ltitle {
+      font-size: 21px;
+      font-weight: 800;
+      color: var(--azul);
+      margin-bottom: 5px;
+      letter-spacing: -.3px;
+      text-align: center
+    }
+
+    .ldesc {
+      font-size: 12.5px;
+      color: var(--txm);
+      margin-bottom: 32px;
+      text-align: center;
+      line-height: 1.6
+    }
+
+    .lerr {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      border-radius: var(--rs);
+      padding: 10px 14px;
+      color: var(--bad);
+      font-size: 12.5px;
+      margin-bottom: 14px;
+      display: none
+    }
+
+    .btn-ms {
+      width: 100%;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      background: var(--azul);
+      color: #fff;
+      border: none;
+      border-radius: var(--rs);
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+      overflow: hidden
+    }
+
+    .btn-ms::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, .1) 50%, transparent 100%);
+      transform: translateX(-100%);
+      transition: transform .4s
+    }
+
+    .btn-ms:hover {
+      background: var(--azul2);
+      box-shadow: 0 4px 18px rgba(0, 29, 98, .4)
+    }
+
+    .btn-ms:hover::after {
+      transform: translateX(100%)
+    }
+
+    .btn-ms:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .div-or {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #c0cce0;
+      font-size: 11.5px;
+      font-weight: 500;
+      margin: 16px 0
+    }
+
+    .div-or::before,
+    .div-or::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    .btn-demo {
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: var(--rs);
+      color: var(--txm);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .btn-demo:hover {
+      border-color: var(--lima2);
+      color: var(--tx)
+    }
+
+    .lfooter {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 11px;
+      color: #c0cce0;
+      line-height: 1.7
+    }
+
+    /* ── APP ── */
+    #app {
+      display: none
+    }
+
+    #app.on {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      animation: fadeIn .35s ease
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: rgba(0, 29, 98, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--lima);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15)
+    }
+
+    .tb-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.3px
+    }
+
+    .tb-brand em {
+      color: var(--lima);
+      font-style: normal
+    }
+
+    .tb-sep {
+      width: 1px;
+      height: 24px;
+      background: rgba(255, 255, 255, .15);
+      margin: 0 12px
+    }
+
+    .tb-mod {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .55);
+      letter-spacing: .6px;
+      text-transform: uppercase
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .tb-badge {
+      background: rgba(255, 255, 255, .15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, .35);
+      font-family: 'DM Mono', monospace;
+      font-size: 10.5px;
+      padding: 3px 10px;
+      border-radius: 20px
+    }
+
+    .btn-out {
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, .1);
+      border: 1px solid rgba(255, 255, 255, .14);
+      color: rgba(255, 255, 255, .8);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .btn-out:hover {
+      background: rgba(255, 255, 255, .18)
+    }
+
+    .uchip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 3px 11px 3px 5px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, .1);
+      border: 1px solid rgba(255, 255, 255, .12);
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .uchip:hover {
+      background: rgba(255, 255, 255, .18)
+    }
+
+    .uav {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--lima), var(--azul3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      overflow: hidden
+    }
+
+    .uav img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .uname {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2
+    }
+
+    .urole {
+      font-size: 9.5px;
+      color: rgba(255, 255, 255, .5)
+    }
+
+    /* ── BODY ── */
+    .abody {
+      display: flex;
+      flex: 1
+    }
+
+    /* ── SIDEBAR ── */
+    .sband {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px
+    }
+
+    .si {
+      background: var(--white);
+      padding: 24px 22px;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--sh);
+      transition: all .4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .si:hover {
+      transform: translateY(-6px) scale(1.01);
+      border-color: var(--azul2);
+      box-shadow: var(--sh2);
+    }
+
+    .si::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 29, 98, 0.03) 0%, transparent 68%);
+      pointer-events: none;
+    }
+
+    .sn {
+      font-family: 'DM Mono', monospace;
+      font-size: 20px;
+      font-weight: 800;
+      color: #001D62 !important;
+      /* Forzado profundo */
+      letter-spacing: -0.5px;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .km-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #001D62 !important;
+      /* Forzado profundo */
+      font-family: 'DM Mono', monospace;
+      white-space: nowrap
+    }
+
+    .sn.lima {
+      color: #166534;
+      /* Fallback color sólido */
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: none;
+    }
+
+    .sl {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--txm);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .sidebar {
+      width: 210px;
+      flex-shrink: 0;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 60px;
+      height: calc(100vh - 60px);
+      overflow-y: auto
+    }
+
+    .sb-sec {
+      padding: 18px 14px 6px;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--txl);
+      letter-spacing: 1.2px;
+      text-transform: uppercase
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 14px;
+      margin: 1px 7px;
+      border-radius: var(--rs);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--txm);
+      cursor: pointer;
+      transition: all .18s;
+      border: none;
+      background: transparent;
+      width: calc(100% - 14px);
+      text-align: left
+    }
+
+    .nav:hover {
+      background: rgba(0, 29, 98, .06);
+      color: var(--azul)
+    }
+
+    .nav.act {
+      background: var(--grad);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 29, 98, 0.2);
+      transform: translateX(4px)
+    }
+
+    .nav.act .ni {
+      color: var(--lima)
+    }
+
+    .ni {
+      font-size: 15px;
+      flex-shrink: 0
+    }
+
+    .nl {
+      flex: 1
+    }
+
+    .nc {
+      font-family: 'DM Mono', monospace;
+      font-size: 9.5px;
+      background: var(--lima);
+      color: var(--azul);
+      border-radius: 9px;
+      padding: 1px 6px;
+      font-weight: 700
+    }
+
+    .nav.act .nc {
+      background: rgba(197, 211, 54, .28);
+      color: var(--lima)
+    }
+
+    .sb-bot {
+      margin-top: auto;
+      padding: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 10.5px;
+      color: var(--txl);
+      line-height: 1.7
+    }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      padding: 24px 28px;
+      overflow-y: auto;
+      min-width: 0
+    }
+
+    .ph {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 14px;
+      flex-wrap: wrap
+    }
+
+    .pt {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--azul);
+      letter-spacing: -.5px;
+      line-height: 1.2
+    }
+
+    .ps {
+      font-size: 12.5px;
+      color: var(--txm);
+      margin-top: 3px
+    }
+
+    .pa {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    /* ── TABS ── */
+    .tp {
+      display: none
+    }
+
+    .tp.on {
+      display: block;
+      animation: fadeIn .28s ease
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      box-shadow: var(--sh);
+      overflow: hidden
+    }
+
+    .card:hover {
+      box-shadow: var(--sh2)
+    }
+
+    .ch {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px
+    }
+
+    .ct {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--azul)
+    }
+
+    .cs {
+      font-size: 11px;
+      color: var(--txm);
+      margin-top: 1px
+    }
+
+    .cw {
+      padding: 14px
+    }
+
+    /* ── KPI GRID ── */
+    .kg {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px
+    }
+
+    .kc {
+      background: var(--white);
+      border-radius: var(--r);
+      padding: 18px;
+      border: 1px solid var(--border);
+      box-shadow: var(--sh);
+      transition: all .18s;
+      position: relative;
+      overflow: hidden;
+      animation: countIn .38s ease both
+    }
+
+    .kc:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--sh2)
+    }
+
+    .kc::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--azul), var(--lima))
+    }
+
+    .kl {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--txm);
+      text-transform: uppercase;
+      letter-spacing: .9px;
+      margin-bottom: 6px
+    }
+
+    .kv {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--azul);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 3px
+    }
+
+    .kv.ok {
+      color: #166534
+    }
+
+    .kv.warn {
+      color: #854d0e
+    }
+
+    .kv.bad {
+      color: #991b1b
+    }
+
+    .kv.lima {
+      color: var(--lima2)
+    }
+
+    .ks {
+      font-size: 11px;
+      color: var(--txm);
+      line-height: 1.4
+    }
+
+    .kico {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      font-size: 24px;
+      opacity: .11
+    }
+
+    .kbar {
+      margin-top: 9px;
+      height: 4px;
+      background: var(--bg);
+      border-radius: 2px;
+      overflow: hidden
+    }
+
+    .kbf {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--azul), var(--lima));
+      transition: width .55s ease
+    }
+
+    /* ── SECTION LABEL ── */
+    .slbl {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--azul);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .slbl::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    /* ── GRIDS ── */
+    .g2 {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 20px
+    }
+
+    .g3 {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 20px
+    }
+
+    .g2 {
+      grid-template-columns: repeat(2, 1fr)
+    }
+
+    .g3 {
+      grid-template-columns: repeat(3, 1fr)
+    }
+
+    .g12 {
+      grid-template-columns: 1.5fr 1fr
+    }
+
+    .g21 {
+      display: grid;
+      grid-template-columns: 2fr 1fr
+    }
+
+    @media(max-width:960px) {
+
+      .g2,
+      .g3,
+      .g12,
+      .g21 {
+        grid-template-columns: 1fr !important
+      }
+    }
+
+    /* ── CUMPL GAUGE ── */
+    .cgw {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px 18px
+    }
+
+    .cgr {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px
+    }
+
+    .cgl {
+      width: 60px;
+      color: var(--txm);
+      font-weight: 600;
+      flex-shrink: 0;
+      text-align: right;
+      font-size: 10px
+    }
+
+    .cgb {
+      flex: 1;
+      height: 9px;
+      background: var(--bg);
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative
+    }
+
+    .cgf {
+      height: 100%;
+      border-radius: 5px;
+      transition: width .55s ease
+    }
+
+    .cgf.ok {
+      background: linear-gradient(90deg, #22c55e, #4ade80)
+    }
+
+    .cgf.warn {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24)
+    }
+
+    .cgf.bad {
+      background: linear-gradient(90deg, #e8334a, #f87171)
+    }
+
+    .cgp {
+      width: 40px;
+      font-weight: 700;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px
+    }
+
+    /* ── PROJ BLOCK ── */
+    .pb {
+      background: var(--white);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      box-shadow: var(--sh);
+      overflow: hidden
+    }
+
+    .pbh {
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .pbt {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -.2px
+    }
+
+    .pbb {
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    .pi {}
+
+    .pil {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--txm);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 1px
+    }
+
+    .piv {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--azul);
+      letter-spacing: -.4px;
+      font-family: 'DM Mono', monospace
+    }
+
+    .piv.ok {
+      color: #166534
+    }
+
+    .piv.warn {
+      color: #854d0e
+    }
+
+    .piv.bad {
+      color: #991b1b
+    }
+
+    .piv.lima {
+      color: var(--lima2)
+    }
+
+    /* ── MODERN KPI CARD ── */
+    .kpi-modern {
+      background: var(--white);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      box-shadow: var(--sh);
+      overflow: hidden;
+      transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column
+    }
+
+    .kpi-modern:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px var(--hover-color, rgba(0, 29, 98, 0.2)), 0 5px 15px rgba(0, 0, 0, 0.05);
+      border-color: var(--hover-color, transparent);
+    }
+
+    .km-head {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+      position: relative
+    }
+
+    #tp-resumen .km-head {
+      padding: 8px 12px;
+    }
+
+    .km-head::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255, 255, 255, .1), transparent);
+      pointer-events: none
+    }
+
+    .km-title {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px
+    }
+
+    .km-icon {
+      font-size: 20px;
+      opacity: .8
+    }
+
+    .main {
+      flex: 1;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      /* Asegurar ancho total */
+    }
+
+    /* ── DASHBOARD 2.0 MINI METRICS ── */
+    .si-mini {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 6px 14px;
+      background: var(--azul);
+      border-radius: 10px;
+      border: none;
+      min-width: 100px;
+      box-shadow: 0 4px 14px rgba(0, 29, 98, 0.22);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .si-mini::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .sn-mini {
+      font-family: 'DM Mono', monospace;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .sl-mini {
+      font-size: 8px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.65);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .km-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1
+    }
+
+    #tp-resumen .km-body {
+      padding: 10px 12px;
+      gap: 8px;
+    }
+
+    .km-main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 12px
+    }
+
+    #tp-resumen .km-main {
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .km-val-box {
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .km-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--txl);
+      text-transform: uppercase;
+      letter-spacing: .8px
+    }
+
+    .km-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--azul);
+      font-family: 'DM Mono', monospace;
+      white-space: nowrap
+    }
+
+    .km-progress-area {
+      margin-bottom: 20px
+    }
+
+    .km-prog-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 6px
+    }
+
+    .km-prog-txt {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--txm)
+    }
+
+    .km-prog-pct {
+      font-size: 14px;
+      font-weight: 800;
+      font-family: 'DM Mono', monospace
+    }
+
+    .km-bar {
+      height: 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden
+    }
+
+    .km-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width .8s cubic-bezier(0.34, 1.56, 0.64, 1)
+    }
+
+    .km-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border)
+    }
+
+    #tp-resumen .km-footer {
+      padding-top: 8px;
+      gap: 8px;
+    }
+
+    .km-sub-box {
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .km-sub-label {
+      font-size: 8.5px;
+      font-weight: 600;
+      color: var(--txl);
+      text-transform: uppercase
+    }
+
+    .km-sub-val {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--txm);
+      font-family: 'DM Mono', monospace
+    }
+
+    /* ── VAR CHIP ── */
+    .vchip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 10.5px;
+      font-weight: 700;
+      font-family: 'DM Mono', monospace
+    }
+
+    .vchip.p {
+      background: #dcfce7;
+      color: #166534
+    }
+
+    .vchip.n {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .vchip.z {
+      background: #f3f4f6;
+      color: #6b7280
+    }
+
+    /* ── TABLE ── */
+    .tw {
+      overflow-x: auto
+    }
+
+    .dt {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.5px
+    }
+
+    .dt th {
+      background: #f4f6fb;
+      color: var(--txm);
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      padding: 9px 12px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      position: sticky;
+      top: 0;
+      z-index: 1
+    }
+
+    .dt th:hover {
+      background: #eceffa;
+      color: var(--azul)
+    }
+
+    .dt td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f0f2f8;
+      color: var(--tx);
+      max-width: 180px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .dt tr:hover td {
+      background: rgba(0, 29, 98, .025)
+    }
+
+    .tf {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      border-top: 1px solid var(--border);
+      font-size: 11.5px;
+      color: var(--txm)
+    }
+
+    .pg {
+      display: flex;
+      gap: 3px
+    }
+
+    .pb2 {
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      color: var(--txm);
+      cursor: pointer;
+      transition: all .18s;
+      font-family: 'Outfit', sans-serif
+    }
+
+    .pb2:hover {
+      border-color: var(--azul);
+      color: var(--azul)
+    }
+
+    .pb2.on {
+      background: var(--azul);
+      color: #fff;
+      border-color: var(--azul)
+    }
+
+    .pb2:disabled {
+      opacity: .35;
+      cursor: default
+    }
+
+    /* ── STATUS / BADGE ── */
+    .sp {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      white-space: nowrap
+    }
+
+    .sp.fin {
+      background: #dcfce7;
+      color: #166534
+    }
+
+    .sp.ejec {
+      background: #dbeafe;
+      color: #1d4ed8
+    }
+
+    .sp.pend {
+      background: #fef9c3;
+      color: #854d0e
+    }
+
+    .sp.canc {
+      background: #fee2e2;
+      color: #991b1b
+    }
+
+    .sp.def {
+      background: #f3f4f6;
+      color: #6b7280
+    }
+
+    .gb {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase
+    }
+
+    .gb.c {
+      background: rgba(0, 29, 98, .1);
+      color: #001D62
+    }
+
+    .gb.l {
+      background: rgba(8, 71, 163, .1);
+      color: #0847a3
+    }
+
+    .gb.b {
+      background: rgba(22, 101, 52, .1);
+      color: #166534
+    }
+
+    /* ── FILTER BAR ── */
+    .fb {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      box-shadow: var(--sh)
+    }
+
+    .fr {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 4px
+    }
+
+    .fg label {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--txm);
+      text-transform: uppercase;
+      letter-spacing: .7px
+    }
+
+    .fg select,
+    .fg input {
+      padding: 8px 11px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--rs);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      color: var(--tx);
+      outline: none;
+      transition: all .18s;
+      min-width: 130px
+    }
+
+    .fg select:focus,
+    .fg input:focus {
+      border-color: var(--azul);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(0, 29, 98, .07)
+    }
+
+    .dri {
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    .btn-app {
+      padding: 8px 16px;
+      background: var(--azul);
+      color: #fff;
+      border: none;
+      border-radius: var(--rs);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .btn-app:hover {
+      background: var(--azul2)
+    }
+
+    .btn-rst {
+      padding: 8px 12px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--txm);
+      border-radius: var(--rs);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all .2s
+    }
+
+    .btn-rst:hover {
+      border-color: var(--bad);
+      color: var(--bad)
+    }
+
+    /* ── FILTERS ── */
+    .pa {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .f-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      padding: 4px 12px;
+      border-radius: var(--rs);
+      border: 1.5px solid var(--border);
+      transition: all .2s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02)
+    }
+
+    .f-group:focus-within {
+      border-color: var(--azul);
+      box-shadow: 0 0 0 3px rgba(0, 29, 98, .08)
+    }
+
+    .f-group label {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--txl);
+      text-transform: uppercase;
+      letter-spacing: .5px
+    }
+
+    .f-sel {
+      border: none;
+      background: transparent;
+      outline: none;
+      color: var(--tx);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0
+    }
+
+    .btn-exp {
+      padding: 8px 16px;
+      background: var(--lima);
+      color: var(--azul);
+      border: none;
+      border-radius: var(--rs);
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(197, 211, 54, 0.3)
+    }
+
+    .btn-exp:hover {
+      background: var(--azul);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 29, 98, 0.2)
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes animIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .fu {
+      animation: animIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .fu1 {
+      animation-delay: 0.05s;
+    }
+
+    .fu2 {
+      animation-delay: 0.12s;
+    }
+
+    .fu3 {
+      animation-delay: 0.2s;
+    }
+
+    .fu4 {
+      animation-delay: 0.28s;
+    }
+
+    /* ── COMPANY BADGE ── */
+    .co-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--azul);
+      color: #fff;
+      border-radius: 30px;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 15px rgba(0, 29, 98, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .co-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--lima);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--lima);
+    }
+
+    /* ── PILL FILTERS ── */
+    .pills {
+      display: flex;
+      gap: 6px;
+      background: #f1f3f9;
+      padding: 4px;
+      border-radius: 12px;
+    }
+
+    .pill {
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--txm);
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+      background: transparent;
+    }
+
+    .pill:hover {
+      color: var(--azul);
+    }
+
+    .pill.on {
+      background: var(--white);
+      color: var(--azul);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ── UPLOAD ZONE ── */
+    .uz {
+      border: 2px dashed var(--border);
+      border-radius: var(--r);
+      padding: 36px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: var(--white)
+    }
+
+    .uz:hover,
+    .uz.dov {
+      border-color: var(--azul);
+      background: rgba(0, 29, 98, .025)
+    }
+
+    .uz .uico {
+      font-size: 32px;
+      margin-bottom: 10px;
+      opacity: .45
+    }
+
+    .uz p {
+      font-size: 13px;
+      color: var(--txm);
+      margin-bottom: 4px
+    }
+
+    .uz small {
+      font-size: 10.5px;
+      color: var(--txl)
+    }
+
+    /* ── PILL FILTERS ── */
+    .pf {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .pfb {
+      padding: 4px 13px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      color: var(--txm);
+      cursor: pointer;
+      transition: all .18s;
+      font-family: 'Outfit', sans-serif
+    }
+
+    .pfb:hover {
+      border-color: var(--azul);
+      color: var(--azul)
+    }
+
+    .pfb.on {
+      background: var(--azul);
+      color: #fff;
+      border-color: var(--azul)
+    }
+
+    /* ── SPINNER ── */
+    .spin {
+      width: 26px;
+      height: 26px;
+      border: 3px solid var(--border);
+      border-top-color: var(--azul);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+      margin: auto
+    }
+
+    .ls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 50px 20px;
+      color: var(--txm);
+      font-size: 12.5px
+    }
+
+    /* ── TOOLTIP mini ── */
+    .tip {
+      position: relative;
+      cursor: help
+    }
+
+    .tip::after {
+      content: attr(data-t);
+      position: absolute;
+      bottom: calc(100% + 7px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--azul);
+      color: #fff;
+      font-size: 10.5px;
+      padding: 5px 9px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .16s
+    }
+
+    .tip:hover::after {
+      opacity: 1
+    }
+
+    /* ── BOOT LOADER ── */
+    #boot {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--azul) 0%, #012a84 100%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      padding: 24px
+    }
+
+    #boot.on {
+      display: flex
+    }
+
+    .boot-card {
+      width: min(520px, 94vw);
+      background: rgba(255, 255, 255, .98);
+      border-radius: 24px;
+      padding: 34px 30px;
+      box-shadow: 0 28px 72px rgba(0, 0, 0, .28), 0 6px 20px rgba(0, 0, 0, .18);
+      position: relative;
+      overflow: hidden
+    }
+
+    .boot-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--azul), var(--lima), var(--azul));
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite
+    }
+
+    .boot-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--azul);
+      letter-spacing: -.4px;
+      margin-bottom: 4px
+    }
+
+    .boot-sub {
+      font-size: 12.5px;
+      color: var(--txm);
+      line-height: 1.6;
+      margin-bottom: 20px
+    }
+
+    .boot-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--txm)
+    }
+
+    .boot-bar {
+      height: 10px;
+      background: #e7ebf5;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 14px
+    }
+
+    .boot-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--azul), var(--lima));
+      transition: width .3s ease
+    }
+
+    .boot-steps {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px
+    }
+
+    .boot-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #f8faff;
+      font-size: 12px;
+      color: var(--txm)
+    }
+
+    .boot-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #c8d1e5;
+      flex-shrink: 0
+    }
+
+    .boot-step.ok .boot-dot {
+      background: var(--ok)
+    }
+
+    .boot-step.err .boot-dot {
+      background: var(--bad)
+    }
+
+    .boot-step.run .boot-dot {
+      background: var(--warn);
+      animation: pulse 1.2s ease infinite
+    }
+
+    .boot-msg {
+      margin-top: 16px;
+      background: #f7f9fe;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 12px;
+      color: var(--txm);
+      line-height: 1.6;
+      white-space: pre-line
+    }
+
+    .boot-msg.err {
+      background: #fff1f2;
+      border-color: #fecdd3;
+      color: #991b1b
+    }
+
+    @media(max-width:768px) {
+      .sidebar {
+        display: none
+      }
+
+      .main {
+        padding: 14px
+      }
+
+      .kg {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    /* ── ESTADO GENERAL HERO ── */
+    .estado-hero {
+      background: linear-gradient(135deg, #001D62 0%, #0a3bb6 60%, #0847a3 100%);
+      border-radius: 16px;
+      padding: 14px 20px 16px;
+      margin-bottom: 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 29, 98, 0.28), 0 2px 8px rgba(0, 29, 98, 0.15);
+      border: 1.5px solid rgba(197, 211, 54, 0.25);
+      flex-shrink: 0;
+    }
+
+    .estado-hero::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -10%;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(197, 211, 54, 0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .estado-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -5%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(197, 211, 54, 0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .estado-hero-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .estado-hero-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .estado-hero-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #C5D336;
+      box-shadow: 0 0 10px #C5D336, 0 0 20px rgba(197, 211, 54, 0.5);
+      animation: pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .estado-hero-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(197, 211, 54, 0.9);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .estado-hero-period {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 0.5px;
+    }
+
+    .estado-hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .estado-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(4px);
+      transition: background .2s;
+    }
+
+    .estado-metric:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .estado-metric.highlight {
+      background: rgba(197, 211, 54, 0.15);
+      border-color: rgba(197, 211, 54, 0.35);
+    }
+
+    .estado-metric-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      letter-spacing: -0.3px;
+    }
+
+    .estado-metric.highlight .estado-metric-val {
+      font-size: 17px;
+      color: #C5D336;
+    }
+
+    .estado-metric-lbl {
+      font-size: 8px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .estado-metric.highlight .estado-metric-lbl {
+      color: rgba(197, 211, 54, 0.75);
+    }
+    /* ── DIARIO KPI mejorado ── */
+    #tp-diario .sband {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    #tp-diario .si {
+      padding: 14px 16px;
+      border-radius: 12px;
+    }
+    #tp-diario .sn {
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── RESUMEN overflow fix ── */
+    #tp-resumen .kpi-modern {
+      overflow: visible;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN REMOVED: acceso público -->
+
+  <!-- BOOT LOADER -->
+  <div id="boot">
+    <div class="boot-card">
+      <div class="boot-title">Cargando datos reales</div>
+      <div class="boot-sub">El dashboard inicia solo cuando encuentra y valida <strong>consolidado.json.gz</strong> y
+        <strong>proyeccion.json.gz</strong> en la raíz del proyecto.
+      </div>
+      <div class="boot-row"><span id="boot-label">Preparando carga…</span><strong id="boot-pct">0%</strong></div>
+      <div class="boot-bar">
+        <div class="boot-fill" id="boot-fill"></div>
+      </div>
+      <div class="boot-steps">
+        <div class="boot-step" id="boot-step-auth"><span class="boot-dot"></span><span>Sesión iniciada</span></div>
+        <div class="boot-step" id="boot-step-cons"><span class="boot-dot"></span><span>Lectura de
+            consolidado.json.gz</span></div>
+        <div class="boot-step" id="boot-step-proy"><span class="boot-dot"></span><span>Lectura de
+            proyeccion.json.gz</span></div>
+        <div class="boot-step" id="boot-step-idx"><span class="boot-dot"></span><span>Construcción de métricas
+            reales</span></div>
+      </div>
+      <div class="boot-msg" id="boot-msg">Esperando archivos reales…</div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="on">
+    <header class="topbar">
+      <div style="display:flex;align-items:center">
+        <div class="tb-brand">
+          <img src="logo.png" alt="Línea Comunicaciones"
+            style="height:36px;max-width:160px;object-fit:contain;filter:brightness(0) invert(1)">
+        </div>
+        <div class="tb-sep"></div>
+        <div class="tb-mod">Dashboard Producción</div>
+      </div>
+      <div class="tb-right">
+        <div class="tb-badge" id="lupd">Cargando…</div>
+      </div>
+    </header>
+
+    <div class="abody">
+      <nav class="sidebar">
+        <div class="sb-sec">Vista</div>
+        <button class="nav act" id="n-resumen" onclick="gotoTab('resumen')"> <span class="ni">📊</span><span
+            class="nl">Resumen</span></button>
+        <button class="nav" id="n-diario" onclick="gotoTab('diario')"> <span class="ni">📅</span><span
+            class="nl">Análisis Diario</span></button>
+
+        <div class="sb-sec" style="margin-top:6px">Proyectos</div>
+        <button class="nav" id="n-cirion" onclick="gotoTab('cirion')"> <span class="ni">🔵</span><span
+            class="nl">Cirion</span><span class="nc" id="nc-c">—</span></button>
+        <button class="nav" id="n-liberty" onclick="gotoTab('liberty')"> <span class="ni">🟢</span><span
+            class="nl">Liberty</span><span class="nc" id="nc-l">—</span></button>
+        <button class="nav" id="n-banca" onclick="gotoTab('banca')"> <span class="ni">🏦</span><span
+            class="nl">Banca</span><span class="nc" id="nc-b">—</span></button>
+        <div class="sb-sec" style="margin-top:6px">Datos</div>
+
+        <button class="nav" id="n-carga" onclick="gotoTab('carga')"> <span class="ni">📂</span><span class="nl">Cargar
+            JSON</span></button>
+        <div class="sb-bot">Lineacom · v3.0<br><span id="sb-rows">0 registros</span></div>
+      </nav>
+
+      <main class="main">
+
+        <!-- ═══ RESUMEN ═══ -->
+        <div id="tp-resumen" class="tp on" style="padding:10px 18px 16px; overflow-y:auto">
+
+          <!-- Section 1: ESTADO GENERAL COMPAÑÍA Hero Banner -->
+          <div class="estado-hero fu" style="margin-bottom:12px">
+            <div class="estado-hero-header">
+              <div class="estado-hero-title">
+                <div class="estado-hero-dot"></div>
+                <span class="estado-hero-label">Estado General Compañía</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px">
+                <div class="f-group"
+                  style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
+                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Desde</label>
+                  <input type="date" id="res-d1" class="f-sel" value="2026-04-01" onchange="renderResumen()"
+                    style="font-size:10px; width:110px; color:#fff; background:transparent">
+                </div>
+                <div class="f-group"
+                  style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
+                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Hasta</label>
+                  <input type="date" id="res-d2" class="f-sel" value="2026-04-30" onchange="renderResumen()"
+                    style="font-size:10px; width:110px; color:#fff; background:transparent">
+                </div>
+                <button class="btn-exp" onclick="exportTab('resumen')"
+                  style="padding:5px 12px; font-size:10px; height:30px">📊 Exportar</button>
+              </div>
+            </div>
+            <div id="res-band" class="estado-hero-metrics"></div>
+          </div>
+
+          <!-- Section 2: Projects Grid - Banca (with Redeban+Wompi) + Cirion + Liberty -->
+          <div style="margin-bottom:14px">
+            <div class="slbl fu fu2" style="font-size:10px; margin-bottom:10px; color:var(--azul)">📈 Gestión Integral Proyectos</div>
+            <div id="res-unified-grid" style="display:grid; grid-template-columns: 1.5fr 1fr 1fr; gap:12px; align-items:start"></div>
+          </div>
+
+          <!-- Section 3: Analytics Row -->
+          <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px">
+            <div class="card fu fu3" style="display:flex; flex-direction:column">
+              <div class="ch" style="padding:6px 14px">
+                <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
+                  <div class="ct" style="font-size:11px">Tendencia Mensual</div>
+                  <div class="pills" id="res-trend-pills" style="padding:2px; scale:0.85; transform-origin:right">
+                    <button class="pill on" onclick="setTrendGer('TODOS')">Consolidado</button>
+                    <button class="pill" onclick="setTrendGer('CIRION')">Cirion</button>
+                    <button class="pill" onclick="setTrendGer('LIBERTY')">Liberty</button>
+                    <button class="pill" onclick="setTrendGer('BANCA')">Banca</button>
+                  </div>
+                </div>
+              </div>
+              <div class="cw" style="height:220px; padding:0 10px 6px"><canvas id="ch-res-tend"></canvas></div>
+            </div>
+            <div class="card fu fu4" style="display:flex; flex-direction:column">
+              <div class="ch" style="padding:6px 14px">
+                <div class="ct" style="font-size:11px">Distribución %</div>
+              </div>
+              <div class="cw" style="height:220px; padding:0 10px 6px"><canvas id="ch-res-dona"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ DIARIO ═══ -->
+        <div id="tp-diario" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt">Análisis Diario</div>
+              <div class="ps">Meta vs producción día a día por proyecto · 2026</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Proyecto</label>
+                <select id="dia-ger" class="f-sel" onchange="renderDiario()">
+                  <option value="BANCA">Banca</option>
+                  <option value="CIRION">Cirion</option>
+                  <option value="LIBERTY">Liberty</option>
+                </select>
+              </div>
+              <div class="f-group">
+                <label>Desde</label>
+                <input type="date" id="dia-d1" class="f-sel" value="2026-04-01" onchange="renderDiario()">
+              </div>
+              <div class="f-group">
+                <label>Hasta</label>
+                <input type="date" id="dia-d2" class="f-sel" value="2026-04-30" onchange="renderDiario()">
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI Band mejorada -->
+          <div id="dia-band" class="sband fu fu1" style="grid-template-columns: repeat(auto-fill, minmax(150px,1fr))"></div>
+
+          <!-- Gráfica Día a Día -->
+          <div class="card fu fu2" style="margin-bottom:18px">
+            <div class="ch">
+              <div>
+                <div class="ct">Día a Día: Meta vs Producción Real</div>
+                <div class="cs" id="dia-subtit"></div>
+              </div>
+              <div id="dia-legend-main" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:10px; color:var(--txm)">
+                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#166534;opacity:.8;display:inline-block"></span>Producción</span>
+                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,0.3);display:inline-block"></span>Faltó</span>
+                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.5);display:inline-block"></span>Superó</span>
+                <span style="display:flex;align-items:center;gap:4px"><span style="width:22px;height:2px;background:#C5D336;display:inline-block"></span>Meta</span>
+              </div>
+            </div>
+            <div class="cw" style="height:320px"><canvas id="ch-dia-main"></canvas></div>
+          </div>
+
+          <!-- Gráfica Acumulada -->
+          <div class="card fu fu3" style="margin-bottom:18px">
+            <div class="ch">
+              <div>
+                <div class="ct">Producción Acumulada vs Meta Acumulada</div>
+                <div class="cs">Curva de cumplimiento acumulado en el periodo · el área roja muestra el faltante</div>
+              </div>
+            </div>
+            <div class="cw" style="height:280px"><canvas id="ch-dia-acum"></canvas></div>
+          </div>
+        </div>
+
+        <!-- ═══ ZONAS ═══ -->
+        <div id="tp-zonas" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt">Distribución por Zona</div>
+              <div class="ps">Meta presupuestada por zona / centro de costo · Cirion y Banca</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Proyecto</label>
+                <select id="zona-ger" class="f-sel" onchange="renderZonas()">
+                  <option value="CIRION">Cirion</option>
+                  <option value="BANCA">Banca</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="sband fu fu1" id="zona-band"></div>
+          <div class="slbl fu fu2">Valor Proyectado Anual por Zona</div>
+          <div class="g12 fu fu2">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Zonas — Valor Anual Proyectado</div>
+                  <div class="cs">Suma 12 meses por centro de costo</div>
+                </div>
+              </div>
+              <div class="cw" style="height:320px"><canvas id="ch-zona-bar"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Distribución porcentual</div>
+                  <div class="cs">% del total por zona</div>
+                </div>
+              </div>
+              <div class="cw" style="height:320px"><canvas id="ch-zona-dona"></canvas></div>
+            </div>
+          </div>
+          <div class="slbl fu fu3">Tendencia Mensual por Zona (Top 6)</div>
+          <div class="card fu fu3">
+            <div class="cw" style="height:300px"><canvas id="ch-zona-tend"></canvas></div>
+          </div>
+        </div>
+
+        <!-- ═══ CIRION ═══ -->
+        <div id="tp-cirion" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt" style="color:#001D62">Cirion</div>
+              <div class="ps">Assurance · Mantenimiento · Delivery · Zonas PI/PE</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Desde</label>
+                <input type="date" id="cir-d1" class="f-sel" value="2026-04-01" onchange="renderCirion()">
+              </div>
+              <div class="f-group">
+                <label>Hasta</label>
+                <input type="date" id="cir-d2" class="f-sel" value="2026-04-30" onchange="renderCirion()">
+              </div>
+              <button class="btn-exp" onclick="exportTab('cirion')">📊 Exportar</button>
+            </div>
+          </div>
+          <div class="sband fu fu1" id="cir-band" style="background:linear-gradient(135deg,#001D62,#0036b0)"></div>
+          <div class="slbl fu fu2">KPIs Cirion</div>
+          <div class="kg fu fu2" id="cir-kpis"></div>
+          <div class="slbl fu fu3">Detalle por Tipo: Assurance · Mantenimiento · Delivery</div>
+          <div class="g3 fu fu3" id="cir-cat-blocks"></div>
+          <div class="slbl fu fu4">Distribución y Tendencia</div>
+          <div class="g3 fu fu4">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">% por Tipo de Actividad</div>
+                  <div class="cs">Assurance · Mantenimiento · Delivery</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-cir-tipo"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Top Zonas Cirion</div>
+                  <div class="cs">PI = Planta Interna · PE = Planta Externa</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-cir-zona"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Tendencia Mensual por Tipo</div>
+                  <div class="cs">Assurance vs Mantenimiento vs Delivery</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-cir-tend"></canvas></div>
+            </div>
+          </div>
+          <div class="slbl">Producción Real Cirion</div>
+          <div class="g12">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Estado Actividades Cirion</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-cir-estado"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Proyectado vs Real · Tendencia</div>
+                  <div class="cs">Meta mensual vs ejecución real</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-cir-pvr"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ LIBERTY ═══ -->
+        <div id="tp-liberty" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt" style="color:#0847a3">Liberty</div>
+              <div class="ps">Cali · Medellín · Proyectado vs Real</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Desde</label>
+                <input type="date" id="lib-d1" class="f-sel" value="2026-04-01" onchange="renderLiberty()">
+              </div>
+              <div class="f-group">
+                <label>Hasta</label>
+                <input type="date" id="lib-d2" class="f-sel" value="2026-04-30" onchange="renderLiberty()">
+              </div>
+              <button class="btn-exp" onclick="exportTab('liberty')">📊 Exportar</button>
+            </div>
+          </div>
+          <div class="sband fu fu1" id="lib-band" style="background:linear-gradient(135deg,#0847a3,#3b82f6)"></div>
+          <div class="slbl fu fu2">KPIs Liberty</div>
+          <div class="kg fu fu2" id="lib-kpis"></div>
+          <div class="g2 fu fu3">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Estado Actividades Liberty</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-lib-estado"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Proyectado vs Real</div>
+                  <div class="cs">Meta mensual vs producción real</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-lib-pvr"></canvas></div>
+            </div>
+          </div>
+          <div class="g2 fu fu4">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Distribución por Zona</div>
+                  <div class="cs">Cali · Medellín</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-lib-zona"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Tipo de Actividad</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-lib-tipo"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ BANCA ═══ -->
+        <div id="tp-banca" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt" style="color:#166534">Banca Seguros</div>
+              <div class="ps">Redeban CB · Redeban POS · Redes · Zonas</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Desde</label>
+                <input type="date" id="ban-d1" class="f-sel" value="2026-04-01" onchange="renderBanca()">
+              </div>
+              <div class="f-group">
+                <label>Hasta</label>
+                <input type="date" id="ban-d2" class="f-sel" value="2026-04-30" onchange="renderBanca()">
+              </div>
+              <button class="btn-exp" onclick="exportTab('banca')">📊 Exportar</button>
+            </div>
+          </div>
+          <div class="sband fu fu1" id="ban-band" style="background:linear-gradient(135deg,#166534,#22c55e)"></div>
+          <div class="slbl fu fu2">KPIs Banca</div>
+          <div class="kg fu fu2" id="ban-kpis"></div>
+          <div class="g3 fu fu3">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Estado Actividades Banca</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-ban-estado"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Proyectado vs Real</div>
+                  <div class="cs">Meta mensual vs producción real</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-ban-pvr"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Tipo de Red</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-ban-red"></canvas></div>
+            </div>
+          </div>
+          <div class="g2 fu fu4">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Top Zonas Banca</div>
+                  <div class="cs">Por valor proyectado anual</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-ban-zona"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Forma de Atención</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-ban-forma"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ DETALLE ═══ -->
+        <div id="tp-detalle" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt">Detalle de Producción</div>
+              <div class="ps">Tabla completa de actividades · filtros · exportar</div>
+            </div>
+            <div class="pa">
+              <div class="pf" id="det-pfg">
+                <button class="pfb on" onclick="setDetGer('todos')">Todos</button>
+                <button class="pfb" onclick="setDetGer('CIRION')">Cirion</button>
+                <button class="pfb" onclick="setDetGer('LIBERTY')">Liberty</button>
+                <button class="pfb" onclick="setDetGer('BANCA')">Banca</button>
+              </div>
+              <button class="btn-exp" onclick="exportTab('detalle')">⬇ Excel</button>
+            </div>
+          </div>
+          <div class="fb fu fu1">
+            <div class="fr">
+              <div class="fg"><label>Buscar</label><input type="text" id="det-srch"
+                  placeholder="ID, lugar, coordinador…" oninput="renderDetalle()" style="min-width:190px"></div>
+              <div class="fg"><label>Estado</label><select id="det-est" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
+              <div class="fg"><label>Desde</label><input type="date" id="det-d1" onchange="renderDetalle()"></div>
+              <div class="fg"><label>Hasta</label><input type="date" id="det-d2" onchange="renderDetalle()"></div>
+              <div style="align-self:flex-end"><button class="btn-rst" onclick="resetDet()">↺</button></div>
+            </div>
+          </div>
+          <div class="card fu fu2">
+            <div class="tw">
+              <table class="dt" id="det-tbl"></table>
+            </div>
+            <div class="tf"><span id="det-cnt" style="font-family:'DM Mono',monospace;font-size:10.5px">—</span>
+              <div class="pg" id="det-pg"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ CARGA ═══ -->
+        <div id="tp-carga" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt">Cargar Datos JSON</div>
+              <div class="ps">Esta versión lee automáticamente consolidado.json.gz y proyeccion.json.gz desde la raíz
+              </div>
+            </div>
+          </div>
+          <div class="card fu fu1" style="padding:28px">
+            <div class="uz" id="uz" onclick="document.getElementById('fi').click()"
+              ondragover="event.preventDefault();this.classList.add('dov')" ondragleave="this.classList.remove('dov')"
+              ondrop="handleDrop(event)">
+              <div class="uico">📄</div>
+              <p>Esta pantalla es solo informativa</p>
+              <small>Publica ambos JSON reales junto a index.html y recarga</small>
+            </div>
+            <input type="file" id="fi" accept=".json" style="display:none" onchange="handleFile(this)">
+            <div id="upst" style="margin-top:14px;font-size:12.5px;color:var(--txm);display:none"></div>
+          </div>
+          <div class="card fu fu2" style="padding:20px;margin-top:14px">
+            <div class="ct" style="margin-bottom:10px">📋 Columnas esperadas</div>
+            <div
+              style="background:var(--bg);border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:11.5px;color:var(--tx);line-height:1.9;overflow-x:auto">
+              <span style="color:var(--azul);font-weight:700">Comunes:</span> ID_TA · GERENCIA · TIPO_ACTIVIDAD ·
+              ESTADO_ACTIVIDAD · FECHA_FINALIZACION · VALOR_TOTAL<br>
+              <span style="color:#001D62;font-weight:700">Cirion:</span> VALOR_OBRA_CIVIL · VALOR_MATERIAL ·
+              TIPO_NEGOCIO · ZONA · BASE_OPERATIVA<br>
+              <span style="color:#166534;font-weight:700">Banca:</span> VALOR_ENTIDAD · VALOR_RED · FORMA_ATENCION ·
+              TIPOLOGIA · RED_ASOCIADA<br>
+              <span style="color:#0847a3;font-weight:700">Liberty:</span> VALOR_APROBADO · VALOR_OBRA_CIVIL ·
+              COORDINADOR · CIUDAD
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+  <script>
+    'use strict';
+    Chart.register(ChartDataLabels);
+
+    // ══════════════════════════════════════════════
+    // REAL JSON DATA (loaded from root files)
+    // ══════════════════════════════════════════════
+
+    let PROYECCION_RAW = [];
+    let PPTO_DIARIO = {};
+    let CIRION_ZONAS = {};
+    let CIRION_CATS = {};
+    let BANCA_ZONAS = {};
+    let LIBERTY_ZONAS = {};
+    let META_MES = { BANCA: {}, CIRION: {}, LIBERTY: {} };
+    // ══════════════════════════════════════════════
+    // AUTH — Desactivado: acceso público
+    // ══════════════════════════════════════════════
+    function doMSLogin() {}
+    function doDemo() {}
+    function doLogout() {}
+    function _enterApp() {}
+
+    // Arranque directo al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('app').classList.add('on');
+      initDash();
+    });
+
+    // ══════════════════════════════════════════════
+    // DATA STATE
+    // ══════════════════════════════════════════════
+    let RAW = [];
+    const CI = new Map(), LI = new Map(), BI = new Map(); // chart instances
+
+    const MONTHS_ISO = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11', '2026-12'];
+    const MONTHS_LBL = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const GERS = ['BANCA', 'CIRION', 'LIBERTY'];
+    const GC = { BANCA: '#166534', CIRION: '#001D62', LIBERTY: '#0847a3' };
+    const PAL = ['#001D62', '#C5D336', '#166534', '#0847a3', '#9eaa25', '#22c55e', '#f59e0b', '#e8334a', '#6366f1', '#ec4899', '#14b8a6', '#f97316'];
+
+    const CT = {
+      plugins: {
+        legend: { labels: { color: '#5c6b8a', font: { family: 'Outfit', size: 11 }, boxWidth: 11, padding: 12 } },
+        tooltip: { backgroundColor: 'rgba(0,29,98,.95)', titleColor: '#C5D336', bodyColor: '#fff', borderColor: 'rgba(197,211,54,.28)', borderWidth: 1, padding: 11, cornerRadius: 7 }
+      }
+    };
+
+    function dc(id) { if (CI.has(id)) { CI.get(id).destroy(); CI.delete(id) } }
+    function mkC(id, type, data, opts = {}) {
+      dc(id);
+      const el = document.getElementById(id); if (!el) return;
+      const c = new Chart(el, { type, data, options: Object.assign({ responsive: true, maintainAspectRatio: false }, CT, opts) });
+      CI.set(id, c); return c;
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────
+    function fmtCOP(v) {
+      if (v === undefined || v === null || isNaN(v)) return '$0';
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(v);
+    }
+
+    function getRange(id1, id2) {
+      const d1 = document.getElementById(id1)?.value;
+      const d2 = document.getElementById(id2)?.value;
+      if (!d1 || !d2) return [d1 ? d1.slice(0, 7) : d2 ? d2.slice(0, 7) : MONTHS_ISO[0]];
+      const m1 = d1.slice(0, 7);
+      const m2 = d2.slice(0, 7);
+      const start = MONTHS_ISO.indexOf(m1);
+      const end = MONTHS_ISO.indexOf(m2);
+      if (start === -1 || end === -1) return [m1];
+      if (start > end) return [m1];
+      return MONTHS_ISO.slice(start, end + 1);
+    }
+    function getRangeDates(id1, id2) {
+      const d1 = document.getElementById(id1)?.value || '';
+      const d2 = document.getElementById(id2)?.value || '';
+      return { d1, d2 };
+    }
+    function pct(n, d) { return d ? Math.round(n / d * 100) : 0; }
+    function cClass(p) { return p >= 95 ? 'ok' : p >= 75 ? 'warn' : 'bad'; }
+    function cTClass(p) { return p >= 95 ? 'ok' : p >= 75 ? 'warn' : 'bad'; }
+    function sumBy(arr, key) { return arr.reduce((s, r) => s + (parseFloat(r[key]) || 0), 0); }
+    function cntBy(arr, key) { return arr.reduce((a, r) => { const v = r[key] || 'N/A'; a[v] = (a[v] || 0) + 1; return a; }, {}); }
+    function topN(obj, n = 8) { return Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n); }
+    function spClass(s) { const u = (s || '').toUpperCase(); if (u.includes('FINAL') || u.includes('COMPLET')) return 'fin'; if (u.includes('EJECUC')) return 'ejec'; if (u.includes('PEND')) return 'pend'; if (u.includes('CANCEL')) return 'canc'; return 'def'; }
+
+    // Meta / Presupuesto
+    function metaMes(ger, mes) {
+      if (ger === 'TODOS') return GERS.reduce((s, g) => s + metaMes(g, mes), 0);
+      if (Array.isArray(mes)) return mes.reduce((s, m) => s + ((META_MES[ger] && META_MES[ger][m]) || 0), 0);
+      return (META_MES[ger] && META_MES[ger][mes]) || 0;
+    }
+    function metaAnual(ger) {
+      if (ger === 'TODOS') return GERS.reduce((s, g) => s + metaAnual(g), 0);
+      return MONTHS_ISO.reduce((s, m) => s + metaMes(ger, m), 0);
+    }
+    function metaDia(ger, fecha) { return (PPTO_DIARIO[ger] && PPTO_DIARIO[ger][fecha]) || 0; }
+
+    // Real from RAW_DATA
+    function prodReal(ger, mes, d1, d2) {
+      const months = Array.isArray(mes) ? mes : [mes];
+      return sumBy(RAW.filter(r => {
+        const fecha = (r.FECHA_FINALIZACION || '');
+        const m = fecha.slice(0, 7);
+        if (!months.includes(m)) return false;
+        if (ger !== 'TODOS' && r.GERENCIA !== ger) return false;
+        if (d1 && fecha < d1) return false;
+        if (d2 && fecha > d2) return false;
+        return true;
+      }), 'VALOR_TOTAL');
+    }
+    function prodRealMes(mes) { return GERS.reduce((s, g) => s + prodReal(g, mes), 0); }
+    function prodAcumYTD(ger, hasta) {
+      const h = Array.isArray(hasta) ? hasta[hasta.length - 1] : hasta;
+      const idx = MONTHS_ISO.indexOf(h);
+      return MONTHS_ISO.slice(0, idx + 1).reduce((s, m) => s + prodReal(ger, m), 0);
+    }
+    function metaAcumYTD(ger, hasta) {
+      if (ger === 'TODOS') return GERS.reduce((s, g) => s + metaAcumYTD(g, hasta), 0);
+      const h = Array.isArray(hasta) ? hasta[hasta.length - 1] : hasta;
+      const idx = MONTHS_ISO.indexOf(h);
+      return MONTHS_ISO.slice(0, idx + 1).reduce((s, m) => s + metaMes(ger, m), 0);
+    }
+    // Daily data per gerencia/month from RAW
+    function rawDayMap(ger, mes) {
+      const m = {};
+      RAW.filter(r => r.GERENCIA === ger && (r.FECHA_FINALIZACION || '').slice(0, 7) === mes)
+        .forEach(r => { const d = (r.FECHA_FINALIZACION || '').slice(0, 10); if (d) m[d] = (m[d] || 0) + (parseFloat(r.VALOR_TOTAL) || 0); });
+      return m;
+    }
+
+    // ── Navigation ──────────────────────────────────────────────
+    let _curTab = 'resumen';
+    function gotoTab(name) {
+      document.querySelectorAll('.tp').forEach(p => p.classList.remove('on'));
+      document.querySelectorAll('.nav').forEach(n => n.classList.remove('act'));
+      const p = document.getElementById('tp-' + name); if (p) p.classList.add('on');
+      const n = document.getElementById('n-' + name); if (n) n.classList.add('act');
+      _curTab = name;
+      if (name === 'resumen') renderResumen();
+      if (name === 'diario') renderDiario();
+      if (name === 'zonas') renderZonas();
+      if (name === 'cirion') renderCirion();
+      if (name === 'liberty') renderLiberty();
+      if (name === 'banca') renderBanca();
+      if (name === 'detalle') renderDetalle();
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────
+    async function initDash() {
+      try {
+        showBoot();
+        setBootStep('auth', 'ok');
+        setBootProgress(8, 'Iniciando lectura de archivos reales…');
+        const { consolidado, proyeccion } = await loadRootData();
+        setBootStep('cons', 'ok');
+        setBootStep('proy', 'ok');
+        setBootProgress(78, 'Normalizando datos reales…');
+        loadData(consolidado, proyeccion);
+        setBootStep('idx', 'ok');
+        setBootProgress(100, 'Dashboard listo');
+        setTimeout(hideBoot, 350);
+      } catch (err) {
+        console.error('[boot]', err);
+        fatalBoot(err.message || 'No fue posible cargar los archivos reales.');
+      }
+    }
+
+    function showBoot() {
+      const b = document.getElementById('boot');
+      if (b) b.classList.add('on');
+      setBootStep('auth', 'run');
+      setBootMsg('Esperando archivos reales…');
+    }
+    function hideBoot() {
+      const b = document.getElementById('boot');
+      if (b) b.classList.remove('on');
+    }
+    function setBootProgress(pct, label = '') {
+      const p = Math.max(0, Math.min(100, Math.round(pct)));
+      const fill = document.getElementById('boot-fill');
+      const pctEl = document.getElementById('boot-pct');
+      const lbl = document.getElementById('boot-label');
+      if (fill) fill.style.width = p + '%';
+      if (pctEl) pctEl.textContent = p + '%';
+      if (lbl && label) lbl.textContent = label;
+    }
+    function setBootStep(step, state) {
+      const el = document.getElementById(`boot-step-${step}`);
+      if (!el) return;
+      el.classList.remove('ok', 'err', 'run');
+      if (state) el.classList.add(state);
+    }
+    function setBootMsg(msg, isErr = false) {
+      const el = document.getElementById('boot-msg');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.toggle('err', !!isErr);
+    }
+    function fatalBoot(msg) {
+      setBootProgress(100, 'Carga detenida');
+      setBootMsg(msg, true);
+      setBootStep('idx', 'err');
+    }
+
+    async function fetchJSONGzStrict(url) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`No se encontró ${url} en la raíz del proyecto.`);
+        const buf = await res.arrayBuffer();
+        if (!buf || !buf.byteLength) throw new Error(`${url} está vacío o no se pudo leer.`);
+        if (typeof window.pako === 'undefined') throw new Error('No se pudo cargar la librería de descompresión gzip (pako).');
+        let jsonText = '';
+        try {
+          jsonText = window.pako.ungzip(new Uint8Array(buf), { to: 'string' });
+        } catch (e) {
+          throw new Error(`${url} no pudo descomprimirse. Verifica que sea un archivo .json.gz válido.`);
+        }
+        try {
+          return JSON.parse(jsonText);
+        } catch (e) {
+          throw new Error(`${url} se descomprimió pero no contiene un JSON válido.`);
+        }
+      } catch (err) {
+        if (location.protocol === 'file:') {
+          throw new Error('Este dashboard no puede leer archivos .json.gz abriéndose con doble clic. Debes servir la carpeta por http/https y dejar consolidado.json.gz y proyeccion.json.gz en la raíz junto a index.html.');
+        }
+        throw err;
+      }
+    }
+
+    async function loadRootData() {
+      setBootStep('cons', 'run');
+      setBootProgress(18, 'Leyendo consolidado.json.gz…');
+      setBootMsg('Buscando consolidado.json.gz en la misma carpeta de index.html');
+      const consolidadoRaw = await fetchJSONGzStrict('./consolidado.json.gz');
+      const consolidado = normalizeConsolidado(consolidadoRaw);
+      if (!consolidado.length) throw new Error('consolidado.json.gz no contiene registros válidos.');
+
+      setBootStep('proy', 'run');
+      setBootProgress(48, 'Leyendo proyeccion.json.gz…');
+      setBootMsg('Buscando proyeccion.json.gz en la misma carpeta de index.html');
+      const proyeccionRaw = await fetchJSONGzStrict('./proyeccion.json.gz');
+      const proyeccion = normalizeProyeccion(proyeccionRaw);
+      if (!proyeccion.length) throw new Error('proyeccion.json.gz no contiene registros válidos.');
+
+      return { consolidado, proyeccion };
+    }
+
+    function normalizeArrayPayload(payload) {
+      if (Array.isArray(payload)) return payload;
+      if (payload && Array.isArray(payload.rows)) return payload.rows;
+      if (payload && Array.isArray(payload.data)) return payload.data;
+      throw new Error('Formato JSON no reconocido. Se esperaba un arreglo de registros.');
+    }
+
+    function normalizeConsolidado(payload) {
+      return normalizeArrayPayload(payload).map((row, idx) => normalizeConsolidadoRow(row, idx)).filter(Boolean);
+    }
+
+    function normalizeConsolidadoRow(row, idx) {
+      const src = {};
+      Object.entries(row || {}).forEach(([k, v]) => { src[String(k).toUpperCase().trim()] = v; });
+
+      const fecha = normalizeDateValue(
+        src.FECHA_FINALIZACION || src.FECHA_FINAL || src.FECHA || src.FECHA_CIERRE || src.FECHA_CIERRE_PLATAFORMA_CLIENTE
+      );
+      const gerRaw = String(src.GERENCIA || src.PROYECTO || src.CLIENTE || '').toUpperCase();
+      const ger = gerRaw.includes('CIRION') ? 'CIRION' : gerRaw.includes('LIBERTY') ? 'LIBERTY' : (gerRaw.includes('BANCA') || gerRaw.includes('WOMPI') || gerRaw.includes('RED')) ? 'BANCA' : (String(src.RED_ASOCIADA || '').toUpperCase().includes('BAN') ? 'BANCA' : '');
+      const valorTotal = toNum(
+        src.VALOR_TOTAL ?? src.VALOR_APROBADO ?? src.VALOR_ENTIDAD ?? src.VALOR ?? src.TOTAL ?? 0
+      );
+
+      if (!fecha || !ger) return null;
+
+      return {
+        ...src,
+        ID_TA: String(src.ID_TA || src.TAREA || src.ID || `ROW-${idx + 1}`),
+        GERENCIA: ger,
+        TIPO_ACTIVIDAD: String(src.TIPO_ACTIVIDAD || src.TIPO || src.TIPOLOGIA || src.LINEA_DE_NEGOCIO || 'SIN CLASIFICAR'),
+        ESTADO_ACTIVIDAD: String(src.ESTADO_ACTIVIDAD || src.ESTADO || 'SIN ESTADO'),
+        FECHA_FINALIZACION: fecha,
+        VALOR_TOTAL: valorTotal,
+        VALOR_APROBADO: toNum(src.VALOR_APROBADO ?? valorTotal),
+        VALOR_OBRA_CIVIL: toNum(src.VALOR_OBRA_CIVIL),
+        VALOR_MATERIAL: toNum(src.VALOR_MATERIAL),
+        VALOR_ENTIDAD: toNum(src.VALOR_ENTIDAD),
+        VALOR_RED: toNum(src.VALOR_RED),
+        COORDINADOR: String(src.COORDINADOR || src.ANALISTA || src.TECNICO || ''),
+        CIUDAD: String(src.CIUDAD || src.CIUDAD_SEDE || src.BASE_OPERATIVA || ''),
+        ZONA: String(src.ZONA || src.PROYECTO_ZONA_SITIO || src['PROYECTO - ZONA - SITIO'] || ''),
+        BASE_OPERATIVA: String(src.BASE_OPERATIVA || src.CIUDAD || ''),
+        LUGAR_EJECUCION: String(src.LUGAR_EJECUCION || src.NOMBRE_PUNTO || src.CODIGO_SITIO || ''),
+        TIPO_NEGOCIO: String(src.TIPO_NEGOCIO || src.LINEA_DE_NEGOCIO || ''),
+        RED_ASOCIADA: String(src.RED_ASOCIADA || src.TIPO_RED || ''),
+        FORMA_ATENCION: String(src.FORMA_ATENCION || ''),
+      };
+    }
+
+    function normalizeProyeccion(payload) {
+      return normalizeArrayPayload(payload).map(row => {
+        const src = {};
+        Object.entries(row || {}).forEach(([k, v]) => { src[String(k).toUpperCase().trim()] = v; });
+        return {
+          CLIENTE_CENTRO_COSTOS: String(src['CLIENTE - CENTRO DE COSTOS'] || src.CLIENTE_CENTRO_COSTOS || ''),
+          LINEA_NEGOCIO: String(src['LINEA DE NEGOCIO'] || src.LINEA_NEGOCIO || ''),
+          PROYECTO_ZONA_SITIO: String(src['PROYECTO - ZONA - SITIO'] || src.PROYECTO_ZONA_SITIO || ''),
+          FECHA: normalizeDateValue(src.FECHA),
+          VALOR: toNum(src.VALOR),
+          GERENCIA: String(src.GERENCIA || '').toUpperCase(),
+          TIPO_RED: String(src.TIPO_RED || ''),
+          TIPO_PROYECCION: String(src.TIPO_PROYECCION || '').toUpperCase()
+        };
+      }).filter(r => r.FECHA && r.GERENCIA && r.TIPO_PROYECCION);
+    }
+
+    function normalizeDateValue(value) {
+      if (value === null || value === undefined || value === '') return '';
+      if (typeof value === 'string') {
+        const clean = value.trim();
+        if (/^\d{4}-\d{2}-\d{2}/.test(clean)) return clean.slice(0, 10);
+        const parsed = new Date(clean);
+        if (!Number.isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
+        const m = clean.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (m) return `${m[3]}-${String(m[2]).padStart(2, '0')}-${String(m[1]).padStart(2, '0')}`;
+        return '';
+      }
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+    }
+
+    function toNum(v) {
+      if (v === null || v === undefined || v === '') return 0;
+      if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
+      const n = Number(String(v).replace(/[^\d,.-]/g, '').replace(/\.(?=.*\.)/g, '').replace(',', '.'));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function buildProjectionIndexes(rows) {
+      PROYECCION_RAW = rows;
+      PPTO_DIARIO = { BANCA: {}, CIRION: {}, LIBERTY: {} };
+      META_MES = { BANCA: {}, CIRION: {}, LIBERTY: {} };
+      CIRION_ZONAS = {};
+      BANCA_ZONAS = {};
+      LIBERTY_ZONAS = {};
+      CIRION_CATS = {};
+
+      rows.forEach(r => {
+        const ger = r.GERENCIA;
+        if (!GERS.includes(ger) || !r.FECHA) return;
+        const mes = r.FECHA.slice(0, 7);
+
+        if (r.TIPO_PROYECCION === 'DIARIA') {
+          PPTO_DIARIO[ger][r.FECHA] = (PPTO_DIARIO[ger][r.FECHA] || 0) + r.VALOR;
+        }
+
+        if (r.TIPO_PROYECCION === 'MENSUAL') {
+          META_MES[ger][mes] = (META_MES[ger][mes] || 0) + r.VALOR;
+
+          const zonaKey = (r.PROYECTO_ZONA_SITIO || 'SIN ZONA').trim();
+          const targetZonas = ger === 'CIRION' ? CIRION_ZONAS : ger === 'BANCA' ? BANCA_ZONAS : LIBERTY_ZONAS;
+          if (!targetZonas[zonaKey]) targetZonas[zonaKey] = {};
+          targetZonas[zonaKey][mes] = (targetZonas[zonaKey][mes] || 0) + r.VALOR;
+
+          if (ger === 'CIRION') {
+            const cat = (r.LINEA_NEGOCIO || 'SIN CATEGORÍA').trim().toUpperCase();
+            if (!CIRION_CATS[cat]) CIRION_CATS[cat] = {};
+            CIRION_CATS[cat][mes] = (CIRION_CATS[cat][mes] || 0) + r.VALOR;
+          }
+        }
+      });
+    }
+
+    function loadData(data, proyeccion) {
+      RAW = data;
+      buildProjectionIndexes(proyeccion);
+      document.getElementById('lupd').textContent = `Actualizado: ${new Date().toLocaleDateString('es-CO')}`;
+      document.getElementById('sb-rows').textContent = `${RAW.length.toLocaleString()} registros`;
+      document.getElementById('nc-c').textContent = RAW.filter(r => r.GERENCIA === 'CIRION').length;
+      document.getElementById('nc-l').textContent = RAW.filter(r => r.GERENCIA === 'LIBERTY').length;
+      document.getElementById('nc-b').textContent = RAW.filter(r => r.GERENCIA === 'BANCA').length;
+      const estats = [...new Set(RAW.map(r => r.ESTADO_ACTIVIDAD).filter(Boolean))].sort();
+      const se = document.getElementById('det-est'); if (se) se.innerHTML = '<option value="">Todos</option>' + estats.map(e => `<option>${e}</option>`).join('');
+      renderResumen();
+    }
+
+    // ══════════════════════════════════════════════
+    // RESUMEN
+    // ══════════════════════════════════════════════
+    let _trendGer = 'TODOS';
+    function setTrendGer(g) {
+      _trendGer = g;
+      document.querySelectorAll('#res-trend-pills .pill').forEach(b => {
+        b.classList.toggle('on', b.textContent.toUpperCase() === g || (b.textContent === 'Consolidado' && g === 'TODOS'));
+      });
+      renderResumen();
+    }
+
+    function renderResumen() {
+      const range = getRange('res-d1', 'res-d2');
+      const { d1: resD1, d2: resD2 } = getRangeDates('res-d1', 'res-d2');
+      const startIdx = MONTHS_ISO.indexOf(range[0]);
+      const endIdx = MONTHS_ISO.indexOf(range[range.length - 1]);
+
+      const rangeLbl = range.length === 1 ? MONTHS_LBL[startIdx] + ' 2026' : `${MONTHS_LBL[startIdx]} - ${MONTHS_LBL[endIdx]} 2026`;
+
+      const prodTot = GERS.reduce((s, g) => s + prodReal(g, range, resD1, resD2), 0);
+      const metaTot = GERS.reduce((s, g) => s + metaMes(g, range), 0);
+      const cump = pct(prodTot, metaTot);
+
+      const lastMonth = range[range.length - 1];
+      const prodAcum = GERS.reduce((s, g) => s + prodAcumYTD(g, lastMonth), 0);
+      const metaAcum = GERS.reduce((s, g) => s + metaAcumYTD(g, lastMonth), 0);
+      const metaAnualTotal = GERS.reduce((s, g) => s + metaAnual(g), 0);
+      const cumpAcumTotal = pct(prodTot, metaAnualTotal);
+      const resBand = document.getElementById('res-band');
+      if (resBand) {
+        resBand.innerHTML = `
+          <div class="estado-metric"><span class="estado-metric-val">${rangeLbl}</span><span class="estado-metric-lbl">Periodo</span></div>
+          <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(prodTot)}</span><span class="estado-metric-lbl">Producción</span></div>
+          <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaTot)}</span><span class="estado-metric-lbl">Meta Periodo</span></div>
+          <div class="estado-metric"><span class="estado-metric-val" style="color:${cump >= 95 ? '#4ade80' : cump >= 75 ? '#fbbf24' : '#f87171'}">${cump}%</span><span class="estado-metric-lbl">%Cump Periodo</span></div>
+          <div class="estado-metric"><span class="estado-metric-val" style="color:${cumpAcumTotal >= 95 ? '#4ade80' : cumpAcumTotal >= 75 ? '#fbbf24' : '#f87171'}">${cumpAcumTotal}%</span><span class="estado-metric-lbl">%Cump Año</span></div>
+          <div class="estado-metric highlight"><span class="estado-metric-val">${fmtCOP(metaAnualTotal)}</span><span class="estado-metric-lbl">Meta Anual 2026</span></div>`;
+      }
+
+      const grid = document.getElementById('res-unified-grid');
+      if (grid) { 
+        const bancaCard = renderUnifiedProjectCard('BANCA', range, resD1, resD2);
+        const cirionCard = renderCompactProjectCard('CIRION', range, resD1, resD2);
+        const libertyCard = renderCompactProjectCard('LIBERTY', range, resD1, resD2);
+        grid.innerHTML = bancaCard + cirionCard + libertyCard;
+      }
+
+      // Tendencia — Siempre 12 meses, filtrable por proyecto
+      const prodM = MONTHS_ISO.map(m => prodReal(_trendGer, m));
+      const metaM = MONTHS_ISO.map(m => metaMes(_trendGer, m));
+      // gapM: cuánto FALTÓ (positivo = faltó, 0 = superó o igualó)
+      const gapM = MONTHS_ISO.map((m, i) => Math.max(0, metaM[i] - prodM[i]));
+      // excessM: cuánto SOBRÓ (positivo = superó, 0 = no llegó)
+      const excessM = MONTHS_ISO.map((m, i) => Math.max(0, prodM[i] - metaM[i]));
+      // base para la barra de producción: mínimo entre prod y meta (el segmento "cumplido dentro de meta")
+      const baseM = MONTHS_ISO.map((m, i) => Math.min(prodM[i], metaM[i]));
+
+      const tendColor = _trendGer === 'TODOS' ? '#001D62' : GC[_trendGer];
+      const tendColorA = tendColor + 'cc';
+
+      function fmtCOPShort(v) {
+        if (!v) return '$0';
+        if (Math.abs(v) >= 1e9) return '$' + (v / 1e9).toFixed(1).replace('.', ',') + 'B';
+        if (Math.abs(v) >= 1e6) return '$' + (v / 1e6).toFixed(1).replace('.', ',') + 'M';
+        if (Math.abs(v) >= 1e3) return '$' + Math.round(v / 1e3) + 'K';
+        return '$' + v;
+      }
+
+      mkC('ch-res-tend', 'bar', {
+        labels: MONTHS_LBL,
+        datasets: [
+          // Segmento base: producción real hasta la meta (o toda la prod si superó)
+          {
+            label: 'Producción Real',
+            data: baseM,
+            backgroundColor: tendColorA,
+            borderRadius: [4, 4, 0, 0],
+            borderSkipped: 'bottom',
+            stack: 'stack',
+            order: 2,
+            datalabels: {
+              display: ctx => {
+                const i = ctx.dataIndex;
+                // mostrar label de producción solo si no hay exceso (lo mostrará el segmento excess)
+                return prodM[i] > 0 && excessM[i] === 0;
+              },
+              anchor: 'end', align: 'top', offset: 3,
+              color: tendColor,
+              font: { family: "'DM Mono', monospace", weight: 'bold', size: 10 },
+              formatter: (v, ctx) => fmtCOPShort(prodM[ctx.dataIndex])
+            }
+          },
+          // Segmento faltante: lo que le faltó para llegar a meta (rojo semitransparente encima)
+          {
+            label: 'Faltó para Meta',
+            data: gapM,
+            backgroundColor: 'rgba(239,68,68,0.22)',
+            borderColor: 'rgba(239,68,68,0.7)',
+            borderWidth: 1.5,
+            borderDash: [4, 2],
+            borderRadius: [4, 4, 0, 0],
+            borderSkipped: 'bottom',
+            stack: 'stack',
+            order: 2,
+            datalabels: {
+              display: ctx => gapM[ctx.dataIndex] > 0,
+              anchor: 'end', align: 'top', offset: 3,
+              color: '#dc2626',
+              font: { family: "'DM Mono', monospace", weight: 'bold', size: 10 },
+              formatter: (v, ctx) => {
+                const i = ctx.dataIndex;
+                return `−${fmtCOPShort(gapM[i])}`;
+              }
+            }
+          },
+          // Segmento exceso: lo que sobrepasó la meta (verde brillante encima)
+          {
+            label: 'Superó Meta',
+            data: excessM,
+            backgroundColor: 'rgba(34,197,94,0.55)',
+            borderColor: '#16a34a',
+            borderWidth: 1.5,
+            borderRadius: [4, 4, 0, 0],
+            borderSkipped: 'bottom',
+            stack: 'stack',
+            order: 2,
+            datalabels: {
+              display: ctx => excessM[ctx.dataIndex] > 0,
+              anchor: 'end', align: 'top', offset: 3,
+              color: '#15803d',
+              font: { family: "'DM Mono', monospace", weight: 'bold', size: 10 },
+              formatter: (v, ctx) => {
+                const i = ctx.dataIndex;
+                return `+${fmtCOPShort(excessM[i])}`;
+              }
+            }
+          },
+          // Línea de Meta Proyectada (por encima de las barras)
+          {
+            label: 'Meta Proyectada',
+            data: metaM,
+            type: 'line',
+            borderColor: '#C5D336',
+            backgroundColor: 'transparent',
+            borderWidth: 2.5,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: '#C5D336',
+            fill: false,
+            stack: undefined,
+            order: 1,
+            datalabels: { display: false }
+          }
+        ]
+      }, {
+        plugins: {
+          ...CT.plugins,
+          tooltip: {
+            ...CT.plugins.tooltip,
+            callbacks: {
+              label: ctx => {
+                const i = ctx.dataIndex;
+                if (ctx.dataset.label === 'Producción Real')
+                  return ` Producción Real: ${fmtCOP(prodM[i])}`;
+                if (ctx.dataset.label === 'Faltó para Meta')
+                  return gapM[i] > 0 ? ` ⚠️ Faltó: ${fmtCOP(gapM[i])}` : null;
+                if (ctx.dataset.label === 'Superó Meta')
+                  return excessM[i] > 0 ? ` ✅ Exceso: +${fmtCOP(excessM[i])}` : null;
+                if (ctx.dataset.label === 'Meta Proyectada')
+                  return ` Meta: ${fmtCOP(metaM[i])}`;
+                return null;
+              },
+              filter: item => item.formattedValue !== null && item.raw > 0
+            }
+          },
+          datalabels: {}
+        },
+        layout: { padding: { top: 28 } },
+        scales: {
+          y: {
+            stacked: true,
+            ticks: { color: '#5c6b8a', callback: v => fmtCOPShort(v) },
+            grid: { color: 'rgba(0,0,0,.04)' }
+          },
+          x: {
+            stacked: true,
+            ticks: { color: '#5c6b8a' },
+            grid: { display: false }
+          }
+        }
+      });
+
+      const donaProd = GERS.map(g => prodReal(g, range));
+      mkC('ch-res-dona', 'doughnut', {
+        labels: GERS,
+        datasets: [{ data: donaProd, backgroundColor: GERS.map(g => GC[g]), borderWidth: 0, hoverOffset: 10 }]
+      }, {
+        cutout: '68%',
+        plugins: {
+          ...CT.plugins,
+          legend: { ...CT.plugins.legend, position: 'bottom' },
+          datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
+        }
+      });
+    }
+
+    // ── Helpers sub-proyectos Banca (datos reales de proyección y RAW) ──────────
+    function isWompi(r) {
+      const fields = [r.RED_ASOCIADA, r.TIPO_ACTIVIDAD, r.TIPO_NEGOCIO, r.ZONA,
+                      r.LUGAR_EJECUCION, r.CLIENTE_CENTRO_COSTOS, r.PROYECTO_ZONA_SITIO,
+                      r.LINEA_NEGOCIO, r.TIPO_RED];
+      return fields.some(f => String(f||'').toUpperCase().includes('WOMPI'));
+    }
+    function isRedeban(r) {
+      const fields = [r.RED_ASOCIADA, r.TIPO_ACTIVIDAD, r.TIPO_NEGOCIO, r.ZONA,
+                      r.LUGAR_EJECUCION, r.CLIENTE_CENTRO_COSTOS, r.PROYECTO_ZONA_SITIO,
+                      r.LINEA_NEGOCIO, r.TIPO_RED];
+      return fields.some(f => String(f||'').toUpperCase().includes('REDEBAN'));
+    }
+
+    // Meta mensual de sub-proyecto desde PROYECCION_RAW
+    function metaSubMes(keyFn, mes) {
+      if (Array.isArray(mes)) return mes.reduce((s, m) => s + metaSubMes(keyFn, m), 0);
+      return PROYECCION_RAW.filter(r =>
+        r.GERENCIA === 'BANCA' && r.TIPO_PROYECCION === 'MENSUAL' &&
+        (r.FECHA||'').slice(0,7) === mes && keyFn(r)
+      ).reduce((s, r) => s + r.VALOR, 0);
+    }
+    function metaSubAcumYTD(keyFn, hasta) {
+      const idx = MONTHS_ISO.indexOf(hasta);
+      return MONTHS_ISO.slice(0, idx+1).reduce((s, m) => s + metaSubMes(keyFn, m), 0);
+    }
+    function metaSubAnual(keyFn) {
+      return MONTHS_ISO.reduce((s, m) => s + metaSubMes(keyFn, m), 0);
+    }
+
+    // Producción real de sub-proyecto desde RAW
+    function prodSubReal(keyFn, range, d1, d2) {
+      return RAW.filter(r => {
+        if (r.GERENCIA !== 'BANCA') return false;
+        if (!keyFn(r)) return false;
+        const f = r.FECHA_FINALIZACION || '';
+        const months = Array.isArray(range) ? range : [range];
+        if (!months.includes(f.slice(0,7))) return false;
+        if (d1 && f < d1) return false;
+        if (d2 && f > d2) return false;
+        return true;
+      }).reduce((s, r) => s + (parseFloat(r.VALOR_TOTAL)||0), 0);
+    }
+    function prodSubAcumYTD(keyFn, hasta) {
+      const idx = MONTHS_ISO.indexOf(hasta);
+      return MONTHS_ISO.slice(0, idx+1).reduce((s, m) => s + prodSubReal(keyFn, m, '', ''), 0);
+    }
+    function countSubActs(keyFn, range, d1, d2) {
+      return RAW.filter(r => {
+        if (r.GERENCIA !== 'BANCA') return false;
+        if (!keyFn(r)) return false;
+        const f = r.FECHA_FINALIZACION || '';
+        const months = Array.isArray(range) ? range : [range];
+        if (!months.includes(f.slice(0,7))) return false;
+        if (d1 && f < d1) return false;
+        if (d2 && f > d2) return false;
+        return true;
+      }).length;
+    }
+
+    function renderSubProyectoCard(label, emoji, accentColor, bgColor, keyFn, range, d1, d2, lastMonth) {
+      const metaPeriodo   = metaSubMes(keyFn, range);
+      const prodPeriodo   = prodSubReal(keyFn, range, d1, d2);
+      const cumplPeriodo  = pct(prodPeriodo, metaPeriodo);
+      const metaAcum      = metaSubAcumYTD(keyFn, lastMonth);
+      const prodAcum      = prodSubAcumYTD(keyFn, lastMonth);
+      const cumplAcum     = pct(prodAcum, metaAcum);
+      const metaAnualSub  = metaSubAnual(keyFn);
+      const progrAnual    = pct(prodAcum, metaAnualSub);
+      const actsP         = countSubActs(keyFn, range, d1, d2);
+      const faltante      = Math.max(0, metaPeriodo - prodPeriodo);
+      const colorBg       = bgColor;
+
+      return `
+        <div style="background:${colorBg}; border-radius:10px; padding:10px 11px; border:1px solid ${accentColor}33">
+          <!-- Header -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+            <span style="font-size:11px; font-weight:800; color:${accentColor}">${emoji} ${label}</span>
+            <span style="font-family:'DM Mono',monospace; font-size:8.5px; font-weight:700; padding:2px 6px; border-radius:10px; background:${accentColor}18; color:${accentColor}">${actsP} acts.</span>
+          </div>
+          <!-- Métricas 2x2 -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:8px">
+            <div style="background:#fff; border-radius:6px; padding:5px 7px">
+              <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase; letter-spacing:.5px">Prod. Periodo</div>
+              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${accentColor}; margin-top:1px">${fmtCOP(prodPeriodo)}</div>
+            </div>
+            <div style="background:#fff; border-radius:6px; padding:5px 7px">
+              <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase; letter-spacing:.5px">Meta Periodo</div>
+              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2); margin-top:1px">${fmtCOP(metaPeriodo)}</div>
+            </div>
+            <div style="background:#fff; border-radius:6px; padding:5px 7px">
+              <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase; letter-spacing:.5px">Prod. Acum YTD</div>
+              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--tx); margin-top:1px">${fmtCOP(prodAcum)}</div>
+            </div>
+            <div style="background:#fff; border-radius:6px; padding:5px 7px">
+              <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase; letter-spacing:.5px">Meta Acum YTD</div>
+              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2); margin-top:1px">${fmtCOP(metaAcum)}</div>
+            </div>
+          </div>
+          <!-- Cumplimiento periodo -->
+          <div style="margin-bottom:6px">
+            <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:2px">
+              <span>Cump. Periodo</span>
+              <span style="color:${cumplPeriodo>=95?'var(--ok)':cumplPeriodo>=75?'var(--warn)':'var(--bad)'}">${cumplPeriodo}%</span>
+            </div>
+            <div style="height:5px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(cumplPeriodo,100)}%; background:${accentColor}; border-radius:4px; transition:width .6s ease"></div>
+            </div>
+            ${faltante>0 ? `<div style="font-size:7.5px; color:var(--bad); margin-top:2px; font-family:'DM Mono',monospace">▼ ${fmtCOP(faltante)}</div>` : `<div style="font-size:7.5px; color:var(--ok); margin-top:2px; font-family:'DM Mono',monospace">✓ En meta</div>`}
+          </div>
+          <!-- Cumplimiento acumulado -->
+          <div style="margin-bottom:6px">
+            <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:2px">
+              <span>Cump. Acum YTD</span>
+              <span style="color:${cumplAcum>=95?'var(--ok)':cumplAcum>=75?'var(--warn)':'var(--bad)'}">${cumplAcum}%</span>
+            </div>
+            <div style="height:5px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(cumplAcum,100)}%; background:linear-gradient(90deg,${accentColor},var(--lima)); border-radius:4px"></div>
+            </div>
+          </div>
+          <!-- Meta anual -->
+          <div style="border-top:1px solid ${accentColor}22; padding-top:6px; margin-top:3px">
+            <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:2px">
+              <span>Avance Anual</span>
+              <span style="color:var(--txm)">${progrAnual}%</span>
+            </div>
+            <div style="height:4px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(progrAnual,100)}%; background:${accentColor}55; border-radius:4px"></div>
+            </div>
+            <div style="font-size:7.5px; color:var(--txl); text-align:right; margin-top:2px; font-weight:700">META: ${fmtCOP(metaAnualSub)}</div>
+          </div>
+        </div>`;
+    }
+
+    function renderUnifiedProjectCard(ger, range, d1, d2) {
+      const color = GC[ger];
+      const prod = prodReal(ger, range, d1, d2);
+      const meta = metaMes(ger, range);
+      const cm = pct(prod, meta);
+      const lastMonth = range[range.length - 1];
+      const prodA = prodAcumYTD(ger, lastMonth);
+      const metaA = metaAcumYTD(ger, lastMonth);
+      const ca = pct(prodA, metaA);
+      const metaAnualVal = metaAnual(ger);
+      const progresoAnual = pct(prodA, metaAnualVal);
+      const faltantePeriodo = Math.max(0, meta - prod);
+      const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
+
+      // Sub-proyectos Banca con datos reales — horizontal row
+      let subProyHtml = '';
+      if (ger === 'BANCA') {
+        const wHtml = renderSubProyectoCard('Wompi',  '💳', '#166534', 'rgba(22,101,52,.06)',  isWompi,  range, d1, d2, lastMonth);
+        const rHtml = renderSubProyectoCard('Redeban','🏦', '#0847a3', 'rgba(8,71,163,.06)',   isRedeban,range, d1, d2, lastMonth);
+        subProyHtml = `
+          <div style="margin-top:10px; border-top:1.5px solid var(--border); padding-top:10px">
+            <div style="font-size:9px; font-weight:800; color:var(--txl); text-transform:uppercase; letter-spacing:.8px; margin-bottom:8px">📦 Sub-proyectos</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+              ${rHtml}
+              ${wHtml}
+            </div>
+          </div>`;
+      }
+
+      return `
+    <div class="kpi-modern" style="--hover-color:${color}; overflow:visible">
+      <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0">
+        <span class="km-title">${ger}</span>
+        <span class="km-icon">${icons[ger] || '📈'}</span>
+      </div>
+      <div style="padding:12px 12px 14px; display:flex; flex-direction:column; gap:8px">
+
+        <!-- Producción vs Meta -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+          <div>
+            <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.7px; margin-bottom:2px">Producción Periodo</div>
+            <div style="font-family:'DM Mono',monospace; font-size:14px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
+          </div>
+          <div>
+            <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.7px; margin-bottom:2px">Meta Periodo</div>
+            <div style="font-family:'DM Mono',monospace; font-size:14px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
+          </div>
+        </div>
+
+        <!-- Cumplimiento periodo -->
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--txm); margin-bottom:3px">
+            <span>Cumplimiento Periodo</span>
+            <span style="font-size:12px; font-family:'DM Mono',monospace; color:${cm>=95?'var(--ok)':cm>=75?'var(--warn)':'var(--bad)'}">${cm}%</span>
+          </div>
+          <div style="height:6px; background:var(--bg); border-radius:4px; overflow:hidden">
+            <div style="height:100%; width:${Math.min(cm,100)}%; background:${color}; border-radius:4px; transition:width .8s ease"></div>
+          </div>
+          ${faltantePeriodo>0 ? `<div style="font-size:8px; color:var(--bad); margin-top:2px; font-family:'DM Mono',monospace; font-weight:700">▼ Faltó: ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:8px; color:var(--ok); margin-top:2px; font-weight:700">✓ Meta superada</div>`}
+        </div>
+
+        <!-- Acumulados -->
+        <div style="border-top:1px solid var(--border); padding-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:6px">
+          <div>
+            <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Prod. Acum YTD</div>
+            <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div>
+          </div>
+          <div>
+            <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acum YTD</div>
+            <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div>
+          </div>
+        </div>
+
+        <!-- Cump acumulado -->
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:3px">
+            <span>%Cump Acumulado YTD</span>
+            <span style="font-family:'DM Mono',monospace; color:${ca>=95?'var(--ok)':ca>=75?'var(--warn)':'var(--bad)'}">${ca}%</span>
+          </div>
+          <div style="height:5px; background:var(--bg); border-radius:3px; overflow:hidden">
+            <div style="height:100%; width:${Math.min(ca,100)}%; background:linear-gradient(90deg,${color},var(--lima)); border-radius:3px"></div>
+          </div>
+        </div>
+
+        <!-- Progreso anual -->
+        <div style="border-top:1px solid var(--border); padding-top:8px">
+          <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:3px">
+            <span>Avance vs Meta Anual</span>
+            <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
+          </div>
+          <div style="height:4px; background:#e2e8f0; border-radius:3px; overflow:hidden">
+            <div style="height:100%; width:${Math.min(progresoAnual,100)}%; background:${color}88; border-radius:3px"></div>
+          </div>
+          <div style="font-size:7.5px; color:var(--txl); text-align:right; margin-top:2px; font-weight:700">META ANUAL: ${fmtCOP(metaAnualVal)}</div>
+        </div>
+
+        ${subProyHtml}
+      </div>
+    </div>`;
+    }
+
+
+
+
+    // ══════════════════════════════════════════════
+    // COMPACT PROJECT CARD (Cirion & Liberty in Resumen)
+    // ══════════════════════════════════════════════
+    function renderCompactProjectCard(ger, range, d1, d2) {
+      const color = GC[ger];
+      const prod = prodReal(ger, range, d1, d2);
+      const meta = metaMes(ger, range);
+      const cm = pct(prod, meta);
+      const lastMonth = range[range.length - 1];
+      const prodA = prodAcumYTD(ger, lastMonth);
+      const metaA = metaAcumYTD(ger, lastMonth);
+      const ca = pct(prodA, metaA);
+      const metaAnualVal = metaAnual(ger);
+      const progresoAnual = pct(prodA, metaAnualVal);
+      const faltantePeriodo = Math.max(0, meta - prod);
+      const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
+
+      return `
+    <div class="kpi-modern" style="--hover-color:${color}; overflow:visible">
+      <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0">
+        <span class="km-title">${ger}</span>
+        <span class="km-icon">${icons[ger] || '📈'}</span>
+      </div>
+      <div style="padding:12px 12px 14px; display:flex; flex-direction:column; gap:8px">
+        <!-- Producción vs Meta -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+          <div>
+            <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:2px">Producción</div>
+            <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
+          </div>
+          <div>
+            <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:2px">Meta</div>
+            <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
+          </div>
+        </div>
+        <!-- Cumplimiento periodo -->
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--txm); margin-bottom:3px">
+            <span>Cump. Periodo</span>
+            <span style="font-family:'DM Mono',monospace; color:${cm>=95?'var(--ok)':cm>=75?'var(--warn)':'var(--bad)'}">${cm}%</span>
+          </div>
+          <div style="height:6px; background:var(--bg); border-radius:4px; overflow:hidden">
+            <div style="height:100%; width:${Math.min(cm,100)}%; background:${color}; border-radius:4px; transition:width .8s ease"></div>
+          </div>
+          ${faltantePeriodo>0 ? `<div style="font-size:8px; color:var(--bad); margin-top:2px; font-family:'DM Mono',monospace; font-weight:700">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:8px; color:var(--ok); margin-top:2px; font-weight:700">✓ Meta superada</div>`}
+        </div>
+        <!-- Acumulados -->
+        <div style="border-top:1px solid var(--border); padding-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:6px">
+          <div>
+            <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Acum YTD</div>
+            <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div>
+          </div>
+          <div>
+            <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acum</div>
+            <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div>
+          </div>
+        </div>
+        <!-- Cump acumulado -->
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:3px">
+            <span>%Cump Acum YTD</span>
+            <span style="font-family:'DM Mono',monospace; color:${ca>=95?'var(--ok)':ca>=75?'var(--warn)':'var(--bad)'}">${ca}%</span>
+          </div>
+          <div style="height:5px; background:var(--bg); border-radius:3px; overflow:hidden">
+            <div style="height:100%; width:${Math.min(ca,100)}%; background:linear-gradient(90deg,${color},var(--lima)); border-radius:3px"></div>
+          </div>
+        </div>
+        <!-- Progreso anual -->
+        <div style="border-top:1px solid var(--border); padding-top:8px">
+          <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:3px">
+            <span>Avance vs Meta Anual</span>
+            <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
+          </div>
+          <div style="height:5px; background:#e2e8f0; border-radius:3px; overflow:hidden">
+            <div style="height:100%; width:${Math.min(progresoAnual,100)}%; background:${color}88; border-radius:3px"></div>
+          </div>
+          <div style="font-size:7.5px; color:var(--txl); text-align:right; margin-top:3px; font-weight:700">META ANUAL: ${fmtCOP(metaAnualVal)}</div>
+        </div>
+      </div>
+    </div>`;
+    }
+    function kpi(lbl, val, sub, cls = '', ico = '', p = null, delay = 0) {
+      return `<div class="kc" style="animation-delay:${delay}s">
+    <div class="kl">${lbl}</div><div class="kv ${cls}">${val}</div><div class="ks">${sub}</div>
+    ${ico ? `<div class="kico">${ico}</div>` : ''}
+    ${p !== null ? `<div class="kbar"><div class="kbf" style="width:${Math.min(p, 100)}%"></div></div>` : ''}
+  </div>`;
+    }
+
+    // ══════════════════════════════════════════════
+    // DIARIO
+    // ══════════════════════════════════════════════
+    function renderDiario() {
+      const ger = document.getElementById('dia-ger')?.value || 'BANCA';
+      const range = getRange('dia-d1', 'dia-d2');
+      const color = GC[ger];
+
+      const startLbl = MONTHS_LBL[MONTHS_ISO.indexOf(range[0])];
+      const endLbl = MONTHS_LBL[MONTHS_ISO.indexOf(range[range.length - 1])];
+      const periodLbl = range.length === 1 ? `${startLbl} 2026` : `${startLbl} - ${endLbl} 2026`;
+
+      const subtitEl = document.getElementById('dia-subtit');
+      if (subtitEl) subtitEl.textContent = `${ger} · ${periodLbl}`;
+
+      // Get all days in the range
+      const pptoGer = PPTO_DIARIO[ger] || {};
+      const diasPpto = Object.entries(pptoGer).filter(([d]) => range.includes(d.slice(0, 7))).sort(([a], [b]) => a.localeCompare(b));
+      const fechasLab = diasPpto.map(([d]) => d);
+      const metaD = diasPpto.map(([, v]) => v);
+
+      // Real from RAW
+      const realMap = {};
+      RAW.filter(r => r.GERENCIA === ger && range.includes((r.FECHA_FINALIZACION || '').slice(0, 7)))
+        .forEach(r => { const d = (r.FECHA_FINALIZACION || '').slice(0, 10); if (d) realMap[d] = (realMap[d] || 0) + (parseFloat(r.VALOR_TOTAL) || 0); });
+
+      const realD = fechasLab.map(d => realMap[d] || 0);
+
+      // Acumulados
+      let metaAc = 0, realAc = 0;
+      const metaAcArr = [], realAcArr = [];
+      for (let i = 0; i < fechasLab.length; i++) {
+        metaAc += metaD[i]; realAc += realD[i];
+        metaAcArr.push(metaAc); realAcArr.push(realAc);
+      }
+
+      const totalMeta = metaD.reduce((s, v) => s + v, 0);
+      const totalReal = realD.reduce((s, v) => s + v, 0);
+      const cp = pct(totalReal, totalMeta);
+
+      // Proyeccion mensual (meta mensual total del periodo)
+      const metaTotalPeriodo = totalMeta;
+      const faltante = Math.max(0, totalMeta - totalReal);
+      const exceso = Math.max(0, totalReal - totalMeta);
+      const cpAcum = pct(realAcArr[realAcArr.length - 1] || 0, metaAcArr[metaAcArr.length - 1] || 1);
+
+      // Actualizar banda con métricas enriquecidas
+      document.getElementById('dia-band').innerHTML = `
+    <div class="si"><span class="sn lima">${ger}</span><span class="sl">Proyecto</span></div>
+    <div class="si"><span class="sn">${periodLbl}</span><span class="sl">Periodo analizado</span></div>
+    <div class="si"><span class="sn">${fmtCOP(totalMeta)}</span><span class="sl">Meta total periodo</span></div>
+    <div class="si"><span class="sn">${fmtCOP(totalReal)}</span><span class="sl">Producción real</span></div>
+    <div class="si"><span class="sn" style="color:${cp >= 95 ? 'var(--ok)' : cp >= 75 ? 'var(--warn)' : 'var(--bad)'}">${cp}%</span><span class="sl">%Cump periodo</span></div>
+    <div class="si"><span class="sn">${fmtCOP(metaAcArr[metaAcArr.length-1]||0)}</span><span class="sl">Meta acumulada</span></div>
+    <div class="si"><span class="sn">${fmtCOP(realAcArr[realAcArr.length-1]||0)}</span><span class="sl">Prod. acumulada</span></div>
+    <div class="si"><span class="sn" style="color:${cpAcum >= 95 ? 'var(--ok)' : cpAcum >= 75 ? 'var(--warn)' : 'var(--bad)'}">${cpAcum}%</span><span class="sl">%Cump acumulado</span></div>
+    <div class="si"><span class="sn" style="color:${faltante > 0 ? 'var(--bad)' : 'var(--ok)'}">${faltante > 0 ? '−' + fmtCOP(faltante) : '+' + fmtCOP(exceso)}</span><span class="sl">${faltante > 0 ? 'Faltó para meta' : 'Exceso sobre meta'}</span></div>
+    <div class="si"><span class="sn">${fechasLab.length}</span><span class="sl">Días con meta</span></div>`;
+
+      const lbl = fechasLab.map(d => d.slice(5)); // month-day
+
+      // Gráfica diaria: barras apiladas con faltante visual
+      const gapD = realD.map((r, i) => Math.max(0, metaD[i] - r));
+      const excessD = realD.map((r, i) => Math.max(0, r - metaD[i]));
+      const baseD = realD.map((r, i) => Math.min(r, metaD[i]));
+
+      function fmtCOPShort2(v) {
+        if (!v) return '$0';
+        if (Math.abs(v) >= 1e9) return '$' + (v / 1e9).toFixed(1).replace('.', ',') + 'B';
+        if (Math.abs(v) >= 1e6) return '$' + (v / 1e6).toFixed(1).replace('.', ',') + 'M';
+        if (Math.abs(v) >= 1e3) return '$' + Math.round(v / 1e3) + 'K';
+        return '$' + v;
+      }
+
+      mkC('ch-dia-main', 'bar', {
+        labels: lbl,
+        datasets: [
+          {
+            label: 'Producción Real',
+            data: baseD,
+            backgroundColor: color + 'cc',
+            borderRadius: [3, 3, 0, 0],
+            borderSkipped: 'bottom',
+            stack: 'stack',
+            datalabels: {
+              display: ctx => baseD[ctx.dataIndex] > 0 && excessD[ctx.dataIndex] === 0,
+              anchor: 'end', align: 'top', offset: 1,
+              color: color,
+              font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              formatter: (v, ctx) => fmtCOPShort2(realD[ctx.dataIndex])
+            }
+          },
+          {
+            label: 'Faltó para Meta',
+            data: gapD,
+            backgroundColor: 'rgba(239,68,68,0.2)',
+            borderColor: 'rgba(239,68,68,0.6)',
+            borderWidth: 1,
+            borderRadius: [3, 3, 0, 0],
+            borderSkipped: 'bottom',
+            stack: 'stack',
+            datalabels: {
+              display: ctx => gapD[ctx.dataIndex] > 0,
+              anchor: 'end', align: 'top', offset: 1,
+              color: '#dc2626',
+              font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              formatter: (v, ctx) => `−${fmtCOPShort2(gapD[ctx.dataIndex])}`
+            }
+          },
+          {
+            label: 'Superó Meta',
+            data: excessD,
+            backgroundColor: 'rgba(34,197,94,0.5)',
+            borderColor: '#16a34a',
+            borderWidth: 1,
+            borderRadius: [3, 3, 0, 0],
+            borderSkipped: 'bottom',
+            stack: 'stack',
+            datalabels: {
+              display: ctx => excessD[ctx.dataIndex] > 0,
+              anchor: 'end', align: 'top', offset: 1,
+              color: '#15803d',
+              font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              formatter: (v, ctx) => `+${fmtCOPShort2(excessD[ctx.dataIndex])}`
+            }
+          },
+          {
+            label: 'Meta Día',
+            data: metaD,
+            type: 'line',
+            borderColor: '#C5D336',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            tension: 0,
+            pointRadius: 0,
+            fill: false,
+            stack: undefined,
+            order: 1,
+            datalabels: { display: false }
+          }
+        ]
+      }, {
+        plugins: {
+          ...CT.plugins,
+          legend: { ...CT.plugins.legend, position: 'top' },
+          tooltip: {
+            ...CT.plugins.tooltip,
+            callbacks: {
+              label: ctx => {
+                const i = ctx.dataIndex;
+                if (ctx.dataset.label === 'Producción Real') return ` Real: ${fmtCOP(realD[i])}`;
+                if (ctx.dataset.label === 'Faltó para Meta') return gapD[i] > 0 ? ` ⚠️ Faltó: ${fmtCOP(gapD[i])}` : null;
+                if (ctx.dataset.label === 'Superó Meta') return excessD[i] > 0 ? ` ✅ Exceso: +${fmtCOP(excessD[i])}` : null;
+                if (ctx.dataset.label === 'Meta Día') return ` Meta: ${fmtCOP(metaD[i])}`;
+                return null;
+              },
+              filter: item => item.raw > 0
+            }
+          }
+        },
+        scales: {
+          y: { stacked: true, ticks: { color: '#5c6b8a', callback: v => fmtCOPShort2(v) }, grid: { color: 'rgba(0,0,0,.04)' } },
+          x: { stacked: true, ticks: { color: '#5c6b8a', font: { size: 9 }, maxRotation: 90, minRotation: 90 }, grid: { display: false } }
+        }
+      });
+
+      // Gráfica acumulada con área de faltante
+      const gapAcArr = metaAcArr.map((m, i) => Math.max(0, m - (realAcArr[i] || 0)));
+      mkC('ch-dia-acum', 'line', {
+        labels: lbl,
+        datasets: [
+          {
+            label: 'Meta Acumulada',
+            data: metaAcArr,
+            borderColor: '#C5D336',
+            backgroundColor: 'rgba(197,211,54,.08)',
+            borderWidth: 2.5,
+            fill: false,
+            tension: .35,
+            borderDash: [5, 4],
+            pointRadius: 0,
+            datalabels: {
+              display: ctx => ctx.dataIndex === metaAcArr.length - 1,
+              anchor: 'end', align: 'right',
+              color: '#9eaa25',
+              font: { family: "'DM Mono',monospace", weight: 'bold', size: 9 },
+              formatter: v => 'Meta: ' + fmtCOPShort2(v)
+            }
+          },
+          {
+            label: 'Prod. Acumulada',
+            data: realAcArr,
+            borderColor: color,
+            backgroundColor: color + '18',
+            borderWidth: 3,
+            fill: true,
+            tension: .35,
+            pointRadius: 2,
+            pointBackgroundColor: color,
+            datalabels: {
+              display: ctx => ctx.dataIndex === realAcArr.length - 1,
+              anchor: 'end', align: 'right',
+              color: color,
+              font: { family: "'DM Mono',monospace", weight: 'bold', size: 9 },
+              formatter: v => 'Real: ' + fmtCOPShort2(v)
+            }
+          },
+          {
+            label: 'Faltante Acumulado',
+            data: gapAcArr,
+            borderColor: 'rgba(239,68,68,0.4)',
+            backgroundColor: 'rgba(239,68,68,0.08)',
+            borderWidth: 1.5,
+            fill: false,
+            tension: .35,
+            pointRadius: 0,
+            borderDash: [3, 3],
+            datalabels: { display: false }
+          }
+        ]
+      }, {
+        plugins: {
+          ...CT.plugins,
+          legend: { ...CT.plugins.legend, position: 'top' },
+          tooltip: {
+            ...CT.plugins.tooltip,
+            callbacks: {
+              label: ctx => {
+                const i = ctx.dataIndex;
+                if (ctx.dataset.label === 'Meta Acumulada') return ` Meta Acum: ${fmtCOP(metaAcArr[i])}`;
+                if (ctx.dataset.label === 'Prod. Acumulada') {
+                  const cumpAc = pct(realAcArr[i], metaAcArr[i]);
+                  return ` Prod Acum: ${fmtCOP(realAcArr[i])} · ${cumpAc}%`;
+                }
+                if (ctx.dataset.label === 'Faltante Acumulado') return gapAcArr[i] > 0 ? ` Faltante: ${fmtCOP(gapAcArr[i])}` : null;
+                return null;
+              },
+              filter: item => item.raw !== null
+            }
+          }
+        },
+        scales: {
+          y: { ticks: { color: '#5c6b8a', callback: v => fmtCOPShort2(v) }, grid: { color: 'rgba(0,0,0,.04)' } },
+          x: { ticks: { color: '#5c6b8a', font: { size: 9 }, maxRotation: 90, minRotation: 90 }, grid: { display: false } }
+        }
+      });
+    }
+
+    // ══════════════════════════════════════════════
+    // ZONAS
+    // ══════════════════════════════════════════════
+    function renderZonas() {
+      const ger = document.getElementById('zona-ger')?.value || 'CIRION';
+      const zonaData = ger === 'CIRION' ? CIRION_ZONAS : (ger === 'BANCA' ? BANCA_ZONAS : LIBERTY_ZONAS);
+      const color = GC[ger];
+
+      // Annual totals
+      const zTot = {};
+      for (const [z, mv] of Object.entries(zonaData)) {
+        zTot[z] = Object.values(mv).reduce((s, v) => s + v, 0);
+      }
+      const topZ = Object.entries(zTot).sort((a, b) => b[1] - a[1]);
+      const total = topZ.reduce((s, [, v]) => s + v, 0);
+
+      // Band
+      document.getElementById('zona-band').innerHTML = `
+    <div class="si"><span class="sn lima">${ger}</span><span class="sl">Proyecto</span></div>
+    <div class="si"><span class="sn">${topZ.length}</span><span class="sl">Zonas / Centros</span></div>
+    <div class="si"><span class="sn">${fmtCOP(total)}</span><span class="sl">Meta anual total</span></div>
+    <div class="si"><span class="sn lima">${fmtCOP(total / 12)}</span><span class="sl">Promedio mensual</span></div>`;
+
+      // Bar chart
+      const top10 = topZ.slice(0, 10);
+      mkC('ch-zona-bar', 'bar', {
+        labels: top10.map(([z]) => z.length > 20 ? z.slice(0, 20) + '…' : z),
+        datasets: [{ label: 'Meta anual', data: top10.map(([, v]) => v), backgroundColor: color, borderRadius: 6, borderSkipped: false }]
+      }, {
+        indexAxis: 'y',
+        plugins: { ...CT.plugins, legend: { display: false }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${fmtCOP(ctx.raw)}` } } },
+        scales: { x: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } }
+      });
+
+      // Dona
+      const top6 = topZ.slice(0, 6);
+      const otros = topZ.slice(6).reduce((s, [, v]) => s + v, 0);
+      const donaL = [...top6.map(([z]) => z.length > 16 ? z.slice(0, 16) + '…' : z)];
+      const donaD = [...top6.map(([, v]) => v)];
+      if (otros > 0) { donaL.push('Otros'); donaD.push(otros); }
+      mkC('ch-zona-dona', 'doughnut', {
+        labels: donaL,
+        datasets: [{ data: donaD, backgroundColor: PAL.slice(0, donaL.length), borderWidth: 0, hoverOffset: 5 }]
+      }, { cutout: '58%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+
+      // Tendencia top 6
+      const top6Z = topZ.slice(0, 6).map(([z]) => z);
+      mkC('ch-zona-tend', 'line', {
+        labels: MONTHS_LBL,
+        datasets: top6Z.map((z, i) => ({
+          label: z.length > 14 ? z.slice(0, 14) + '…' : z,
+          data: MONTHS_ISO.map(m => (zonaData[z] && zonaData[z][m]) || 0),
+          borderColor: PAL[i], backgroundColor: PAL[i] + '18',
+          borderWidth: 1.8, fill: false, tension: .4, pointRadius: 2
+        }))
+      }, {
+        plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'top' }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtCOP(ctx.raw)}` } } },
+        scales: { y: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, x: { ticks: { color: '#5c6b8a' }, grid: { display: false } } }
+      });
+    }
+
+    // ══════════════════════════════════════════════
+    // CIRION
+    // ══════════════════════════════════════════════
+    function renderCirion() {
+      const range = getRange('cir-d1', 'cir-d2');
+      const { d1: cirD1, d2: cirD2 } = getRangeDates('cir-d1', 'cir-d2');
+      const c = RAW.filter(r => {
+        if (r.GERENCIA !== 'CIRION') return false;
+        const f = r.FECHA_FINALIZACION || '';
+        if (cirD1 && f < cirD1) return false;
+        if (cirD2 && f > cirD2) return false;
+        return true;
+      });
+      const fin = c.filter(r => (r.ESTADO_ACTIVIDAD || '').toUpperCase().includes('FINAL')).length;
+      const vt = sumBy(c, 'VALOR_TOTAL');
+      const prod = prodReal('CIRION', range, cirD1, cirD2);
+      const meta = metaMes('CIRION', range);
+      const cp = pct(prod, meta);
+
+      document.getElementById('cir-band').innerHTML = `
+    <div class="si"><span class="sn">${c.length.toLocaleString()}</span><span class="sl">Total actividades</span></div>
+    <div class="si"><span class="sn lima">${Math.round(fin / c.length * 100) || 0}%</span><span class="sl">Finalizadas</span></div>
+    <div class="si"><span class="sn">${fmtCOP(vt)}</span><span class="sl">Producción real</span></div>
+    <div class="si"><span class="sn">${fmtCOP(meta)}</span><span class="sl">Meta Periodo</span></div>
+    <div class="si"><span class="sn" style="color:${cp >= 95 ? 'var(--ok)' : cp >= 75 ? 'var(--warn)' : 'var(--bad)'}">${cp}%</span><span class="sl">%Cump Periodo</span></div>
+    <div class="si"><span class="sn lima">${fmtCOP(metaAnual('CIRION'))}</span><span class="sl">Meta anual 2026</span></div>`;
+
+      const periodLbl = range.length === 1 ? MONTHS_LBL[MONTHS_ISO.indexOf(range[0])] : 'Periodo';
+
+      document.getElementById('cir-kpis').innerHTML = [
+        kpi('Total Actividades', c.length.toLocaleString(), 'Cirion', '', '🔵'),
+        kpi('Finalizadas', fin.toLocaleString(), `${Math.round(fin / c.length * 100) || 0}%`, 'ok', '✅', Math.round(fin / c.length * 100) || 0),
+        kpi('Producción Real', fmtCOP(vt), 'Valor total histórico', '', '💰'),
+        kpi('%Cump Periodo', cp + '%', `${periodLbl} · ${fmtCOP(prod)} / ${fmtCOP(meta)}`, cTClass(cp), '🎯', cp),
+        kpi('Meta Anual', fmtCOP(metaAnual('CIRION')), 'Presupuesto 2026', 'lima', '📆'),
+        kpi('Zonas', Object.keys(CIRION_ZONAS).length.toString(), 'Centros de costo activos', 'lima', '📍'),
+      ].join('');
+
+      // Cat blocks: ASSURANCE, MANTENIMIENTO, DELIVERY
+      const catColors = { ASSURANCE: '#001D62', MANTENIMIENTO: '#0847a3', DELIVERY: '#166534' };
+      document.getElementById('cir-cat-blocks').innerHTML = Object.entries(CIRION_CATS).map(([cat, mv]) => {
+        const total = Object.values(mv).reduce((s, v) => s + v, 0);
+        const pct12 = MONTHS_ISO.map(m => mv[m] || 0);
+        const catColor = catColors[cat] || '#001D62';
+        return `<div class="pb">
+      <div class="pbh" style="border-left:4px solid ${catColor}">
+        <div class="pbt" style="color:${catColor}">${cat}</div>
+        <div style="font-size:10px;color:var(--txm)">Total anual: <b style="font-family:'DM Mono',monospace">${fmtCOP(total)}</b></div>
+      </div>
+      <div class="pbb">
+        <div class="pi"><div class="pil">Total anual proyectado</div><div class="piv" style="color:${catColor}">${fmtCOP(total)}</div></div>
+        <div class="pi"><div class="pil">Promedio mensual</div><div class="piv lima">${fmtCOP(total / 12)}</div></div>
+        <div class="pi"><div class="pil">Mejor mes</div><div class="piv ok">${fmtCOP(Math.max(...pct12))}</div></div>
+        <div class="pi"><div class="pil">% del total Cirion</div><div class="piv">${pct(total, Object.values(CIRION_CATS).reduce((s, v) => s + Object.values(v).reduce((a, b) => a + b, 0), 0))}%</div></div>
+      </div>
+    </div>`;
+      }).join('');
+
+      // Tipo dona
+      const catTotals = Object.entries(CIRION_CATS).map(([k, v]) => [k, Object.values(v).reduce((s, x) => s + x, 0)]);
+      mkC('ch-cir-tipo', 'doughnut', {
+        labels: catTotals.map(([k]) => k),
+        datasets: [{ data: catTotals.map(([, v]) => v), backgroundColor: ['#001D62', '#0847a3', '#166534'], borderWidth: 0, hoverOffset: 5 }]
+      }, { cutout: '63%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+
+      // Top zonas Cirion
+      const zTot = Object.entries(CIRION_ZONAS).map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)]).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      mkC('ch-cir-zona', 'bar', {
+        labels: zTot.map(([z]) => z.length > 16 ? z.slice(0, 16) + '…' : z),
+        datasets: [{ label: 'Meta anual', data: zTot.map(([, v]) => v), backgroundColor: '#C5D336', borderRadius: 5, borderSkipped: false }]
+      }, {
+        indexAxis: 'y',
+        plugins: { ...CT.plugins, legend: { display: false }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${fmtCOP(ctx.raw)}` } } },
+        scales: { x: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } }
+      });
+
+      // Tendencia mensual por tipo
+      mkC('ch-cir-tend', 'line', {
+        labels: MONTHS_LBL,
+        datasets: Object.entries(CIRION_CATS).map(([cat, mv], i) => ({
+          label: cat, data: MONTHS_ISO.map(m => mv[m] || 0),
+          borderColor: Object.values(catColors)[i], backgroundColor: Object.values(catColors)[i] + '18',
+          borderWidth: 2, fill: false, tension: .4, pointRadius: 2
+        }))
+      }, {
+        plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'top' }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtCOP(ctx.raw)}` } } },
+        scales: { y: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, x: { ticks: { color: '#5c6b8a' }, grid: { display: false } } }
+      });
+
+      // Estado real
+      const estC = cntBy(c, 'ESTADO_ACTIVIDAD');
+      const estColors = Object.keys(estC).map(k => { const u = k.toUpperCase(); return u.includes('FINAL') ? '#22c55e' : u.includes('EJECUC') ? '#3b82f6' : u.includes('PEND') ? '#f59e0b' : '#e8334a'; });
+      mkC('ch-cir-estado', 'doughnut', {
+        labels: Object.keys(estC),
+        datasets: [{ data: Object.values(estC), backgroundColor: estColors, borderWidth: 0, hoverOffset: 5 }]
+      }, { cutout: '62%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+
+      // Proyectado vs real
+      mkC('ch-cir-pvr', 'bar', {
+        labels: MONTHS_LBL,
+        datasets: [
+          { label: 'Meta', data: MONTHS_ISO.map(m => metaMes('CIRION', m)), backgroundColor: 'rgba(0,29,98,.18)', borderColor: '#001D62', borderWidth: 1.5, borderRadius: 4, borderSkipped: false },
+          { label: 'Real', data: MONTHS_ISO.map(m => prodReal('CIRION', m)), backgroundColor: '#001D62', borderColor: '#001D62', borderWidth: 0, borderRadius: 4, borderSkipped: false }
+        ]
+      }, {
+        plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'top' }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtCOP(ctx.raw)}` } } },
+        scales: { y: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, x: { ticks: { color: '#5c6b8a' }, grid: { display: false } } }
+      });
+    }
+
+    // ══════════════════════════════════════════════
+    // LIBERTY
+    // ══════════════════════════════════════════════
+    function renderLiberty() {
+      const range = getRange('lib-d1', 'lib-d2');
+      const { d1: libD1, d2: libD2 } = getRangeDates('lib-d1', 'lib-d2');
+      const l = RAW.filter(r => {
+        if (r.GERENCIA !== 'LIBERTY') return false;
+        const f = r.FECHA_FINALIZACION || '';
+        if (libD1 && f < libD1) return false;
+        if (libD2 && f > libD2) return false;
+        return true;
+      });
+      const fin = l.filter(r => (r.ESTADO_ACTIVIDAD || '').toUpperCase().includes('FINAL')).length;
+      const vt = sumBy(l, 'VALOR_TOTAL');
+      const prod = prodReal('LIBERTY', range, libD1, libD2);
+      const meta = metaMes('LIBERTY', range);
+      const cp = pct(prod, meta);
+
+      document.getElementById('lib-band').innerHTML = `
+    <div class="si"><span class="sn">${l.length.toLocaleString()}</span><span class="sl">Total actividades</span></div>
+    <div class="si"><span class="sn lima">${Math.round(fin / (l.length || 1) * 100)}%</span><span class="sl">Finalizadas</span></div>
+    <div class="si"><span class="sn">${fmtCOP(vt)}</span><span class="sl">Producción real</span></div>
+    <div class="si"><span class="sn">${fmtCOP(meta)}</span><span class="sl">Meta Periodo</span></div>
+    <div class="si"><span class="sn" style="color:${cp >= 95 ? 'var(--ok)' : cp >= 75 ? 'var(--warn)' : 'var(--bad)'}">${cp}%</span><span class="sl">%Cump Periodo</span></div>
+    <div class="si"><span class="sn lima">${fmtCOP(metaAnual('LIBERTY'))}</span><span class="sl">Meta anual 2026</span></div>`;
+
+      const periodLbl = range.length === 1 ? MONTHS_LBL[MONTHS_ISO.indexOf(range[0])] : 'Periodo';
+
+      document.getElementById('lib-kpis').innerHTML = [
+        kpi('Total Actividades', l.length.toLocaleString(), 'Liberty', '', '🟢'),
+        kpi('Finalizadas', fin.toLocaleString(), `${Math.round(fin / (l.length || 1) * 100)}%`, 'ok', '✅', Math.round(fin / (l.length || 1) * 100)),
+        kpi('Producción Real', fmtCOP(vt), 'Valor total histórico', '', '💰'),
+        kpi('%Cump Periodo', cp + '%', `${periodLbl} · ${fmtCOP(prod)} / ${fmtCOP(meta)}`, cTClass(cp), '🎯', cp),
+        kpi('Meta Anual', fmtCOP(metaAnual('LIBERTY')), 'Presupuesto 2026', 'lima', '📆'),
+        kpi('Zonas', '2', 'Cali · Medellín', 'lima', '📍'),
+      ].join('');
+
+      const estL = cntBy(l, 'ESTADO_ACTIVIDAD');
+      const estCL = Object.keys(estL).map(k => { const u = k.toUpperCase(); return u.includes('FINAL') ? '#22c55e' : u.includes('EJECUC') ? '#3b82f6' : u.includes('PEND') ? '#f59e0b' : '#e8334a'; });
+      mkC('ch-lib-estado', 'doughnut', { labels: Object.keys(estL), datasets: [{ data: Object.values(estL), backgroundColor: estCL, borderWidth: 0, hoverOffset: 5 }] }, { cutout: '62%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+
+      mkC('ch-lib-pvr', 'bar', {
+        labels: MONTHS_LBL,
+        datasets: [
+          { label: 'Meta', data: MONTHS_ISO.map(m => metaMes('LIBERTY', m)), backgroundColor: 'rgba(8,71,163,.18)', borderColor: '#0847a3', borderWidth: 1.5, borderRadius: 4, borderSkipped: false },
+          { label: 'Real', data: MONTHS_ISO.map(m => prodReal('LIBERTY', m)), backgroundColor: '#0847a3', borderRadius: 4, borderSkipped: false }
+        ]
+      }, {
+        plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'top' }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtCOP(ctx.raw)}` } } },
+        scales: { y: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, x: { ticks: { color: '#5c6b8a' }, grid: { display: false } } }
+      });
+
+      const zonaLTot = Object.entries(LIBERTY_ZONAS).map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)]).sort((a, b) => b[1] - a[1]);
+      const zonaLTop = zonaLTot.slice(0, 6);
+      mkC('ch-lib-zona', 'doughnut', {
+        labels: zonaLTop.map(([z]) => z),
+        datasets: [{ data: zonaLTop.map(([, v]) => v), backgroundColor: PAL.slice(0, Math.max(zonaLTop.length, 2)), borderWidth: 0, hoverOffset: 5 }]
+      }, { cutout: '60%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+
+      const tipL = cntBy(l, 'TIPO_ACTIVIDAD');
+      const topT = topN(tipL, 7);
+      mkC('ch-lib-tipo', 'bar', {
+        labels: topT.map(([k]) => k.length > 18 ? k.slice(0, 18) + '…' : k),
+        datasets: [{ label: 'Actividades', data: topT.map(([, v]) => v), backgroundColor: '#0847a3', borderRadius: 5, borderSkipped: false }]
+      }, {
+        indexAxis: 'y',
+        plugins: { ...CT.plugins, legend: { display: false } },
+        scales: { x: { ticks: { color: '#5c6b8a' }, grid: { color: 'rgba(0,0,0,.05)' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } }
+      });
+    }
+
+    // ══════════════════════════════════════════════
+    // BANCA
+    // ══════════════════════════════════════════════
+    function renderBanca() {
+      const range = getRange('ban-d1', 'ban-d2');
+      const { d1: banD1, d2: banD2 } = getRangeDates('ban-d1', 'ban-d2');
+      const b = RAW.filter(r => {
+        if (r.GERENCIA !== 'BANCA') return false;
+        const f = r.FECHA_FINALIZACION || '';
+        if (banD1 && f < banD1) return false;
+        if (banD2 && f > banD2) return false;
+        return true;
+      });
+      const fin = b.filter(r => (r.ESTADO_ACTIVIDAD || '').toUpperCase().includes('FINAL')).length;
+      const vt = sumBy(b, 'VALOR_TOTAL');
+      const prod = prodReal('BANCA', range, banD1, banD2);
+      const meta = metaMes('BANCA', range);
+      const cp = pct(prod, meta);
+
+      document.getElementById('ban-band').innerHTML = `
+    <div class="si"><span class="sn">${b.length.toLocaleString()}</span><span class="sl">Total actividades</span></div>
+    <div class="si"><span class="sn lima">${Math.round(fin / (b.length || 1) * 100)}%</span><span class="sl">Finalizadas</span></div>
+    <div class="si"><span class="sn">${fmtCOP(vt)}</span><span class="sl">Producción real</span></div>
+    <div class="si"><span class="sn">${fmtCOP(meta)}</span><span class="sl">Meta Periodo</span></div>
+    <div class="si"><span class="sn" style="color:${cp >= 95 ? 'var(--ok)' : cp >= 75 ? 'var(--warn)' : 'var(--bad)'}">${cp}%</span><span class="sl">%Cump Periodo</span></div>
+    <div class="si"><span class="sn lima">${fmtCOP(metaAnual('BANCA'))}</span><span class="sl">Meta anual 2026</span></div>`;
+
+      const periodLbl = range.length === 1 ? MONTHS_LBL[MONTHS_ISO.indexOf(range[0])] : 'Periodo';
+
+      document.getElementById('ban-kpis').innerHTML = [
+        kpi('Total Actividades', b.length.toLocaleString(), 'Banca', '', '🏦'),
+        kpi('Finalizadas', fin.toLocaleString(), `${Math.round(fin / (b.length || 1) * 100)}%`, 'ok', '✅', Math.round(fin / (b.length || 1) * 100)),
+        kpi('Producción Real', fmtCOP(vt), 'Valor total histórico', '', '💰'),
+        kpi('%Cump Periodo', cp + '%', `${periodLbl} · ${fmtCOP(prod)} / ${fmtCOP(meta)}`, cTClass(cp), '🎯', cp),
+        kpi('Meta Anual', fmtCOP(metaAnual('BANCA')), 'Presupuesto 2026', 'lima', '📆'),
+        kpi('Zonas', Object.keys(BANCA_ZONAS).length.toString(), 'Redes y centros', 'lima', '📍'),
+      ].join('');
+
+      const estB = cntBy(b, 'ESTADO_ACTIVIDAD');
+      const estCB = Object.keys(estB).map(k => { const u = k.toUpperCase(); return u.includes('FINAL') ? '#22c55e' : u.includes('EJECUC') ? '#3b82f6' : u.includes('PEND') ? '#f59e0b' : '#e8334a'; });
+      mkC('ch-ban-estado', 'doughnut', { labels: Object.keys(estB), datasets: [{ data: Object.values(estB), backgroundColor: estCB, borderWidth: 0, hoverOffset: 5 }] }, { cutout: '62%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+
+      mkC('ch-ban-pvr', 'bar', {
+        labels: MONTHS_LBL,
+        datasets: [
+          { label: 'Meta', data: MONTHS_ISO.map(m => metaMes('BANCA', m)), backgroundColor: 'rgba(22,101,52,.18)', borderColor: '#166534', borderWidth: 1.5, borderRadius: 4, borderSkipped: false },
+          { label: 'Real', data: MONTHS_ISO.map(m => prodReal('BANCA', m)), backgroundColor: '#166534', borderRadius: 4, borderSkipped: false }
+        ]
+      }, {
+        plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'top' }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtCOP(ctx.raw)}` } } },
+        scales: { y: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, x: { ticks: { color: '#5c6b8a' }, grid: { display: false } } }
+      });
+
+      // Red banca
+      const redB = cntBy(b, 'RED_ASOCIADA');
+      const validR = Object.fromEntries(Object.entries(redB).filter(([k]) => k !== 'NO APLICA'));
+      const topR = topN(validR, 6);
+      mkC('ch-ban-red', 'bar', {
+        labels: topR.map(([k]) => k.length > 14 ? k.slice(0, 14) + '…' : k),
+        datasets: [{ label: 'Actividades', data: topR.map(([, v]) => v), backgroundColor: '#C5D336', borderRadius: 5, borderSkipped: false }]
+      }, {
+        indexAxis: 'y',
+        plugins: { ...CT.plugins, legend: { display: false } },
+        scales: { x: { ticks: { color: '#5c6b8a' }, grid: { color: 'rgba(0,0,0,.05)' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } }
+      });
+
+      // Top zonas banca
+      const zTotB = Object.entries(BANCA_ZONAS).map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)]).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      mkC('ch-ban-zona', 'bar', {
+        labels: zTotB.map(([z]) => z.length > 16 ? z.slice(0, 16) + '…' : z),
+        datasets: [{ label: 'Meta anual', data: zTotB.map(([, v]) => v), backgroundColor: '#166534', borderRadius: 5, borderSkipped: false }]
+      }, {
+        indexAxis: 'y',
+        plugins: { ...CT.plugins, legend: { display: false }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${fmtCOP(ctx.raw)}` } } },
+        scales: { x: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } }
+      });
+
+      const formaB = cntBy(b, 'FORMA_ATENCION');
+      const validF = Object.fromEntries(Object.entries(formaB).filter(([k]) => k !== 'NO APLICA'));
+      mkC('ch-ban-forma', 'doughnut', {
+        labels: Object.keys(validF),
+        datasets: [{ data: Object.values(validF), backgroundColor: ['#166534', '#22c55e', '#4ade80'], borderWidth: 0, hoverOffset: 5 }]
+      }, { cutout: '60%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+    }
+
+    // ══════════════════════════════════════════════
+    // DETALLE TABLE
+    // ══════════════════════════════════════════════
+    let _dGer = 'todos', _dPage = 1, _dSrch = '', _dEst = '', _dD1 = '', _dD2 = '';
+    const DET_SZ = 50;
+
+    const DCOLS = [
+      { h: 'ID', k: 'ID_TA' }, { h: 'Proyecto', k: 'GERENCIA', t: 'ger' }, { h: 'Tipo Act.', k: 'TIPO_ACTIVIDAD' },
+      { h: 'Estado', k: 'ESTADO_ACTIVIDAD', t: 'status' }, { h: 'Fecha', k: 'FECHA_FINALIZACION' },
+      { h: 'Valor Total', k: 'VALOR_TOTAL', t: 'cur' }, { h: 'Coordinador', k: 'COORDINADOR' },
+      { h: 'Ciudad/Zona', k: 'CIUDAD' }, { h: 'Lugar', k: 'LUGAR_EJECUCION' },
+    ];
+
+    function setDetGer(g) {
+      _dGer = g; _dPage = 1;
+      document.querySelectorAll('#det-pfg .pfb').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase() === g.toLowerCase() || (b.textContent === 'Todos' && g === 'todos')));
+      renderDetalle();
+    }
+    function resetDet() {
+      _dSrch = ''; _dEst = ''; _dD1 = ''; _dD2 = ''; _dPage = 1;
+      ['det-srch', 'det-est', 'det-d1', 'det-d2'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+      renderDetalle();
+    }
+    function renderDetalle() {
+      _dSrch = (document.getElementById('det-srch')?.value || '').toLowerCase();
+      _dEst = document.getElementById('det-est')?.value || '';
+      _dD1 = document.getElementById('det-d1')?.value || '';
+      _dD2 = document.getElementById('det-d2')?.value || '';
+
+      let rows = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
+      if (_dSrch) rows = rows.filter(r => DCOLS.some(c => String(r[c.k] || '').toLowerCase().includes(_dSrch)));
+      if (_dEst) rows = rows.filter(r => r.ESTADO_ACTIVIDAD === _dEst);
+      if (_dD1) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') >= _dD1);
+      if (_dD2) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') <= _dD2);
+
+      const total = rows.length;
+      const pages = Math.max(1, Math.ceil(total / DET_SZ));
+      if (_dPage > pages) _dPage = pages;
+      const sl = rows.slice((_dPage - 1) * DET_SZ, _dPage * DET_SZ);
+
+      const t = document.getElementById('det-tbl');
+      if (!t) return;
+      if (!sl.length) { t.innerHTML = '<tbody><tr><td colspan="9" style="text-align:center;padding:50px;color:var(--txm)">Sin registros</td></tr></tbody>'; document.getElementById('det-cnt').textContent = '0'; document.getElementById('det-pg').innerHTML = ''; return; }
+
+      t.innerHTML = `<thead><tr>${DCOLS.map(c => `<th>${c.h}</th>`).join('')}</tr></thead><tbody>
+    ${sl.map((r, i) => `<tr style="background:${i % 2 ? '' : 'rgba(0,29,98,.018)'}">
+      ${DCOLS.map(c => {
+        const v = String(r[c.k] || '—');
+        if (c.t === 'ger') return `<td><span class="gb ${r[c.k] === 'CIRION' ? 'c' : r[c.k] === 'LIBERTY' ? 'l' : 'b'}">${v}</span></td>`;
+        if (c.t === 'status') return `<td><span class="sp ${spClass(v)}">${v}</span></td>`;
+        if (c.t === 'cur') return `<td style="font-family:'DM Mono',monospace;font-size:10.5px">${fmtCOP(r[c.k] || 0)}</td>`;
+        return `<td title="${v}">${v}</td>`;
+      }).join('')}
+    </tr>`).join('')}
+  </tbody>`;
+
+      document.getElementById('det-cnt').textContent = `${total.toLocaleString()} registros · pág ${_dPage}/${pages}`;
+      const pg = document.getElementById('det-pg');
+      const bs = [];
+      bs.push(`<button class="pb2" onclick="setDP(${_dPage - 1})" ${_dPage === 1 ? 'disabled' : ''}>‹</button>`);
+      const s = Math.max(1, _dPage - 2), e = Math.min(pages, _dPage + 2);
+      if (s > 1) bs.push(`<button class="pb2" onclick="setDP(1)">1</button>${s > 2 ? '<span style="padding:0 3px;color:var(--txl)">…</span>' : ''}`);
+      for (let p = s; p <= e; p++)bs.push(`<button class="pb2 ${p === _dPage ? 'on' : ''}" onclick="setDP(${p})">${p}</button>`);
+      if (e < pages) bs.push(`${e < pages - 1 ? '<span style="padding:0 3px;color:var(--txl)">…</span>' : ''}<button class="pb2" onclick="setDP(${pages})">${pages}</button>`);
+      bs.push(`<button class="pb2" onclick="setDP(${_dPage + 1})" ${_dPage === pages ? 'disabled' : ''}>›</button>`);
+      pg.innerHTML = bs.join('');
+    }
+    function setDP(p) { _dPage = p; renderDetalle(); }
+
+    // ══════════════════════════════════════════════
+    // FILE UPLOAD
+    // ══════════════════════════════════════════════
+    function handleDrop(e) { e.preventDefault(); document.getElementById('uz').classList.remove('dov'); showRootOnlyMsg(); }
+    function handleFile() { showRootOnlyMsg(); }
+    function parseFile() { showRootOnlyMsg(); }
+    function showRootOnlyMsg() {
+      const st = document.getElementById('upst');
+      st.style.display = 'block';
+      st.style.color = 'var(--bad)';
+      st.innerHTML = '❌ Esta versión no admite carga manual. Debes publicar <strong>consolidado.json.gz</strong> y <strong>proyeccion.json.gz</strong> en la raíz junto a <strong>index.html</strong> y recargar la página.';
+    }
+
+    // ══════════════════════════════════════════════
+    // EXPORT
+    // ══════════════════════════════════════════════
+    function exportTab(tab) {
+      let data = [];
+      if (tab === 'detalle') {
+        const srch = (document.getElementById('det-srch')?.value || '').toLowerCase();
+        const est = document.getElementById('det-est')?.value || '';
+        const d1 = document.getElementById('det-d1')?.value || '';
+        const d2 = document.getElementById('det-d2')?.value || '';
+        data = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
+        if (srch) data = data.filter(r => DCOLS.some(c => String(r[c.k] || '').toLowerCase().includes(srch)));
+        if (est) data = data.filter(r => r.ESTADO_ACTIVIDAD === est);
+        if (d1) data = data.filter(r => (r.FECHA_FINALIZACION || '') >= d1);
+        if (d2) data = data.filter(r => (r.FECHA_FINALIZACION || '') <= d2);
+      } else if (tab === 'resumen') {
+        const { d1, d2 } = getRangeDates('res-d1', 'res-d2');
+        data = RAW.filter(r => {
+          const f = r.FECHA_FINALIZACION || '';
+          if (d1 && f < d1) return false;
+          if (d2 && f > d2) return false;
+          return true;
+        });
+      } else if (tab === 'cirion') {
+        const { d1, d2 } = getRangeDates('cir-d1', 'cir-d2');
+        data = RAW.filter(r => {
+          if (r.GERENCIA !== 'CIRION') return false;
+          const f = r.FECHA_FINALIZACION || '';
+          if (d1 && f < d1) return false;
+          if (d2 && f > d2) return false;
+          return true;
+        });
+      } else if (tab === 'liberty') {
+        const { d1, d2 } = getRangeDates('lib-d1', 'lib-d2');
+        data = RAW.filter(r => {
+          if (r.GERENCIA !== 'LIBERTY') return false;
+          const f = r.FECHA_FINALIZACION || '';
+          if (d1 && f < d1) return false;
+          if (d2 && f > d2) return false;
+          return true;
+        });
+      } else if (tab === 'banca') {
+        const { d1, d2 } = getRangeDates('ban-d1', 'ban-d2');
+        data = RAW.filter(r => {
+          if (r.GERENCIA !== 'BANCA') return false;
+          const f = r.FECHA_FINALIZACION || '';
+          if (d1 && f < d1) return false;
+          if (d2 && f > d2) return false;
+          return true;
+        });
+      } else if (tab === 'proyeccion') {
+        MONTHS_ISO.forEach((m, i) => {
+          GERS.forEach(g => {
+            data.push({ 'Mes': MONTHS_LBL[i] + ' 2026', 'Proyecto': g, 'Meta Mensual': metaMes(g, m), 'Producción Real': prodReal(g, m), '%Cump': pct(prodReal(g, m), metaMes(g, m)), 'Variación': prodReal(g, m) - metaMes(g, m), 'Meta Acum YTD': metaAcumYTD(g, m), 'Prod Acum YTD': prodAcumYTD(g, m), '%Cump Acum': pct(prodAcumYTD(g, m), metaAcumYTD(g, m)) });
+          });
+        });
+      }
+      if (!data || !data.length) { alert('Sin datos.'); return; }
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(data);
+      const cols = Object.keys(data[0] || {});
+      ws['!cols'] = cols.map(k => ({ wch: Math.max(k.length + 2, ...data.slice(0, 40).map(r => String(r[k] || '').length)) }));
+      XLSX.utils.book_append_sheet(wb, ws, tab.charAt(0).toUpperCase() + tab.slice(1));
+      XLSX.writeFile(wb, `Linea_${tab}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    }
+  </script>
+</body>
+
+</html>
