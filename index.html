@@ -2203,26 +2203,26 @@
           </div>
 
           <!-- Section 2: Mosaic Summary Layout -->
-          <div style="display:grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto 1fr; gap:8px; align-items: start; flex: 1; min-height: 0; margin-bottom: 4px">
+          <div style="display:grid; grid-template-columns: 0.8fr 1.1fr 1.1fr; grid-template-rows: auto 1fr; gap:12px; align-items: stretch; flex: 1; min-height: 520px; margin-bottom: 10px">
             <div id="res-grid-banca"></div>
             <div id="res-grid-cirion"></div>
             <div id="res-grid-liberty"></div>
             
             <!-- Row 2: Distribution Chart (Col 1) and Trend Graph (Col 2-3) -->
             <div class="card fu fu4" style="display:flex; flex-direction:column; min-height: 0; margin-bottom: 0">
-              <div class="ch" style="padding:6px 14px">
-                <div class="ct" style="font-size:11px">Distribución %</div>
+              <div class="ch" style="padding:10px 14px">
+                <div class="ct" style="font-size:13px">Distribución %</div>
               </div>
-              <div class="cw" style="flex:1; padding:0 10px 10px; display:flex; align-items:center; justify-content:center">
-                <canvas id="ch-res-dona"></canvas>
+              <div class="cw" style="flex:1; padding:0 15px 15px; display:flex; align-items:center; justify-content:center">
+                <canvas id="ch-res-dona" style="max-height: 250px"></canvas>
               </div>
             </div>
             
             <div class="card fu fu3" style="grid-column: span 2; display:flex; flex-direction:column; min-height: 0; margin-bottom: 0">
-              <div class="ch" style="padding:6px 14px">
+              <div class="ch" style="padding:10px 14px">
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
-                  <div class="ct" style="font-size:11px">Tendencia Mensual</div>
-                  <div class="pills" id="res-trend-pills" style="padding:2px; scale:0.8; transform-origin:right">
+                  <div class="ct" style="font-size:13px">Tendencia Mensual</div>
+                  <div class="pills" id="res-trend-pills" style="padding:4px; scale:0.9; transform-origin:right">
                     <button class="pill on" onclick="setTrendGer('TODOS')">Consolidado</button>
                     <button class="pill" onclick="setTrendGer('CIRION')">Cirion</button>
                     <button class="pill" onclick="setTrendGer('LIBERTY')">Liberty</button>
@@ -2230,7 +2230,7 @@
                   </div>
                 </div>
               </div>
-              <div class="cw" style="flex:1; padding:0 10px 10px"><canvas id="ch-res-tend"></canvas></div>
+              <div class="cw" style="flex:1; padding:5px 15px 15px"><canvas id="ch-res-tend"></canvas></div>
             </div>
           </div>
         </div>
@@ -3307,9 +3307,9 @@
     function renderSubProyectoCard(label, emoji, accentColor, bgColor, keyFn, range, d1, d2, lastMonth) {
       const prodPeriodo = prodSubReal(keyFn, range, d1, d2);
       const prodAcum = prodSubAcumYTD(keyFn, lastMonth);
-      return `<div style="background:${bgColor}; border-radius:6px; border:1px solid ${accentColor}15; padding: 2px 6px; display: flex; flex-direction: column; justify-content: center">
-          <div style="display:flex; justify-content:space-between; align-items:center"><span style="font-size:7px; font-weight:800; color:${accentColor}">${emoji} ${label}</span><span style="font-family:'DM Mono',monospace; font-size:9px; font-weight:800; color:var(--tx)">${fmtCOP(prodPeriodo)}</span></div>
-          <div style="display:flex; justify-content:space-between; align-items:center"><span style="font-size:6px; color:var(--txl); font-weight:700">Acum:</span><span style="font-family:'DM Mono',monospace; font-size:8px; font-weight:700; color:${accentColor}">${fmtCOP(prodAcum)}</span></div>
+      return `<div style="background:${bgColor}; border-radius:8px; border:1px solid ${accentColor}15; padding: 6px 10px; display: flex; flex-direction: column; justify-content: center">
+          <div style="display:flex; justify-content:space-between; align-items:center"><span style="font-size:10px; font-weight:800; color:${accentColor}">${emoji} ${label}</span><span style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:var(--tx)">${fmtCOP(prodPeriodo)}</span></div>
+          <div style="display:flex; justify-content:space-between; align-items:center"><span style="font-size:9px; color:var(--txl); font-weight:700">Acum:</span><span style="font-family:'DM Mono',monospace; font-size:11px; font-weight:700; color:${accentColor}">${fmtCOP(prodAcum)}</span></div>
         </div>`;
     }
 
@@ -3339,31 +3339,31 @@
       }
 
       return `
-      <div class="kpi-modern" style="--hover-color:${color}; overflow:hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: fit-content; width: 100%">
-        <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 4px 10px; display:flex; justify-content:space-between; align-items:center">
-          <span class="km-title" style="font-size:10px; color:#fff">${ger}</span>
-          <span class="km-icon" style="font-size:10px">${icons[ger] || '📈'}</span>
+      <div class="kpi-modern" style="--hover-color:${color}; overflow:hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 100%; width: 100%">
+        <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 8px 15px; display:flex; justify-content:space-between; align-items:center">
+          <span class="km-title" style="font-size:14px; color:#fff">${ger}</span>
+          <span class="km-icon" style="font-size:14px">${icons[ger] || '📈'}</span>
         </div>
-        <div style="padding:4px 10px; display:flex; flex-direction:column; gap:2px">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+        <div style="padding:10px 15px; display:flex; flex-direction:column; gap:8px">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
             <div>
-              <div style="font-size:7px; color:var(--txl); text-transform:uppercase; font-weight:700">Producción</div>
-              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}">${fmtCOP(prod)}</div>
-              ${faltantePeriodo > 0 ? `<div style="font-size:6px; color:var(--bad); font-weight:700">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:6px; color:var(--ok); font-weight:700">✓ Meta ok</div>`}
+              <div style="font-size:10px; color:var(--txl); text-transform:uppercase; font-weight:700">Producción</div>
+              <div style="font-family:'DM Mono',monospace; font-size:15px; font-weight:800; color:${color}">${fmtCOP(prod)}</div>
+              ${faltantePeriodo > 0 ? `<div style="font-size:9px; color:var(--bad); font-weight:700">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:9px; color:var(--ok); font-weight:700">✓ Meta ok</div>`}
             </div>
             <div>
-              <div style="font-size:7px; color:var(--txl); text-transform:uppercase; font-weight:700">Meta Mes</div>
-              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2)">${fmtCOP(meta)}</div>
+              <div style="font-size:10px; color:var(--txl); text-transform:uppercase; font-weight:700">Meta Mes</div>
+              <div style="font-family:'DM Mono',monospace; font-size:15px; font-weight:800; color:var(--lima2)">${fmtCOP(meta)}</div>
             </div>
           </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; border-top:1px solid var(--border); padding-top:2px">
-             <div><div style="font-size:6px; color:var(--txl); font-weight:700">Acum.</div><div style="font-family:'DM Mono',monospace; font-size:9px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div></div>
-             <div><div style="font-size:6px; color:var(--txl); font-weight:700">Meta Acum.</div><div style="font-family:'DM Mono',monospace; font-size:9px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; border-top:1px solid var(--border); padding-top:6px">
+             <div><div style="font-size:9px; color:var(--txl); font-weight:700">Acum.</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div></div>
+             <div><div style="font-size:9px; color:var(--txl); font-weight:700">Meta Acum.</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div></div>
           </div>
           ${subProyHtml}
-          <div style="border-top:1px solid var(--border); padding-top:2px">
-            <div style="display:flex; justify-content:space-between; font-size:7px; font-weight:700; color:var(--txm); margin-bottom:1px"><span>Avance Anual</span><span style="font-family:'DM Mono',monospace">${progresoAnual}%</span></div>
-            <div style="height:3px; background:#e2e8f0; border-radius:3px; overflow:hidden"><div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:3px"></div></div>
+          <div style="border-top:1px solid var(--border); padding-top:6px">
+            <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700; color:var(--txm); margin-bottom:2px"><span>Avance Anual</span><span style="font-family:'DM Mono',monospace">${progresoAnual}%</span></div>
+            <div style="height:5px; background:#e2e8f0; border-radius:4px; overflow:hidden"><div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:4px"></div></div>
           </div>
         </div>
       </div>`;
@@ -3382,30 +3382,30 @@
       const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
 
       return `
-      <div class="kpi-modern" style="--hover-color:${color}; overflow:hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: fit-content; width: 100%">
-        <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 4px 10px; display:flex; justify-content:space-between; align-items:center">
-          <span class="km-title" style="font-size:10px; color:#fff">${ger}</span>
-          <span class="km-icon" style="font-size:10px">${icons[ger] || '📈'}</span>
+      <div class="kpi-modern" style="--hover-color:${color}; overflow:hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 100%; width: 100%">
+        <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 8px 15px; display:flex; justify-content:space-between; align-items:center">
+          <span class="km-title" style="font-size:14px; color:#fff">${ger}</span>
+          <span class="km-icon" style="font-size:14px">${icons[ger] || '📈'}</span>
         </div>
-        <div style="padding:4px 10px; display:flex; flex-direction:column; gap:2px">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+        <div style="padding:10px 15px; display:flex; flex-direction:column; gap:8px">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
             <div>
-              <div style="font-size:7px; color:var(--txl); text-transform:uppercase; font-weight:700">Producción</div>
-              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}">${fmtCOP(prod)}</div>
-              ${faltantePeriodo > 0 ? `<div style="font-size:6px; color:var(--bad); font-weight:700">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:6px; color:var(--ok); font-weight:700">✓ Meta ok</div>`}
+              <div style="font-size:10px; color:var(--txl); text-transform:uppercase; font-weight:700">Producción</div>
+              <div style="font-family:'DM Mono',monospace; font-size:15px; font-weight:800; color:${color}">${fmtCOP(prod)}</div>
+              ${faltantePeriodo > 0 ? `<div style="font-size:9px; color:var(--bad); font-weight:700">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:9px; color:var(--ok); font-weight:700">✓ Meta ok</div>`}
             </div>
             <div>
-              <div style="font-size:7px; color:var(--txl); text-transform:uppercase; font-weight:700">Meta Mes</div>
-              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2)">${fmtCOP(meta)}</div>
+              <div style="font-size:10px; color:var(--txl); text-transform:uppercase; font-weight:700">Meta Mes</div>
+              <div style="font-family:'DM Mono',monospace; font-size:15px; font-weight:800; color:var(--lima2)">${fmtCOP(meta)}</div>
             </div>
           </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; border-top:1px solid var(--border); padding-top:2px">
-             <div><div style="font-size:6px; color:var(--txl); font-weight:700">Acum.</div><div style="font-family:'DM Mono',monospace; font-size:9px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div></div>
-             <div><div style="font-size:6px; color:var(--txl); font-weight:700">Meta Acum.</div><div style="font-family:'DM Mono',monospace; font-size:9px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div></div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; border-top:1px solid var(--border); padding-top:6px">
+             <div><div style="font-size:9px; color:var(--txl); font-weight:700">Acum.</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div></div>
+             <div><div style="font-size:9px; color:var(--txl); font-weight:700">Meta Acum.</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div></div>
           </div>
-          <div style="border-top:1px solid var(--border); padding-top:2px">
-            <div style="display:flex; justify-content:space-between; font-size:7px; font-weight:700; color:var(--txm); margin-bottom:1px"><span>Avance Anual</span><span style="font-family:'DM Mono',monospace">${progresoAnual}%</span></div>
-            <div style="height:3px; background:#e2e8f0; border-radius:3px; overflow:hidden"><div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:3px"></div></div>
+          <div style="border-top:1px solid var(--border); padding-top:6px">
+            <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700; color:var(--txm); margin-bottom:2px"><span>Avance Anual</span><span style="font-family:'DM Mono',monospace">${progresoAnual}%</span></div>
+            <div style="height:5px; background:#e2e8f0; border-radius:4px; overflow:hidden"><div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:4px"></div></div>
           </div>
         </div>
       </div>`;
