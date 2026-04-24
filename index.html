@@ -2205,26 +2205,28 @@
             <div id="res-band" class="estado-hero-metrics"></div>
           </div>
 
-          <!-- Section 2: Projects Grid -->
-          <div id="res-unified-grid" style="display:grid; grid-template-columns: 1.5fr 1fr 1fr; gap:12px; align-items:start"></div>
-
-          <!-- Section 3: Monthly Trend only, moved next to Banca subprojects -->
-          <!-- This is now handled by injecting the trend card into the same layout or a coordinated one -->
-          <div id="res-analytics-area" style="display:grid; grid-template-columns: 1.5fr 2fr; gap:12px; margin-top:12px">
-            <div id="res-placeholder-banca-sub" style="visibility:hidden"></div> <!-- Placeholder for Banca alignment -->
-            <div class="card fu fu3" style="display:flex; flex-direction:column">
-              <div class="ch" style="padding:6px 14px">
-                <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
-                  <div class="ct" style="font-size:11px">Tendencia Mensual</div>
-                  <div class="pills" id="res-trend-pills" style="padding:2px; scale:0.85; transform-origin:right">
-                    <button class="pill on" onclick="setTrendGer('TODOS')">Consolidado</button>
-                    <button class="pill" onclick="setTrendGer('CIRION')">Cirion</button>
-                    <button class="pill" onclick="setTrendGer('LIBERTY')">Liberty</button>
-                    <button class="pill" onclick="setTrendGer('BANCA')">Banca</button>
-                  </div>
-                </div>
-              </div>
-              <div class="cw" style="height:320px; padding:0 10px 6px"><canvas id="ch-res-tend"></canvas></div>
+          <!-- Section 2: Unified Summary Layout -->
+          <div style="display:grid; grid-template-columns: 1.5fr 2fr; gap:12px; align-items:start">
+            <!-- Col 1: Banca Card -->
+            <div id="res-col-banca"></div>
+            
+            <!-- Col 2: Cirion + Liberty (top) and Trend (bottom) -->
+            <div style="display:flex; flex-direction:column; gap:12px">
+               <div id="res-row-compact" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px"></div>
+               <div class="card fu fu3" style="display:flex; flex-direction:column">
+                 <div class="ch" style="padding:6px 14px">
+                   <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
+                     <div class="ct" style="font-size:11px">Tendencia Mensual</div>
+                     <div class="pills" id="res-trend-pills" style="padding:2px; scale:0.85; transform-origin:right">
+                       <button class="pill on" onclick="setTrendGer('TODOS')">Consolidado</button>
+                       <button class="pill" onclick="setTrendGer('CIRION')">Cirion</button>
+                       <button class="pill" onclick="setTrendGer('LIBERTY')">Liberty</button>
+                       <button class="pill" onclick="setTrendGer('BANCA')">Banca</button>
+                     </div>
+                   </div>
+                 </div>
+                 <div class="cw" style="height:320px; padding:0 10px 6px"><canvas id="ch-res-tend"></canvas></div>
+               </div>
             </div>
           </div>
         </div>
@@ -3049,17 +3051,17 @@
           <div class="estado-metric"><span class="estado-metric-val">${rangeLbl}</span><span class="estado-metric-lbl">Periodo</span></div>
           <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(prodTot)}</span><span class="estado-metric-lbl">Producción</span></div>
           <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaTot)}</span><span class="estado-metric-lbl">Meta Mensual</span></div>
-          <div class="estado-metric highlight"><span class="estado-metric-val">${fmtCOP(metaAnualTotal)}</span><span class="estado-metric-lbl">Meta Anual 2026</span></div>
           <div class="estado-metric"><span class="estado-metric-val" style="color:${cump >= 95 ? '#4ade80' : cump >= 75 ? '#fbbf24' : '#f87171'}">${cump}%</span><span class="estado-metric-lbl">%Cump Periodo</span></div>
+          <div class="estado-metric highlight"><span class="estado-metric-val">${fmtCOP(metaAnualTotal)}</span><span class="estado-metric-lbl">Meta Anual 2026</span></div>
           <div class="estado-metric"><span class="estado-metric-val" style="color:${cumpAcumTotal >= 95 ? '#4ade80' : cumpAcumTotal >= 75 ? '#fbbf24' : '#f87171'}">${cumpAcumTotal}%</span><span class="estado-metric-lbl">%Cump Año</span></div>`;
       }
 
-      const grid = document.getElementById('res-unified-grid');
-      if (grid) { 
-        const bancaCard = renderUnifiedProjectCard('BANCA', range, resD1, resD2);
-        const cirionCard = renderCompactProjectCard('CIRION', range, resD1, resD2);
-        const libertyCard = renderCompactProjectCard('LIBERTY', range, resD1, resD2);
-        grid.innerHTML = bancaCard + cirionCard + libertyCard;
+      const colBanca = document.getElementById('res-col-banca');
+      const rowCompact = document.getElementById('res-row-compact');
+      if (colBanca && rowCompact) {
+        colBanca.innerHTML = renderUnifiedProjectCard('BANCA', range, resD1, resD2);
+        rowCompact.innerHTML = renderCompactProjectCard('CIRION', range, resD1, resD2) + 
+                               renderCompactProjectCard('LIBERTY', range, resD1, resD2);
       }
 
       // Tendencia — Siempre 12 meses, filtrable por proyecto
