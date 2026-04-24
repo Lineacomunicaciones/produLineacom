@@ -2236,69 +2236,38 @@
         </div>
 
         <!-- ═══ DIARIO ═══ -->
-        <div id="tp-diario" class="tp">
-          <div class="ph fu">
-            <div>
-              <div class="pt">Análisis Diario</div>
-              <div class="ps">Meta vs producción día a día por proyecto · 2026</div>
-            </div>
-            <div class="pa">
-              <div class="f-group">
-                <label>Proyecto</label>
-                <select id="dia-ger" class="f-sel" onchange="toggleSubGer(); renderDiario()">
-                  <option value="BANCA">Banca</option>
-                  <option value="CIRION">Cirion</option>
-                  <option value="LIBERTY">Liberty</option>
-                </select>
-              </div>
-              <div class="f-group" id="dia-sub-group" style="display:none">
-                <label>Subproyecto</label>
-                <select id="dia-sub" class="f-sel" onchange="renderDiario()">
-                  <option value="TODOS">Todos</option>
-                  <option value="WOMPI">Wompi</option>
-                  <option value="REDEBAN">Redeban</option>
-                </select>
-              </div>
-              <div class="f-group">
-                <label>Desde</label>
-                <input type="date" id="dia-d1" class="f-sel" value="2026-04-01" onchange="renderDiario()">
-              </div>
-              <div class="f-group">
-                <label>Hasta</label>
-                <input type="date" id="dia-d2" class="f-sel" value="2026-04-30" onchange="renderDiario()">
-              </div>
-            </div>
-          </div>
+        <div id="tp-diario" class="tp" style="padding:10px 18px; display:flex; flex-direction:column; height:100%; box-sizing:border-box; overflow:hidden">
+          
+          <!-- Header y Filtros integrados en el Banner -->
+          <div id="dia-band" class="estado-hero fu fu1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; padding: 12px 18px; margin-bottom: 10px; align-items: center"></div>
 
-          <!-- KPI Band mejorada estilo Hero -->
-          <div id="dia-band" class="estado-hero fu fu1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; padding: 15px 20px; margin-bottom: 15px"></div>
-
-          <!-- Gráfica Día a Día -->
-          <div class="card fu fu2" style="margin-bottom:18px">
-            <div class="ch">
-              <div>
-                <div class="ct">Día a Día: Meta vs Producción Real</div>
-                <div class="cs" id="dia-subtit"></div>
+          <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px">
+            <!-- Gráfica Día a Día -->
+            <div class="card fu fu2" style="flex: 1.2; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
+              <div class="ch" style="padding: 6px 14px">
+                <div>
+                  <div class="ct" style="font-size: 11px">Día a Día: Meta vs Producción Real</div>
+                  <div class="cs" id="dia-subtit" style="font-size: 9px"></div>
+                </div>
+                <div id="dia-legend-main" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:9px; color:var(--txm)">
+                  <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#166534;opacity:.8;display:inline-block"></span>Producción</span>
+                  <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(239,68,68,0.3);display:inline-block"></span>Faltó</span>
+                  <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(34,197,94,0.5);display:inline-block"></span>Superó</span>
+                  <span style="display:flex;align-items:center;gap:4px"><span style="width:18px;height:2px;background:#C5D336;display:inline-block"></span>Meta</span>
+                </div>
               </div>
-              <div id="dia-legend-main" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:10px; color:var(--txm)">
-                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#166534;opacity:.8;display:inline-block"></span>Producción</span>
-                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,0.3);display:inline-block"></span>Faltó</span>
-                <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,0.5);display:inline-block"></span>Superó</span>
-                <span style="display:flex;align-items:center;gap:4px"><span style="width:22px;height:2px;background:#C5D336;display:inline-block"></span>Meta</span>
-              </div>
+              <div class="cw" style="flex: 1; min-height: 0"><canvas id="ch-dia-main"></canvas></div>
             </div>
-            <div class="cw" style="height:320px"><canvas id="ch-dia-main"></canvas></div>
-          </div>
 
-          <!-- Gráfica Acumulada -->
-          <div class="card fu fu3" style="margin-bottom:18px">
-            <div class="ch">
-              <div>
-                <div class="ct">Producción Acumulada vs Meta Acumulada</div>
-                <div class="cs">Curva de cumplimiento acumulado en el periodo · el área roja muestra el faltante</div>
+            <!-- Gráfica Acumulada -->
+            <div class="card fu fu3" style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
+              <div class="ch" style="padding: 6px 14px">
+                <div>
+                  <div class="ct" style="font-size: 11px">Producción Acumulada vs Meta Acumulada</div>
+                </div>
               </div>
+              <div class="cw" style="flex: 1; min-height: 0"><canvas id="ch-dia-acum"></canvas></div>
             </div>
-            <div class="cw" style="height:280px"><canvas id="ch-dia-acum"></canvas></div>
           </div>
         </div>
 
@@ -3561,9 +3530,40 @@
       const faltante = Math.max(0, totalMeta - totalReal);
       const exceso = Math.max(0, totalReal - totalMeta);
 
-      // Actualizar banda con métricas estilo Hero (igual a Resumen)
+      // Construir banda con Título, Filtros y Métricas integrados
       document.getElementById('dia-band').innerHTML = `
-        <div class="estado-metric"><span class="estado-metric-val">${fullTitle}</span><span class="estado-metric-lbl">Proyecto</span></div>
+        <div style="grid-column: span 2; display: flex; flex-direction: column; justify-content: center">
+          <div style="font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 2px">Análisis Diario</div>
+          <div style="font-size: 9px; color: rgba(255,255,255,0.7)">Meta vs Producción 2026</div>
+        </div>
+
+        <div style="grid-column: span 3; display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.08); padding: 8px 12px; border-radius: 8px">
+          <div class="f-group" style="margin:0">
+            <label style="color:rgba(255,255,255,0.8); font-size:8px">PROYECTO</label>
+            <select id="dia-ger" class="f-sel" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); height:26px; padding:2px 8px; font-size:10px" onchange="toggleSubGer(); renderDiario()">
+              <option value="BANCA" ${ger==='BANCA'?'selected':''}>Banca</option>
+              <option value="CIRION" ${ger==='CIRION'?'selected':''}>Cirion</option>
+              <option value="LIBERTY" ${ger==='LIBERTY'?'selected':''}>Liberty</option>
+            </select>
+          </div>
+          <div class="f-group" id="dia-sub-group" style="margin:0; display:${ger==='BANCA'?'block':'none'}">
+            <label style="color:rgba(255,255,255,0.8); font-size:8px">SUBPROYECTO</label>
+            <select id="dia-sub" class="f-sel" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); height:26px; padding:2px 8px; font-size:10px" onchange="renderDiario()">
+              <option value="TODOS" ${sub==='TODOS'?'selected':''}>Todos</option>
+              <option value="WOMPI" ${sub==='WOMPI'?'selected':''}>Wompi</option>
+              <option value="REDEBAN" ${sub==='REDEBAN'?'selected':''}>Redeban</option>
+            </select>
+          </div>
+          <div class="f-group" style="margin:0">
+            <label style="color:rgba(255,255,255,0.8); font-size:8px">DESDE</label>
+            <input type="date" id="dia-d1" class="f-sel" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); height:26px; padding:2px 4px; font-size:10px" value="${range[0]}-01" onchange="renderDiario()">
+          </div>
+          <div class="f-group" style="margin:0">
+            <label style="color:rgba(255,255,255,0.8); font-size:8px">HASTA</label>
+            <input type="date" id="dia-d2" class="f-sel" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); height:26px; padding:2px 4px; font-size:10px" value="${range[range.length-1]}-30" onchange="renderDiario()">
+          </div>
+        </div>
+
         <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(totalReal)}</span><span class="estado-metric-lbl">Producción Real</span></div>
         <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(totalMeta)}</span><span class="estado-metric-lbl">Meta Periodo</span></div>
         <div class="estado-metric"><span class="estado-metric-val" style="color:${cp >= 95 ? '#4ade80' : cp >= 75 ? '#fbbf24' : '#f87171'}">${cp}%</span><span class="estado-metric-lbl">%Cump Periodo</span></div>
