@@ -2245,7 +2245,7 @@
             <div class="pa">
               <div class="f-group">
                 <label>Proyecto</label>
-                <select id="dia-ger" class="f-sel" onchange="renderDiario()">
+                <select id="dia-ger" class="f-sel" onchange="toggleSubGer(); renderDiario()">
                   <option value="BANCA">Banca</option>
                   <option value="CIRION">Cirion</option>
                   <option value="LIBERTY">Liberty</option>
@@ -2262,8 +2262,8 @@
             </div>
           </div>
 
-          <!-- KPI Band mejorada -->
-          <div id="dia-band" class="sband fu fu1" style="grid-template-columns: repeat(auto-fill, minmax(150px,1fr))"></div>
+          <!-- KPI Band mejorada estilo Hero -->
+          <div id="dia-band" class="estado-hero fu fu1" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; padding: 15px 20px; margin-bottom: 15px"></div>
 
           <!-- Gráfica Día a Día -->
           <div class="card fu fu2" style="margin-bottom:18px">
@@ -2774,7 +2774,7 @@
       const n = document.getElementById('n-' + name); if (n) n.classList.add('act');
       _curTab = name;
       if (name === 'resumen') renderResumen();
-      if (name === 'diario') renderDiario();
+      if (name === 'diario') { toggleSubGer(); renderDiario(); }
       if (name === 'zonas') renderZonas();
       if (name === 'cirion') renderCirion();
       if (name === 'liberty') renderLiberty();
@@ -3480,8 +3480,15 @@
     // ══════════════════════════════════════════════
     // DIARIO
     // ══════════════════════════════════════════════
+    function toggleSubGer() {
+      const g = document.getElementById('dia-ger')?.value;
+      const sub = document.getElementById('dia-sub-group');
+      if (sub) sub.style.display = (g === 'BANCA') ? 'block' : 'none';
+    }
+
     function renderDiario() {
       const ger = document.getElementById('dia-ger')?.value || 'BANCA';
+      const sub = document.getElementById('dia-sub')?.value || 'TODOS';
       const range = getRange('dia-d1', 'dia-d2');
       const color = GC[ger];
 
@@ -3490,51 +3497,73 @@
       const periodLbl = range.length === 1 ? `${startLbl} 2026` : `${startLbl} - ${endLbl} 2026`;
 
       const subtitEl = document.getElementById('dia-subtit');
-      if (subtitEl) subtitEl.textContent = `${ger} · ${periodLbl}`;
+      let fullTitle = ger;
+      if (ger === 'BANCA' && sub !== 'TODOS') fullTitle += ` · ${sub}`;
+      if (subtitEl) subtitEl.textContent = `${fullTitle} · ${periodLbl}`;
 
-      // Get all days in the range
+      // Filtro de subproyecto para Banca
+      const subFn = (sub === 'WOMPI') ? isWompi : (sub === 'REDEBAN') ? isRedeban : null;
+
+      // Meta Diaria filtrada
       const pptoGer = PPTO_DIARIO[ger] || {};
-      const diasPpto = Object.entries(pptoGer).filter(([d]) => range.includes(d.slice(0, 7))).sort(([a], [b]) => a.localeCompare(b));
-      const fechasLab = diasPpto.map(([d]) => d);
-      const metaD = diasPpto.map(([, v]) => v);
+      const fechasLab = Object.keys(pptoGer).filter(d => range.includes(d.slice(0, 7))).sort();
+      
+      const metaD = fechasLab.map(d => {
+        if (ger === 'BANCA' && subFn) {
+          return PROYECCION_RAW.filter(r => r.GERENCIA === 'BANCA' && r.TIPO_PROYECCION === 'DIARIA' && r.FECHA === d && subFn(r)).reduce((s, r) => s + r.VALOR, 0);
+        }
+        return pptoGer[d] || 0;
+      });
 
-      // Real from RAW
+      // Real from RAW filtrado
       const realMap = {};
-      RAW.filter(r => r.GERENCIA === ger && range.includes((r.FECHA_FINALIZACION || '').slice(0, 7)))
-        .forEach(r => { const d = (r.FECHA_FINALIZACION || '').slice(0, 10); if (d) realMap[d] = (realMap[d] || 0) + (parseFloat(r.VALOR_TOTAL) || 0); });
+      RAW.filter(r => {
+        if (r.GERENCIA !== ger) return false;
+        if (!range.includes((r.FECHA_FINALIZACION || '').slice(0, 7))) return false;
+        if (ger === 'BANCA' && subFn && !subFn(r)) return false;
+        return true;
+      }).forEach(r => {
+        const d = (r.FECHA_FINALIZACION || '').slice(0, 10);
+        if (d) realMap[d] = (realMap[d] || 0) + (parseFloat(r.VALOR_TOTAL) || 0);
+      });
 
       const realD = fechasLab.map(d => realMap[d] || 0);
 
       // Acumulados
       let metaAc = 0, realAc = 0;
+      let diasCumplidos = 0, diasIncumplidos = 0;
       const metaAcArr = [], realAcArr = [];
+      
       for (let i = 0; i < fechasLab.length; i++) {
-        metaAc += metaD[i]; realAc += realD[i];
-        metaAcArr.push(metaAc); realAcArr.push(realAc);
+        metaAc += metaD[i]; 
+        realAc += realD[i];
+        metaAcArr.push(metaAc); 
+        realAcArr.push(realAc);
+        
+        if (metaD[i] > 0) {
+          if (realD[i] >= metaD[i]) diasCumplidos++;
+          else diasIncumplidos++;
+        }
       }
 
       const totalMeta = metaD.reduce((s, v) => s + v, 0);
       const totalReal = realD.reduce((s, v) => s + v, 0);
       const cp = pct(totalReal, totalMeta);
-
-      // Proyeccion mensual (meta mensual total del periodo)
-      const metaTotalPeriodo = totalMeta;
+      const cpAcum = pct(realAcArr[realAcArr.length - 1] || 0, metaAcArr[metaAcArr.length - 1] || 1);
       const faltante = Math.max(0, totalMeta - totalReal);
       const exceso = Math.max(0, totalReal - totalMeta);
-      const cpAcum = pct(realAcArr[realAcArr.length - 1] || 0, metaAcArr[metaAcArr.length - 1] || 1);
 
-      // Actualizar banda con métricas enriquecidas
+      // Actualizar banda con métricas estilo Hero (igual a Resumen)
       document.getElementById('dia-band').innerHTML = `
-    <div class="si"><span class="sn lima">${ger}</span><span class="sl">Proyecto</span></div>
-    <div class="si"><span class="sn">${periodLbl}</span><span class="sl">Periodo analizado</span></div>
-    <div class="si"><span class="sn">${fmtCOP(totalMeta)}</span><span class="sl">Meta total periodo</span></div>
-    <div class="si"><span class="sn">${fmtCOP(totalReal)}</span><span class="sl">Producción real</span></div>
-    <div class="si"><span class="sn" style="color:${cp >= 95 ? 'var(--ok)' : cp >= 75 ? 'var(--warn)' : 'var(--bad)'}">${cp}%</span><span class="sl">%Cump periodo</span></div>
-    <div class="si"><span class="sn">${fmtCOP(metaAcArr[metaAcArr.length-1]||0)}</span><span class="sl">Meta acumulada</span></div>
-    <div class="si"><span class="sn">${fmtCOP(realAcArr[realAcArr.length-1]||0)}</span><span class="sl">Prod. acumulada</span></div>
-    <div class="si"><span class="sn" style="color:${cpAcum >= 95 ? 'var(--ok)' : cpAcum >= 75 ? 'var(--warn)' : 'var(--bad)'}">${cpAcum}%</span><span class="sl">%Cump acumulado</span></div>
-    <div class="si"><span class="sn" style="color:${faltante > 0 ? 'var(--bad)' : 'var(--ok)'}">${faltante > 0 ? '−' + fmtCOP(faltante) : '+' + fmtCOP(exceso)}</span><span class="sl">${faltante > 0 ? 'Faltó para meta' : 'Exceso sobre meta'}</span></div>
-    <div class="si"><span class="sn">${fechasLab.length}</span><span class="sl">Días con meta</span></div>`;
+        <div class="estado-metric"><span class="estado-metric-val">${fullTitle}</span><span class="estado-metric-lbl">Proyecto</span></div>
+        <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(totalReal)}</span><span class="estado-metric-lbl">Producción Real</span></div>
+        <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(totalMeta)}</span><span class="estado-metric-lbl">Meta Periodo</span></div>
+        <div class="estado-metric"><span class="estado-metric-val" style="color:${cp >= 95 ? '#4ade80' : cp >= 75 ? '#fbbf24' : '#f87171'}">${cp}%</span><span class="estado-metric-lbl">%Cump Periodo</span></div>
+        <div class="estado-metric highlight"><span class="estado-metric-val">${diasCumplidos}</span><span class="estado-metric-lbl">Días Cumplidos</span></div>
+        <div class="estado-metric highlight" style="--bg-h: rgba(239,68,68,0.2)"><span class="estado-metric-val" style="color:#f87171">${diasIncumplidos}</span><span class="estado-metric-lbl">Días Incumplidos</span></div>
+        <div class="estado-metric"><span class="estado-metric-val" style="color:${faltante > 0 ? '#f87171' : '#4ade80'}">${faltante > 0 ? '−' + fmtCOP(faltante) : '+' + fmtCOP(exceso)}</span><span class="estado-metric-lbl">Variación</span></div>
+        <div class="estado-metric"><span class="estado-metric-val">${cpAcum}%</span><span class="estado-metric-lbl">%Cump Acumulado</span></div>
+      `;
 
       const lbl = fechasLab.map(d => d.slice(5)); // month-day
 
