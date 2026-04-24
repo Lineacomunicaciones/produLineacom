@@ -2203,7 +2203,7 @@
           </div>
 
           <!-- Section 2: Mosaic Summary Layout -->
-          <div style="display:grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1.3fr 1fr; gap:10px; align-items: stretch; flex: 1; min-height: 0; margin-bottom: 4px">
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap:8px; align-items: stretch; flex: 1; min-height: 0; margin-bottom: 4px">
             <div id="res-grid-banca"></div>
             <div id="res-grid-cirion"></div>
             <div id="res-grid-liberty"></div>
@@ -2248,30 +2248,30 @@
                 <div style="font-size: 9px; color: rgba(255,255,255,0.7)">Meta vs Producción · 2026</div>
               </div>
 
-              <div style="display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.08); padding: 6px 12px; border-radius: 8px; justify-content: flex-end">
+              <div style="display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 8px; justify-content: flex-end">
                 <div class="f-group" style="margin:0">
-                  <label style="color:rgba(255,255,255,0.8); font-size:8px">PROYECTO</label>
-                  <select id="dia-ger" class="f-sel" style="background:rgba(0,0,0,0.2); color:#fff; border:1px solid rgba(255,255,255,0.2); height:24px; padding:0 8px; font-size:10px" onchange="toggleSubGer(); renderDiario()">
+                  <label style="color:rgba(255,255,255,0.9); font-size:8px; font-weight:700">PROYECTO</label>
+                  <select id="dia-ger" class="f-sel" style="background:#fff; color:#001D62; border:1px solid #ccc; height:24px; padding:0 8px; font-size:10px; font-weight:700; border-radius:4px" onchange="toggleSubGer(); renderDiario()">
                     <option value="BANCA">Banca</option>
                     <option value="CIRION">Cirion</option>
                     <option value="LIBERTY">Liberty</option>
                   </select>
                 </div>
                 <div class="f-group" id="dia-sub-group" style="margin:0; display:none">
-                  <label style="color:rgba(255,255,255,0.8); font-size:8px">SUBPROYECTO</label>
-                  <select id="dia-sub" class="f-sel" style="background:rgba(0,0,0,0.2); color:#fff; border:1px solid rgba(255,255,255,0.2); height:24px; padding:0 8px; font-size:10px" onchange="renderDiario()">
+                  <label style="color:rgba(255,255,255,0.9); font-size:8px; font-weight:700">SUBPROYECTO</label>
+                  <select id="dia-sub" class="f-sel" style="background:#fff; color:#166534; border:1px solid #ccc; height:24px; padding:0 8px; font-size:10px; font-weight:700; border-radius:4px" onchange="renderDiario()">
                     <option value="TODOS">Todos</option>
                     <option value="WOMPI">Wompi</option>
                     <option value="REDEBAN">Redeban</option>
                   </select>
                 </div>
                 <div class="f-group" style="margin:0">
-                  <label style="color:rgba(255,255,255,0.8); font-size:8px">DESDE</label>
-                  <input type="date" id="dia-d1" class="f-sel" style="background:rgba(0,0,0,0.2); color:#fff; border:1px solid rgba(255,255,255,0.2); height:24px; padding:0 4px; font-size:10px" value="2026-04-01" onchange="renderDiario()">
+                  <label style="color:rgba(255,255,255,0.9); font-size:8px; font-weight:700">DESDE</label>
+                  <input type="date" id="dia-d1" class="f-sel" style="background:#fff; color:#333; border:1px solid #ccc; height:24px; padding:0 4px; font-size:10px; font-weight:700; border-radius:4px" value="2026-04-01" onchange="renderDiario()">
                 </div>
                 <div class="f-group" style="margin:0">
-                  <label style="color:rgba(255,255,255,0.8); font-size:8px">HASTA</label>
-                  <input type="date" id="dia-d2" class="f-sel" style="background:rgba(0,0,0,0.2); color:#fff; border:1px solid rgba(255,255,255,0.2); height:24px; padding:0 4px; font-size:10px" value="2026-04-30" onchange="renderDiario()">
+                  <label style="color:rgba(255,255,255,0.9); font-size:8px; font-weight:700">HASTA</label>
+                  <input type="date" id="dia-d2" class="f-sel" style="background:#fff; color:#333; border:1px solid #ccc; height:24px; padding:0 4px; font-size:10px; font-weight:700; border-radius:4px" value="2026-04-30" onchange="renderDiario()">
                 </div>
               </div>
             </div>
@@ -2282,7 +2282,7 @@
 
           <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px">
             <!-- Gráfica Día a Día -->
-            <div class="card fu fu2" style="flex: 1.2; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
+            <div class="card fu fu2" style="flex: 1.6; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding: 6px 14px">
                 <div>
                   <div class="ct" style="font-size: 11px">Día a Día: Meta vs Producción Real</div>
@@ -3387,40 +3387,59 @@
           <span class="km-title">${ger}</span>
           <span class="km-icon">${icons[ger] || '📈'}</span>
         </div>
-        <div style="padding:10px 12px; flex: 1; display:flex; flex-direction:column; gap:6px; justify-content: space-between">
+        <div style="padding:6px 12px; flex: 1; display:flex; flex-direction:column; gap:4px; justify-content: space-between">
           <div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom: 4px">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom: 2px">
               <div>
-                <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:1px">Producción</div>
-                <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
+                <div style="font-size:7.5px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:1px">Producción</div>
+                <div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
               </div>
               <div>
-                <div style="font-size:8px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:1px">Meta</div>
-                <div style="font-family:'DM Mono',monospace; font-size:13px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
+                <div style="font-size:7.5px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:1px">Meta</div>
+                <div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
               </div>
             </div>
-            ${faltantePeriodo > 0 ? `<div style="font-size:8px; color:var(--bad); font-family:'DM Mono',monospace; font-weight:700; margin-bottom: 4px">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:8px; color:var(--ok); font-weight:700; margin-bottom: 4px">✓ Meta superada</div>`}
+            ${faltantePeriodo > 0 ? `<div style="font-size:7.5px; color:var(--bad); font-family:'DM Mono',monospace; font-weight:700; margin-bottom: 2px">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:7.5px; color:var(--ok); font-weight:700; margin-bottom: 2px">✓ Meta ok</div>`}
 
-            <div style="border-top:1px solid var(--border); padding-top:6px; display:grid; grid-template-columns:1fr 1fr; gap:6px">
+            <div style="border-top:1px solid var(--border); padding-top:4px; display:grid; grid-template-columns:1fr 1fr; gap:6px">
               <div>
-                <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Acumulada</div>
-                <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div>
+                <div style="font-size:7px; color:var(--txl); font-weight:700; text-transform:uppercase">Acum.</div>
+        <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 6px 10px">
+          <span class="km-title">${ger}</span>
+          <span class="km-icon">${icons[ger] || '📈'}</span>
+        </div>
+        <div style="padding:6px 10px; flex: 1; display:flex; flex-direction:column; gap:3px; justify-content: space-between">
+          <div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom: 2px">
+              <div>
+                <div style="font-size:7px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.4px; margin-bottom:1px">Prod.</div>
+                <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${color}; white-space:nowrap">${fmtCOP(prod)}</div>
               </div>
               <div>
-                <div style="font-size:7.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acum.</div>
-                <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div>
+                <div style="font-size:7px; font-weight:700; color:var(--txl); text-transform:uppercase; letter-spacing:.4px; margin-bottom:1px">Meta</div>
+                <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:var(--lima2); white-space:nowrap">${fmtCOP(meta)}</div>
+              </div>
+            </div>
+            ${faltantePeriodo > 0 ? `<div style="font-size:7px; color:var(--bad); font-family:'DM Mono',monospace; font-weight:700; margin-bottom: 2px">▼ ${fmtCOP(faltantePeriodo)}</div>` : `<div style="font-size:7px; color:var(--ok); font-weight:700; margin-bottom: 2px">✓ Meta ok</div>`}
+
+            <div style="border-top:1px solid var(--border); padding-top:3px; display:grid; grid-template-columns:1fr 1fr; gap:4px">
+              <div>
+                <div style="font-size:6.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Acum.</div>
+                <div style="font-family:'DM Mono',monospace; font-size:9px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div>
+              </div>
+              <div>
+                <div style="font-size:6.5px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Ac.</div>
+                <div style="font-family:'DM Mono',monospace; font-size:9px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div>
               </div>
             </div>
           </div>
-
           ${subProyHtml}
-
-          <div style="border-top:1px solid var(--border); padding-top:6px">
-            <div style="display:flex; justify-content:space-between; font-size:8.5px; font-weight:700; color:var(--txm); margin-bottom:2px">
+          <div style="border-top:1px solid var(--border); padding-top:4px">
+            <div style="display:flex; justify-content:space-between; font-size:7px; font-weight:700; color:var(--txm); margin-bottom:2px">
               <span>Avance Anual</span>
               <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
             </div>
-            <div style="height:4px; background:#e2e8f0; border-radius:3px; overflow:hidden">
+            <div style="height:3px; background:#e2e8f0; border-radius:3px; overflow:hidden">
               <div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:3px"></div>
             </div>
           </div>
