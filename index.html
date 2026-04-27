@@ -3307,9 +3307,47 @@
     function renderSubProyectoCard(label, emoji, accentColor, bgColor, keyFn, range, d1, d2, lastMonth) {
       const prodPeriodo = prodSubReal(keyFn, range, d1, d2);
       const prodAcum = prodSubAcumYTD(keyFn, lastMonth);
-      return `<div style="background:${bgColor}; border-radius:8px; border:1px solid ${accentColor}15; padding: 6px 10px; display: flex; flex-direction: column; justify-content: center">
-          <div style="display:flex; justify-content:space-between; align-items:center"><span style="font-size:10px; font-weight:800; color:${accentColor}">${emoji} ${label}</span><span style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:var(--tx)">${fmtCOP(prodPeriodo)}</span></div>
-          <div style="display:flex; justify-content:space-between; align-items:center"><span style="font-size:9px; color:var(--txl); font-weight:700">Acum:</span><span style="font-family:'DM Mono',monospace; font-size:11px; font-weight:700; color:${accentColor}">${fmtCOP(prodAcum)}</span></div>
+      // Intentar obtener meta del subproyecto (proporción de banca)
+      const metaBanca = metaMes('BANCA', range);
+      const metaBancaAcum = metaAcumYTD('BANCA', lastMonth);
+      const metaBancaAnual = metaAnual('BANCA');
+      // Distribución estimada según sub (Redeban ~60%, Wompi ~40% como fallback si no hay meta específica)
+      const ratio = (label === 'Redeban') ? 0.6 : 0.4;
+      const metaSub = Math.round(metaBanca * ratio);
+      const metaSubAcum = Math.round(metaBancaAcum * ratio);
+      const cumplPeriodo = pct(prodPeriodo, metaSub);
+      const cumplAcum = pct(prodAcum, metaSubAcum);
+      return `<div style="background:${bgColor}; border-radius:8px; border:1px solid ${accentColor}22; padding:8px 10px; display:flex; flex-direction:column; gap:5px">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px">
+            <span style="font-size:10px; font-weight:800; color:${accentColor}">${emoji} ${label}</span>
+            <span style="font-size:9px; font-weight:700; color:${cumplPeriodo>=100?'var(--ok)':'var(--bad)'}; font-family:'DM Mono',monospace">${cumplPeriodo}%</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px">
+            <div>
+              <div style="font-size:8px; color:var(--txl); font-weight:700; text-transform:uppercase">Producción</div>
+              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:800; color:${accentColor}">${fmtCOP(prodPeriodo)}</div>
+            </div>
+            <div>
+              <div style="font-size:8px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta</div>
+              <div style="font-family:'DM Mono',monospace; font-size:11px; font-weight:700; color:var(--lima2)">${fmtCOP(metaSub)}</div>
+            </div>
+          </div>
+          <div style="height:4px; background:#e2e8f0; border-radius:3px; overflow:hidden">
+            <div style="height:100%; width:${Math.min(cumplPeriodo,100)}%; background:${accentColor}; border-radius:3px; transition:width .4s"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; border-top:1px dashed ${accentColor}22; padding-top:4px">
+            <div>
+              <div style="font-size:8px; color:var(--txl); font-weight:700; text-transform:uppercase">Acumulado</div>
+              <div style="font-family:'DM Mono',monospace; font-size:10px; font-weight:800; color:${accentColor}">${fmtCOP(prodAcum)}</div>
+            </div>
+            <div>
+              <div style="font-size:8px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acum.</div>
+              <div style="font-family:'DM Mono',monospace; font-size:10px; font-weight:700; color:var(--lima2)">${fmtCOP(metaSubAcum)}</div>
+            </div>
+          </div>
+          <div style="height:3px; background:#e2e8f0; border-radius:3px; overflow:hidden">
+            <div style="height:100%; width:${Math.min(cumplAcum,100)}%; background:${accentColor}88; border-radius:3px; transition:width .4s"></div>
+          </div>
         </div>`;
     }
 
@@ -3322,6 +3360,7 @@
       const metaA = metaAcumYTD(ger, lastMonth);
       const metaAnualVal = metaAnual(ger);
       const progresoAnual = pct(prodA, metaAnualVal);
+      const cumplPeriodo = pct(prod, meta);
       const faltantePeriodo = Math.max(0, meta - prod);
       const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
 
@@ -3331,12 +3370,15 @@
         const wHtml = renderSubProyectoCard('Wompi', '💳', '#166534', 'rgba(22,101,52,.06)', isWompi, range, d1, d2, lastMonth);
         const rHtml = renderSubProyectoCard('Redeban', '🏦', '#0847a3', 'rgba(8,71,163,.06)', isRedeban, range, d1, d2, lastMonth);
       subProyHtml = `
-          <div style="margin-top:2px; border-top:1px solid var(--border); padding-top:2px">
+          <div style="margin-top:2px; border-top:1px solid var(--border); padding-top:4px">
+            <div style="font-size:8px; font-weight:800; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px">Subproyectos</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px">
               ${rHtml}${wHtml}
             </div>
           </div>`;
       }
+
+      const barColorPeriodo = cumplPeriodo >= 100 ? 'var(--ok)' : cumplPeriodo >= 70 ? 'var(--warn)' : 'var(--bad)';
 
       return `
       <div class="kpi-modern" style="--hover-color:${color}; overflow:hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 100%; width: 100%">
@@ -3356,15 +3398,29 @@
               <div style="font-family:'DM Mono',monospace; font-size:15px; font-weight:800; color:var(--lima2)">${fmtCOP(meta)}</div>
             </div>
           </div>
+          <div style="border-top:1px solid var(--border); padding-top:6px">
+            <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--txm); margin-bottom:3px">
+              <span>Cumplimiento Periodo</span>
+              <span style="font-family:'DM Mono',monospace; color:${barColorPeriodo}">${cumplPeriodo}%</span>
+            </div>
+            <div style="height:6px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(cumplPeriodo,100)}%; background:${barColorPeriodo}; border-radius:4px; transition:width .6s ease"></div>
+            </div>
+          </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; border-top:1px solid var(--border); padding-top:6px">
-             <div><div style="font-size:9px; color:var(--txl); font-weight:700">Acum.</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div></div>
+             <div><div style="font-size:9px; color:var(--txl); font-weight:700">Acumulado</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div></div>
              <div><div style="font-size:9px; color:var(--txl); font-weight:700">Meta Acum.</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div></div>
           </div>
-          ${subProyHtml}
           <div style="border-top:1px solid var(--border); padding-top:6px">
-            <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700; color:var(--txm); margin-bottom:2px"><span>Avance Anual</span><span style="font-family:'DM Mono',monospace">${progresoAnual}%</span></div>
-            <div style="height:5px; background:#e2e8f0; border-radius:4px; overflow:hidden"><div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:4px"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--txm); margin-bottom:3px">
+              <span>Avance Anual</span>
+              <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
+            </div>
+            <div style="height:6px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(progresoAnual,100)}%; background:${color}88; border-radius:4px; transition:width .6s ease"></div>
+            </div>
           </div>
+          ${subProyHtml}
         </div>
       </div>`;
     }
@@ -3378,8 +3434,11 @@
       const metaA = metaAcumYTD(ger, lastMonth);
       const metaAnualVal = metaAnual(ger);
       const progresoAnual = pct(prodA, metaAnualVal);
+      const cumplPeriodo = pct(prod, meta);
       const faltantePeriodo = Math.max(0, meta - prod);
       const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
+
+      const barColorPeriodo = cumplPeriodo >= 100 ? 'var(--ok)' : cumplPeriodo >= 70 ? 'var(--warn)' : 'var(--bad)';
 
       return `
       <div class="kpi-modern" style="--hover-color:${color}; overflow:hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 100%; width: 100%">
@@ -3399,13 +3458,27 @@
               <div style="font-family:'DM Mono',monospace; font-size:15px; font-weight:800; color:var(--lima2)">${fmtCOP(meta)}</div>
             </div>
           </div>
+          <div style="border-top:1px solid var(--border); padding-top:6px">
+            <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--txm); margin-bottom:3px">
+              <span>Cumplimiento Periodo</span>
+              <span style="font-family:'DM Mono',monospace; color:${barColorPeriodo}">${cumplPeriodo}%</span>
+            </div>
+            <div style="height:6px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(cumplPeriodo,100)}%; background:${barColorPeriodo}; border-radius:4px; transition:width .6s ease"></div>
+            </div>
+          </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; border-top:1px solid var(--border); padding-top:6px">
-             <div><div style="font-size:9px; color:var(--txl); font-weight:700">Acum.</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div></div>
+             <div><div style="font-size:9px; color:var(--txl); font-weight:700">Acumulado</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:${color}">${fmtCOP(prodA)}</div></div>
              <div><div style="font-size:9px; color:var(--txl); font-weight:700">Meta Acum.</div><div style="font-family:'DM Mono',monospace; font-size:12px; font-weight:800; color:var(--lima2)">${fmtCOP(metaA)}</div></div>
           </div>
           <div style="border-top:1px solid var(--border); padding-top:6px">
-            <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700; color:var(--txm); margin-bottom:2px"><span>Avance Anual</span><span style="font-family:'DM Mono',monospace">${progresoAnual}%</span></div>
-            <div style="height:5px; background:#e2e8f0; border-radius:4px; overflow:hidden"><div style="height:100%; width:${Math.min(progresoAnual, 100)}%; background:${color}88; border-radius:4px"></div></div>
+            <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; color:var(--txm); margin-bottom:3px">
+              <span>Avance Anual</span>
+              <span style="font-family:'DM Mono',monospace">${progresoAnual}%</span>
+            </div>
+            <div style="height:6px; background:#e2e8f0; border-radius:4px; overflow:hidden">
+              <div style="height:100%; width:${Math.min(progresoAnual,100)}%; background:${color}88; border-radius:4px; transition:width .6s ease"></div>
+            </div>
           </div>
         </div>
       </div>`;
