@@ -3068,9 +3068,6 @@
       buildProjectionIndexes(proyeccion);
       document.getElementById('lupd').textContent = `Actualizado: ${new Date().toLocaleDateString('es-CO')}`;
       document.getElementById('sb-rows').textContent = `${RAW.length.toLocaleString()} registros`;
-      document.getElementById('nc-c').textContent = RAW.filter(r => r.GERENCIA === 'CIRION').length;
-      document.getElementById('nc-l').textContent = RAW.filter(r => r.GERENCIA === 'LIBERTY').length;
-      document.getElementById('nc-b').textContent = RAW.filter(r => r.GERENCIA === 'BANCA').length;
       const estats = [...new Set(RAW.map(r => r.ESTADO_ACTIVIDAD).filter(Boolean))].sort();
       const se = document.getElementById('det-est'); if (se) se.innerHTML = '<option value="">Todos</option>' + estats.map(e => `<option>${e}</option>`).join('');
       renderResumen();
