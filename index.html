@@ -2286,7 +2286,7 @@
 
           <div style="flex: 1; min-height: 540px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px">
             <!-- Gráfica Día a Día -->
-            <div class="card fu fu2" style="flex: 2.8; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
+            <div class="card fu fu2" style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding: 6px 14px">
                 <div>
                   <div class="ct" style="font-size: 11px">Día a Día: Meta vs Producción Real</div>
@@ -2303,7 +2303,7 @@
             </div>
 
             <!-- Gráfica Acumulada -->
-            <div class="card fu fu3" style="flex: 1.2; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
+            <div class="card fu fu3" style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding: 6px 14px">
                 <div>
                   <div class="ct" style="font-size: 11px">Producción Acumulada vs Meta Acumulada</div>
@@ -3482,7 +3482,7 @@
               <span style="font-family:'DM Mono',monospace; color:${barColorPeriodo}">${cumplPeriodo}%</span>
             </div>
             <div style="height:6px; background:#e2e8f0; border-radius:4px; overflow:hidden">
-              <div style="height:100%; width:${Math.min(cumplPeriodo,100)}%; background:${barColorPeriodo}; border-radius:4px; transition:width .6s ease"></div>
+               <div style="height:100%; width:${Math.min(cumplPeriodo,100)}%; background:${barColorPeriodo}; border-radius:4px; transition:width .6s ease"></div>
             </div>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; border-top:1px solid var(--border); padding-top:6px">
@@ -3501,6 +3501,67 @@
         </div>
       </div>`;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ══════════════════════════════════════════════
+    // ZONAS
+    // ══════════════════════════════════════════════
     function kpi(lbl, val, sub, cls = '', ico = '', p = null, delay = 0) {
       return `<div class="kc" style="animation-delay:${delay}s">
     <div class="kl">${lbl}</div><div class="kv ${cls}">${val}</div><div class="ks">${sub}</div>
@@ -3533,10 +3594,8 @@
       if (ger === 'BANCA' && sub !== 'TODOS') fullTitle += ` · ${sub}`;
       if (subtitEl) subtitEl.textContent = `${fullTitle} · ${periodLbl}`;
 
-      // Filtro de subproyecto para Banca
       const subFn = (sub === 'WOMPI') ? isWompi : (sub === 'REDEBAN') ? isRedeban : null;
 
-      // Meta Diaria filtrada
       const pptoGer = PPTO_DIARIO[ger] || {};
       const fechasLab = Object.keys(pptoGer).filter(d => range.includes(d.slice(0, 7))).sort();
       
@@ -3547,7 +3606,6 @@
         return pptoGer[d] || 0;
       });
 
-      // Real from RAW filtrado
       const realMap = {};
       RAW.filter(r => {
         if (r.GERENCIA !== ger) return false;
@@ -3561,7 +3619,6 @@
 
       const realD = fechasLab.map(d => realMap[d] || 0);
 
-      // Acumulados
       let metaAc = 0, realAc = 0;
       let diasCumplidos = 0, diasIncumplidos = 0;
       const metaAcArr = [], realAcArr = [];
@@ -3571,7 +3628,6 @@
         realAc += realD[i];
         metaAcArr.push(metaAc); 
         realAcArr.push(realAc);
-        
         if (metaD[i] > 0) {
           if (realD[i] >= metaD[i]) diasCumplidos++;
           else diasIncumplidos++;
@@ -3585,7 +3641,6 @@
       const faltante = Math.max(0, totalMeta - totalReal);
       const exceso = Math.max(0, totalReal - totalMeta);
 
-      // Actualizar solo la cuadrícula de métricas
       document.getElementById('dia-metrics').innerHTML = `
         <div class="estado-metric"><span class="estado-metric-val" style="font-size:13px">${fmtCOP(totalReal)}</span><span class="estado-metric-lbl">Producción Real</span></div>
         <div class="estado-metric"><span class="estado-metric-val" style="font-size:13px">${fmtCOP(totalMeta)}</span><span class="estado-metric-lbl">Meta Periodo</span></div>
@@ -3596,12 +3651,7 @@
         <div class="estado-metric"><span class="estado-metric-val" style="font-size:13px">${cpAcum}%</span><span class="estado-metric-lbl">%Cump Acumulado</span></div>
       `;
 
-      const lbl = fechasLab.map(d => d.slice(5)); // month-day
-
-      // Gráfica diaria: barras apiladas con faltante visual
-      const gapD = realD.map((r, i) => Math.max(0, metaD[i] - r));
-      const excessD = realD.map((r, i) => Math.max(0, r - metaD[i]));
-      const baseD = realD.map((r, i) => Math.min(r, metaD[i]));
+      const lbl = fechasLab.map(d => d.slice(5));
 
       function fmtCOPShort2(v) {
         if (!v) return '$0';
@@ -3611,185 +3661,107 @@
         return '$' + v;
       }
 
+      // --- GRÁFICA DÍA A DÍA ---
+      const gapD = realD.map((r, i) => Math.max(0, metaD[i] - r));
+      const excessD = realD.map((r, i) => Math.max(0, r - metaD[i]));
+      const baseD = realD.map((r, i) => Math.min(r, metaD[i]));
+
       mkC('ch-dia-main', 'bar', {
         labels: lbl,
         datasets: [
           {
-            label: 'Producción Real',
-            data: baseD,
-            backgroundColor: color + 'cc',
-            borderRadius: [3, 3, 0, 0],
-            borderSkipped: 'bottom',
-            stack: 'stack',
+            label: 'Producción Real', data: baseD, backgroundColor: color + 'cc', borderRadius: [3, 3, 0, 0], borderSkipped: 'bottom', stack: 'stack',
             datalabels: {
               display: ctx => baseD[ctx.dataIndex] > 0 && excessD[ctx.dataIndex] === 0,
-              anchor: 'end', align: 'top', offset: 1,
-              color: color,
-              font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              anchor: 'end', align: 'top', offset: 1, color: color, font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
               formatter: (v, ctx) => fmtCOPShort2(realD[ctx.dataIndex])
             }
           },
           {
-            label: 'Faltó para Meta',
-            data: gapD,
-            backgroundColor: 'rgba(239,68,68,0.2)',
-            borderColor: 'rgba(239,68,68,0.6)',
-            borderWidth: 1,
-            borderRadius: [3, 3, 0, 0],
-            borderSkipped: 'bottom',
-            stack: 'stack',
+            label: 'Faltó para Meta', data: gapD, backgroundColor: 'rgba(239,68,68,0.2)', borderColor: 'rgba(239,68,68,0.6)', borderWidth: 1, borderRadius: [3, 3, 0, 0], borderSkipped: 'bottom', stack: 'stack',
             datalabels: {
               display: ctx => gapD[ctx.dataIndex] > 0,
-              anchor: 'end', align: 'top', offset: 1,
-              color: '#dc2626',
-              font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              anchor: 'end', align: 'top', offset: 1, color: '#dc2626', font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
               formatter: (v, ctx) => `−${fmtCOPShort2(gapD[ctx.dataIndex])}`
             }
           },
           {
-            label: 'Superó Meta',
-            data: excessD,
-            backgroundColor: 'rgba(34,197,94,0.5)',
-            borderColor: '#16a34a',
-            borderWidth: 1,
-            borderRadius: [3, 3, 0, 0],
-            borderSkipped: 'bottom',
-            stack: 'stack',
+            label: 'Superó Meta', data: excessD, backgroundColor: 'rgba(34,197,94,0.5)', borderColor: '#16a34a', borderWidth: 1, borderRadius: [3, 3, 0, 0], borderSkipped: 'bottom', stack: 'stack',
             datalabels: {
               display: ctx => excessD[ctx.dataIndex] > 0,
-              anchor: 'end', align: 'top', offset: 1,
-              color: '#15803d',
-              font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              anchor: 'end', align: 'top', offset: 1, color: '#15803d', font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
               formatter: (v, ctx) => `+${fmtCOPShort2(excessD[ctx.dataIndex])}`
             }
           },
           {
-            label: 'Meta Día',
-            data: metaD,
-            type: 'line',
-            borderColor: '#C5D336',
-            backgroundColor: 'transparent',
-            borderWidth: 2,
-            tension: 0,
-            pointRadius: 0,
-            fill: false,
-            stack: undefined,
-            order: 1,
-            datalabels: { display: false }
+            label: 'Meta Día', data: metaD, type: 'line', borderColor: '#C5D336', borderWidth: 2, tension: 0, pointRadius: 0, fill: false, datalabels: { display: false }
           }
         ]
       }, {
-        plugins: {
-          ...CT.plugins,
-          legend: { ...CT.plugins.legend, position: 'top' },
-          tooltip: {
-            ...CT.plugins.tooltip,
-            callbacks: {
-              label: ctx => {
-                const i = ctx.dataIndex;
-                if (ctx.dataset.label === 'Producción Real') return ` Real: ${fmtCOP(realD[i])}`;
-                if (ctx.dataset.label === 'Faltó para Meta') return gapD[i] > 0 ? ` ⚠️ Faltó: ${fmtCOP(gapD[i])}` : null;
-                if (ctx.dataset.label === 'Superó Meta') return excessD[i] > 0 ? ` ✅ Exceso: +${fmtCOP(excessD[i])}` : null;
-                if (ctx.dataset.label === 'Meta Día') return ` Meta: ${fmtCOP(metaD[i])}`;
-                return null;
-              },
-              filter: item => item.raw > 0
-            }
-          }
-        },
-        scales: {
-          y: { stacked: true, ticks: { color: '#5c6b8a', callback: v => fmtCOPShort2(v) }, grid: { color: 'rgba(0,0,0,.04)' } },
-          x: { stacked: true, ticks: { color: '#5c6b8a', font: { size: 9 }, maxRotation: 90, minRotation: 90 }, grid: { display: false } }
-        }
+        plugins: { ...CT.plugins, legend: { position: 'top' }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => {
+          const i = ctx.dataIndex;
+          if (ctx.dataset.label === 'Producción Real') return ` Real: ${fmtCOP(realD[i])}`;
+          if (ctx.dataset.label === 'Faltó para Meta') return gapD[i] > 0 ? ` ⚠️ Faltó: ${fmtCOP(gapD[i])}` : null;
+          if (ctx.dataset.label === 'Superó Meta') return excessD[i] > 0 ? ` ✅ Exceso: +${fmtCOP(excessD[i])}` : null;
+          if (ctx.dataset.label === 'Meta Día') return ` Meta: ${fmtCOP(metaD[i])}`;
+          return null;
+        } } } },
+        scales: { y: { stacked: true, ticks: { callback: v => fmtCOPShort2(v) } }, x: { stacked: true } }
       });
 
-      // Gráfica acumulada con área de faltante
+      // --- GRÁFICA ACUMULADA ---
       const gapAcArr = metaAcArr.map((m, i) => Math.max(0, m - (realAcArr[i] || 0)));
+      const excessAcArr = metaAcArr.map((m, i) => Math.max(0, (realAcArr[i] || 0) - m));
+      const baseAcArr = metaAcArr.map((m, i) => Math.min(m, (realAcArr[i] || 0)));
+
       mkC('ch-dia-acum', 'bar', {
         labels: lbl,
         datasets: [
           {
-            label: 'Meta Acumulada',
-            data: metaAcArr,
-            borderColor: '#9eaa25',
-            backgroundColor: 'rgba(197,211,54, 0.3)',
-            borderWidth: 1,
-            borderRadius: 4,
-
-
-
-
+            label: 'Producción Real', data: baseAcArr, backgroundColor: color + 'cc', borderRadius: [3, 3, 0, 0], borderSkipped: 'bottom', stack: 'stack',
             datalabels: {
-              display: ctx => ctx.dataIndex === metaAcArr.length - 1,
-              anchor: 'end', align: 'top',
-              color: '#9eaa25',
-              font: { family: "'DM Mono',monospace", weight: 'bold', size: 9 },
-              formatter: v => 'Meta: ' + fmtCOPShort2(v)
+              display: ctx => baseAcArr[ctx.dataIndex] > 0 && excessAcArr[ctx.dataIndex] === 0,
+              anchor: 'end', align: 'top', offset: 1, color: color, font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              formatter: (v, ctx) => fmtCOPShort2(realAcArr[ctx.dataIndex])
             }
           },
           {
-            label: 'Prod. Acumulada',
-            data: realAcArr,
-            backgroundColor: color + 'cc',
-            borderRadius: 4,
-
-
-
-
-
-
+            label: 'Faltó para Meta', data: gapAcArr, backgroundColor: 'rgba(239,68,68,0.2)', borderColor: 'rgba(239,68,68,0.6)', borderWidth: 1, borderRadius: [3, 3, 0, 0], borderSkipped: 'bottom', stack: 'stack',
             datalabels: {
-              display: ctx => ctx.dataIndex === realAcArr.length - 1,
-              anchor: 'end', align: 'top',
-              color: color,
-              font: { family: "'DM Mono',monospace", weight: 'bold', size: 9 },
-              formatter: v => 'Real: ' + fmtCOPShort2(v)
+              display: ctx => gapAcArr[ctx.dataIndex] > 0,
+              anchor: 'end', align: 'top', offset: 1, color: '#dc2626', font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              formatter: (v, ctx) => `−${fmtCOPShort2(gapAcArr[ctx.dataIndex])}`
+            }
+          },
+          {
+            label: 'Superó Meta', data: excessAcArr, backgroundColor: 'rgba(34,197,94,0.5)', borderColor: '#16a34a', borderWidth: 1, borderRadius: [3, 3, 0, 0], borderSkipped: 'bottom', stack: 'stack',
+            datalabels: {
+              display: ctx => excessAcArr[ctx.dataIndex] > 0,
+              anchor: 'end', align: 'top', offset: 1, color: '#15803d', font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              formatter: (v, ctx) => `+${fmtCOPShort2(excessAcArr[ctx.dataIndex])}`
+            }
+          },
+          {
+            label: 'Meta Acumulada', data: metaAcArr, type: 'line', borderColor: '#C5D336', borderWidth: 2, tension: 0, pointRadius: 0, fill: false, datalabels: {
+              display: ctx => ctx.dataIndex === metaAcArr.length - 1,
+              anchor: 'end', align: 'right', color: '#9eaa25', font: { family: "'DM Mono', monospace", weight: 'bold', size: 9 },
+              formatter: v => 'Meta: ' + fmtCOPShort2(v)
             }
           }
-
-
-
-
-
-
-
-
-
-
-
-
         ]
       }, {
-        plugins: {
-          ...CT.plugins,
-          legend: { ...CT.plugins.legend, position: 'top' },
-          tooltip: {
-            ...CT.plugins.tooltip,
-            callbacks: {
-              label: ctx => {
-                const i = ctx.dataIndex;
-                if (ctx.dataset.label === 'Meta Acumulada') return ` Meta Acum: ${fmtCOP(metaAcArr[i])}`;
-                if (ctx.dataset.label === 'Prod. Acumulada') {
-                  const cumpAc = pct(realAcArr[i], metaAcArr[i]);
-                  return ` Prod Acum: ${fmtCOP(realAcArr[i])} · ${cumpAc}%`;
-                }
-                if (ctx.dataset.label === 'Faltante Acumulado') return gapAcArr[i] > 0 ? ` Faltante: ${fmtCOP(gapAcArr[i])}` : null;
-                return null;
-              },
-              filter: item => item.raw !== null
-            }
-          }
-        },
-        scales: {
-          y: { ticks: { color: '#5c6b8a', callback: v => fmtCOPShort2(v) }, grid: { color: 'rgba(0,0,0,.04)' } },
-          x: { ticks: { color: '#5c6b8a', font: { size: 9 }, maxRotation: 90, minRotation: 90 }, grid: { display: false } }
-        }
+        plugins: { ...CT.plugins, legend: { position: 'top' }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => {
+          const i = ctx.dataIndex;
+          if (ctx.dataset.label === 'Producción Real') return ` Real: ${fmtCOP(realAcArr[i])}`;
+          if (ctx.dataset.label === 'Faltó para Meta') return gapAcArr[i] > 0 ? ` ⚠️ Faltó: ${fmtCOP(gapAcArr[i])}` : null;
+          if (ctx.dataset.label === 'Superó Meta') return excessAcArr[i] > 0 ? ` ✅ Exceso: +${fmtCOP(excessAcArr[i])}` : null;
+          if (ctx.dataset.label === 'Meta Acumulada') return ` Meta: ${fmtCOP(metaAcArr[i])}`;
+          return null;
+        } } } },
+        scales: { y: { stacked: true, ticks: { callback: v => fmtCOPShort2(v) } }, x: { stacked: true } }
       });
     }
 
-    // ══════════════════════════════════════════════
-    // ZONAS
-    // ══════════════════════════════════════════════
     function renderZonas() {
       const ger = document.getElementById('zona-ger')?.value || 'CIRION';
       const zonaData = ger === 'CIRION' ? CIRION_ZONAS : (ger === 'BANCA' ? BANCA_ZONAS : LIBERTY_ZONAS);
