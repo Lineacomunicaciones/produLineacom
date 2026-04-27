@@ -728,6 +728,10 @@
       animation: fadeIn .28s ease
     }
 
+    #tp-diario.on {
+      animation: none
+    }
+
     /* ── CARDS ── */
     .card {
       background: var(--white);
@@ -2790,7 +2794,7 @@
       const n = document.getElementById('n-' + name); if (n) n.classList.add('act');
       _curTab = name;
       if (name === 'resumen') renderResumen();
-      if (name === 'diario') { toggleSubGer(); renderDiario(); }
+      if (name === 'diario') { toggleSubGer(); requestAnimationFrame(() => renderDiario()); }
       if (name === 'zonas') renderZonas();
       if (name === 'cirion') renderCirion();
       if (name === 'liberty') renderLiberty();
@@ -2914,6 +2918,11 @@
       const src = {};
       Object.entries(row || {}).forEach(([k, v]) => { src[String(k).toUpperCase().trim()] = v; });
 
+      // NEGOCIOGENERAL puede venir como "NEGOCIO GENERAL", "NEGOCIOGENERAL", "NEGOCIO_GENERAL"
+      const negocioGeneral = String(
+        src.NEGOCIOGENERAL || src['NEGOCIO GENERAL'] || src.NEGOCIO_GENERAL || src.NEGOCIO || ''
+      ).toUpperCase().trim();
+
       const fecha = normalizeDateValue(
         src.FECHA_FINALIZACION || src.FECHA_FINAL || src.FECHA || src.FECHA_CIERRE || src.FECHA_CIERRE_PLATAFORMA_CLIENTE
       );
@@ -2946,6 +2955,7 @@
         TIPO_NEGOCIO: String(src.TIPO_NEGOCIO || src.LINEA_DE_NEGOCIO || ''),
         RED_ASOCIADA: String(src.RED_ASOCIADA || src.TIPO_RED || ''),
         FORMA_ATENCION: String(src.FORMA_ATENCION || ''),
+        NEGOCIOGENERAL: negocioGeneral,
       };
     }
 
@@ -2953,6 +2963,10 @@
       return normalizeArrayPayload(payload).map(row => {
         const src = {};
         Object.entries(row || {}).forEach(([k, v]) => { src[String(k).toUpperCase().trim()] = v; });
+        // NEGOCIOGENERAL puede venir como "NEGOCIO GENERAL", "NEGOCIOGENERAL", "NEGOCIO_GENERAL"
+        const negocioGeneral = String(
+          src.NEGOCIOGENERAL || src['NEGOCIO GENERAL'] || src.NEGOCIO_GENERAL || src.NEGOCIO || ''
+        ).toUpperCase().trim();
         return {
           CLIENTE_CENTRO_COSTOS: String(src['CLIENTE - CENTRO DE COSTOS'] || src.CLIENTE_CENTRO_COSTOS || ''),
           LINEA_NEGOCIO: String(src['LINEA DE NEGOCIO'] || src.LINEA_NEGOCIO || ''),
@@ -2961,7 +2975,8 @@
           VALOR: toNum(src.VALOR),
           GERENCIA: String(src.GERENCIA || '').toUpperCase(),
           TIPO_RED: String(src.TIPO_RED || ''),
-          TIPO_PROYECCION: String(src.TIPO_PROYECCION || '').toUpperCase()
+          TIPO_PROYECCION: String(src.TIPO_PROYECCION || '').toUpperCase(),
+          NEGOCIOGENERAL: negocioGeneral
         };
       }).filter(r => r.FECHA && r.GERENCIA && r.TIPO_PROYECCION);
     }
@@ -3246,12 +3261,20 @@
 
     // ── Helpers sub-proyectos Banca (datos reales de proyección y RAW) ──────────
     function isWompi(r) {
+      // Primero verificar NEGOCIOGENERAL (columna principal de ambos archivos)
+      const ng = String(r.NEGOCIOGENERAL || '').toUpperCase();
+      if (ng) return ng.includes('WOMPI');
+      // Fallback: buscar en otros campos
       const fields = [r.RED_ASOCIADA, r.TIPO_ACTIVIDAD, r.TIPO_NEGOCIO, r.ZONA,
                       r.LUGAR_EJECUCION, r.CLIENTE_CENTRO_COSTOS, r.PROYECTO_ZONA_SITIO,
                       r.LINEA_NEGOCIO, r.TIPO_RED];
       return fields.some(f => String(f||'').toUpperCase().includes('WOMPI'));
     }
     function isRedeban(r) {
+      // Primero verificar NEGOCIOGENERAL (columna principal de ambos archivos)
+      const ng = String(r.NEGOCIOGENERAL || '').toUpperCase();
+      if (ng) return ng.includes('REDEBAN');
+      // Fallback: buscar en otros campos
       const fields = [r.RED_ASOCIADA, r.TIPO_ACTIVIDAD, r.TIPO_NEGOCIO, r.ZONA,
                       r.LUGAR_EJECUCION, r.CLIENTE_CENTRO_COSTOS, r.PROYECTO_ZONA_SITIO,
                       r.LINEA_NEGOCIO, r.TIPO_RED];
@@ -3307,16 +3330,11 @@
     function renderSubProyectoCard(label, emoji, accentColor, bgColor, keyFn, range, d1, d2, lastMonth) {
       const prodPeriodo = prodSubReal(keyFn, range, d1, d2);
       const prodAcum = prodSubAcumYTD(keyFn, lastMonth);
-      // Intentar obtener meta del subproyecto (proporción de banca)
-      const metaBanca = metaMes('BANCA', range);
-      const metaBancaAcum = metaAcumYTD('BANCA', lastMonth);
-      const metaBancaAnual = metaAnual('BANCA');
-      // Distribución estimada según sub (Redeban ~60%, Wompi ~40% como fallback si no hay meta específica)
-      const ratio = (label === 'Redeban') ? 0.6 : 0.4;
-      const metaSub = Math.round(metaBanca * ratio);
-      const metaSubAcum = Math.round(metaBancaAcum * ratio);
+      // Meta real desde proyeccion.json.gz usando NEGOCIOGENERAL via keyFn
+      const metaSub = metaSubMes(keyFn, range);
+      const metaSubAcumVal = metaSubAcumYTD(keyFn, lastMonth);
       const cumplPeriodo = pct(prodPeriodo, metaSub);
-      const cumplAcum = pct(prodAcum, metaSubAcum);
+      const cumplAcum = pct(prodAcum, metaSubAcumVal);
       return `<div style="background:${bgColor}; border-radius:8px; border:1px solid ${accentColor}22; padding:8px 10px; display:flex; flex-direction:column; gap:5px">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px">
             <span style="font-size:10px; font-weight:800; color:${accentColor}">${emoji} ${label}</span>
@@ -3342,7 +3360,7 @@
             </div>
             <div>
               <div style="font-size:8px; color:var(--txl); font-weight:700; text-transform:uppercase">Meta Acum.</div>
-              <div style="font-family:'DM Mono',monospace; font-size:10px; font-weight:700; color:var(--lima2)">${fmtCOP(metaSubAcum)}</div>
+              <div style="font-family:'DM Mono',monospace; font-size:10px; font-weight:700; color:var(--lima2)">${fmtCOP(metaSubAcumVal)}</div>
             </div>
           </div>
           <div style="height:3px; background:#e2e8f0; border-radius:3px; overflow:hidden">
