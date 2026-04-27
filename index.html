@@ -2158,13 +2158,21 @@
     <div class="abody">
       <nav class="sidebar">
         <div class="sb-sec">Vista</div>
-        <button class="nav act" id="n-resumen" onclick="gotoTab('resumen')"> <span class="ni">📊</span><span class="nl">Resumen</span></button>
-        <button class="nav" id="n-diario" onclick="gotoTab('diario')"> <span class="ni">📅</span><span class="nl">Análisis Diario</span></button>
-        <div class="sb-sec" style="margin-top:6px">Proyectos</div>
-        <button class="nav" id="n-proyectos" onclick="gotoTab('proyectos')"> <span class="ni">📁</span><span class="nl">Gestión Proyectos</span><span class="nc" id="nc-p">—</span></button>
-        <div class="sb-bot">Lineacom · v4.0<br><span id="sb-rows">0 registros</span></div>
+        <button class="nav act" id="n-resumen" onclick="gotoTab('resumen')"> <span class="ni">📊</span><span
+            class="nl">Resumen</span></button>
+        <button class="nav" id="n-diario" onclick="gotoTab('diario')"> <span class="ni">📅</span><span
+            class="nl">Análisis Diario</span></button>
+
+        <div class="sb-sec" style="margin-top:6px">Producción</div>
+        <button class="nav" id="n-detalle" onclick="gotoTab('detalle')"> <span class="ni">📋</span><span
+            class="nl">Detalle</span></button>
+
+        <div class="sb-bot">Lineacom · v3.0<br><span id="sb-rows">0 registros</span></div>
       </nav>
+
       <main class="main">
+
+        <!-- ═══ RESUMEN ═══ -->
         <div id="tp-resumen" class="tp on" style="padding:10px 18px; box-sizing:border-box">
 
           <!-- Section 1: ESTADO GENERAL COMPAÑÍA Hero Banner -->
@@ -2227,6 +2235,7 @@
           </div>
         </div>
 
+        <!-- ═══ DIARIO ═══ -->
         <div id="tp-diario" class="tp" style="padding:10px 18px; box-sizing:border-box">
           
           <!-- Banner Superior Compacto -->
@@ -2301,82 +2310,539 @@
           </div>
         </div>
 
-        <!-- ═══ PROYECTOS UNIFICADO ═══ -->
-        <div id="tp-proyectos" class="tp" style="padding:10px 18px; box-sizing:border-box">
-          <div class="estado-hero fu fu1" style="display: flex; flex-direction: column; gap: 10px; padding: 12px 18px; margin-bottom: 10px">
-            <div style="display: grid; grid-template-columns: 2fr 3fr; gap: 15px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px">
-              <div>
-                <div style="font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 2px" id="pro-title">Gestión de Proyectos</div>
-                <div style="font-size: 9px; color: rgba(255,255,255,0.7)" id="pro-subtitle">Detalle por gerencia y periodo</div>
-              </div>
-              <div style="display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 8px; justify-content: flex-end">
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Proyecto:</span>
-                  <select id="pro-ger" class="f-sel" style="background:#fff; color:#001D62; border:1px solid #ccc; height:24px; padding:0 8px; font-size:10px; font-weight:700; border-radius:4px" onchange="renderProyectos()">
-                    <option value="CIRION">Cirion</option>
-                    <option value="LIBERTY">Liberty</option>
-                    <option value="BANCA">Banca</option>
-                  </select>
-                </div>
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Desde:</span>
-                  <input type="date" id="pro-d1" class="f-sel" style="background:#fff; color:#333; border:1px solid #ccc; height:24px; padding:0 4px; font-size:10px; font-weight:700; border-radius:4px" value="2026-04-01" onchange="renderProyectos()">
-                </div>
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Hasta:</span>
-                  <input type="date" id="pro-d2" class="f-sel" style="background:#fff; color:#333; border:1px solid #ccc; height:24px; padding:0 4px; font-size:10px; font-weight:700; border-radius:4px" value="2026-04-30" onchange="renderProyectos()">
-                </div>
-                <button class="btn-exp" onclick="exportTab(document.getElementById('pro-ger').value.toLowerCase())" style="padding:5px 12px; font-size:10px; height:24px">📊 Exportar</button>
+        <!-- ═══ ZONAS ═══ -->
+        <div id="tp-zonas" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt">Distribución por Zona</div>
+              <div class="ps">Meta presupuestada por zona / centro de costo · Cirion y Banca</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Proyecto</label>
+                <select id="zona-ger" class="f-sel" onchange="renderZonas()">
+                  <option value="CIRION">Cirion</option>
+                  <option value="BANCA">Banca</option>
+                </select>
               </div>
             </div>
-            <div id="pro-metrics" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px"></div>
           </div>
-          <div id="pro-content" class="fu fu2" style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px; min-height: 450px"></div>
+          <div class="sband fu fu1" id="zona-band"></div>
+          <div class="slbl fu fu2">Valor Proyectado Anual por Zona</div>
+          <div class="g12 fu fu2">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Zonas — Valor Anual Proyectado</div>
+                  <div class="cs">Suma 12 meses por centro de costo</div>
+                </div>
+              </div>
+              <div class="cw" style="height:320px"><canvas id="ch-zona-bar"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Distribución porcentual</div>
+                  <div class="cs">% del total por zona</div>
+                </div>
+              </div>
+              <div class="cw" style="height:320px"><canvas id="ch-zona-dona"></canvas></div>
+            </div>
+          </div>
+          <div class="slbl fu fu3">Tendencia Mensual por Zona (Top 6)</div>
+          <div class="card fu fu3">
+            <div class="cw" style="height:300px"><canvas id="ch-zona-tend"></canvas></div>
+          </div>
+        </div>
+
+        <!-- ═══ CIRION ═══ -->
+        <div id="tp-cirion" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt" style="color:#001D62">Cirion</div>
+              <div class="ps">Assurance · Mantenimiento · Delivery · Zonas PI/PE</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Desde</label>
+                <input type="date" id="cir-d1" class="f-sel" value="2026-04-01" onchange="renderCirion()">
+              </div>
+              <div class="f-group">
+                <label>Hasta</label>
+                <input type="date" id="cir-d2" class="f-sel" value="2026-04-30" onchange="renderCirion()">
+              </div>
+              <button class="btn-exp" onclick="exportTab('cirion')">📊 Exportar</button>
+            </div>
+          </div>
+          <div class="sband fu fu1" id="cir-band" style="background:linear-gradient(135deg,#001D62,#0036b0)"></div>
+          <div class="slbl fu fu2">KPIs Cirion</div>
+          <div class="kg fu fu2" id="cir-kpis"></div>
+          <div class="slbl fu fu3">Detalle por Tipo: Assurance · Mantenimiento · Delivery</div>
+          <div class="g3 fu fu3" id="cir-cat-blocks"></div>
+          <div class="slbl fu fu4">Distribución y Tendencia</div>
+          <div class="g3 fu fu4">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">% por Tipo de Actividad</div>
+                  <div class="cs">Assurance · Mantenimiento · Delivery</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-cir-tipo"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Top Zonas Cirion</div>
+                  <div class="cs">PI = Planta Interna · PE = Planta Externa</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-cir-zona"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Tendencia Mensual por Tipo</div>
+                  <div class="cs">Assurance vs Mantenimiento vs Delivery</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-cir-tend"></canvas></div>
+            </div>
+          </div>
+          <div class="slbl">Producción Real Cirion</div>
+          <div class="g12">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Estado Actividades Cirion</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-cir-estado"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Proyectado vs Real · Tendencia</div>
+                  <div class="cs">Meta mensual vs ejecución real</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-cir-pvr"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ LIBERTY ═══ -->
+        <div id="tp-liberty" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt" style="color:#0847a3">Liberty</div>
+              <div class="ps">Cali · Medellín · Proyectado vs Real</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Desde</label>
+                <input type="date" id="lib-d1" class="f-sel" value="2026-04-01" onchange="renderLiberty()">
+              </div>
+              <div class="f-group">
+                <label>Hasta</label>
+                <input type="date" id="lib-d2" class="f-sel" value="2026-04-30" onchange="renderLiberty()">
+              </div>
+              <button class="btn-exp" onclick="exportTab('liberty')">📊 Exportar</button>
+            </div>
+          </div>
+          <div class="sband fu fu1" id="lib-band" style="background:linear-gradient(135deg,#0847a3,#3b82f6)"></div>
+          <div class="slbl fu fu2">KPIs Liberty</div>
+          <div class="kg fu fu2" id="lib-kpis"></div>
+          <div class="g2 fu fu3">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Estado Actividades Liberty</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-lib-estado"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Proyectado vs Real</div>
+                  <div class="cs">Meta mensual vs producción real</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-lib-pvr"></canvas></div>
+            </div>
+          </div>
+          <div class="g2 fu fu4">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Distribución por Zona</div>
+                  <div class="cs">Cali · Medellín</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-lib-zona"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Tipo de Actividad</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-lib-tipo"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ BANCA ═══ -->
+        <div id="tp-banca" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt" style="color:#166534">Banca Seguros</div>
+              <div class="ps">Redeban CB · Redeban POS · Redes · Zonas</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Desde</label>
+                <input type="date" id="ban-d1" class="f-sel" value="2026-04-01" onchange="renderBanca()">
+              </div>
+              <div class="f-group">
+                <label>Hasta</label>
+                <input type="date" id="ban-d2" class="f-sel" value="2026-04-30" onchange="renderBanca()">
+              </div>
+              <button class="btn-exp" onclick="exportTab('banca')">📊 Exportar</button>
+            </div>
+          </div>
+          <div class="sband fu fu1" id="ban-band" style="background:linear-gradient(135deg,#166534,#22c55e)"></div>
+          <div class="slbl fu fu2">KPIs Banca</div>
+          <div class="kg fu fu2" id="ban-kpis"></div>
+          <div class="g3 fu fu3">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Estado Actividades Banca</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-ban-estado"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Proyectado vs Real</div>
+                  <div class="cs">Meta mensual vs producción real</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-ban-pvr"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Tipo de Red</div>
+                </div>
+              </div>
+              <div class="cw" style="height:250px"><canvas id="ch-ban-red"></canvas></div>
+            </div>
+          </div>
+          <div class="g2 fu fu4">
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Top Zonas Banca</div>
+                  <div class="cs">Por valor proyectado anual</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-ban-zona"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch">
+                <div>
+                  <div class="ct">Forma de Atención</div>
+                </div>
+              </div>
+              <div class="cw" style="height:260px"><canvas id="ch-ban-forma"></canvas></div>
+            </div>
+          </div>
         </div>
 
         <!-- ═══ DETALLE ═══ -->
-        <div id="tp-detalle" class="tp">
-          <div class="ph fu">
+        <div id="tp-detalle" class="tp" style="padding:10px 18px; box-sizing:border-box">
+
+          <!-- Estado General Compañía Hero -->
+          <div class="estado-hero fu" style="margin-bottom:14px; padding: 12px 20px">
+            <div class="estado-hero-header">
+              <div class="estado-hero-title">
+                <div class="estado-hero-dot"></div>
+                <span class="estado-hero-label">Estado General Compañía</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+                <!-- Filtro Gerencia -->
+                <div class="f-group"
+                  style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
+                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Gerencia</label>
+                  <select id="det-ger-sel" class="f-sel" style="font-size:10px; color:#fff; background:transparent; border:none; outline:none; font-weight:700; cursor:pointer" onchange="onDetGerChange()">
+                    <option value="todos" style="color:#001D62">Todas</option>
+                    <option value="BANCA" style="color:#001D62">Banca</option>
+                    <option value="CIRION" style="color:#001D62">Cirion</option>
+                    <option value="LIBERTY" style="color:#001D62">Liberty</option>
+                  </select>
+                </div>
+                <!-- Filtro Fechas -->
+                <div class="f-group"
+                  style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
+                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Desde</label>
+                  <input type="date" id="det-hero-d1" class="f-sel" value="2026-04-01" onchange="renderDetalleHero(); renderDetalle()"
+                    style="font-size:10px; width:110px; color:#fff; background:transparent">
+                </div>
+                <div class="f-group"
+                  style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
+                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Hasta</label>
+                  <input type="date" id="det-hero-d2" class="f-sel" value="2026-04-30" onchange="renderDetalleHero(); renderDetalle()"
+                    style="font-size:10px; width:110px; color:#fff; background:transparent">
+                </div>
+                <button class="btn-exp" onclick="exportTab('detalle')"
+                  style="padding:5px 12px; font-size:10px; height:30px">📊 Exportar</button>
+              </div>
+            </div>
+            <div id="det-hero-band" class="estado-hero-metrics"></div>
+          </div>
+
+          <div class="ph fu fu1" style="margin-bottom:10px">
             <div>
               <div class="pt">Detalle de Producción</div>
               <div class="ps">Tabla completa de actividades · filtros · exportar</div>
             </div>
-            <div class="pa">
-              <div class="pf" id="det-pfg">
-                <button class="pfb on" onclick="setDetGer('todos')">Todos</button>
-                <button class="pfb" onclick="setDetGer('CIRION')">Cirion</button>
-                <button class="pfb" onclick="setDetGer('LIBERTY')">Liberty</button>
-                <button class="pfb" onclick="setDetGer('BANCA')">Banca</button>
-              </div>
-              <button class="btn-exp" onclick="exportTab('detalle')">⬇ Excel</button>
+          </div>
+          <div class="fb fu fu1">
+            <div class="fr">
+              <div class="fg"><label>Buscar</label><input type="text" id="det-srch"
+                  placeholder="ID, lugar, coordinador…" oninput="renderDetalle()" style="min-width:190px"></div>
+              <div class="fg"><label>Estado</label><select id="det-est" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
+              <div style="align-self:flex-end"><button class="btn-rst" onclick="resetDet()">↺</button></div>
             </div>
           </div>
-        fatalBoot(err.message || 'No fue posible cargar los archivos reales.');
+          <div class="card fu fu2">
+            <div class="tw">
+              <table class="dt" id="det-tbl"></table>
+            </div>
+            <div class="tf"><span id="det-cnt" style="font-family:'DM Mono',monospace;font-size:10.5px">—</span>
+              <div class="pg" id="det-pg"></div>
+            </div>
+          </div>
         </div>
+
+        <!-- ═══ CARGA ═══ -->
+        <div id="tp-carga" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt">Cargar Datos JSON</div>
+              <div class="ps">Esta versión lee automáticamente consolidado.json.gz y proyeccion.json.gz desde la raíz
+              </div>
+            </div>
+          </div>
+          <div class="card fu fu1" style="padding:28px">
+            <div class="uz" id="uz" onclick="document.getElementById('fi').click()"
+              ondragover="event.preventDefault();this.classList.add('dov')" ondragleave="this.classList.remove('dov')"
+              ondrop="handleDrop(event)">
+              <div class="uico">📄</div>
+              <p>Esta pantalla es solo informativa</p>
+              <small>Publica ambos JSON reales junto a index.html y recarga</small>
+            </div>
+            <input type="file" id="fi" accept=".json" style="display:none" onchange="handleFile(this)">
+            <div id="upst" style="margin-top:14px;font-size:12.5px;color:var(--txm);display:none"></div>
+          </div>
+          <div class="card fu fu2" style="padding:20px;margin-top:14px">
+            <div class="ct" style="margin-bottom:10px">📋 Columnas esperadas</div>
+            <div
+              style="background:var(--bg);border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:11.5px;color:var(--tx);line-height:1.9;overflow-x:auto">
+              <span style="color:var(--azul);font-weight:700">Comunes:</span> ID_TA · GERENCIA · TIPO_ACTIVIDAD ·
+              ESTADO_ACTIVIDAD · FECHA_FINALIZACION · VALOR_TOTAL<br>
+              <span style="color:#001D62;font-weight:700">Cirion:</span> VALOR_OBRA_CIVIL · VALOR_MATERIAL ·
+              TIPO_NEGOCIO · ZONA · BASE_OPERATIVA<br>
+              <span style="color:#166534;font-weight:700">Banca:</span> VALOR_ENTIDAD · VALOR_RED · FORMA_ATENCION ·
+              TIPOLOGIA · RED_ASOCIADA<br>
+              <span style="color:#0847a3;font-weight:700">Liberty:</span> VALOR_APROBADO · VALOR_OBRA_CIVIL ·
+              COORDINADOR · CIUDAD
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
   <script>
     'use strict';
     Chart.register(ChartDataLabels);
-    let PROYECCION_RAW = [], PPTO_DIARIO = {}, CIRION_ZONAS = {}, CIRION_CATS = {}, BANCA_ZONAS = {}, LIBERTY_ZONAS = {}, META_MES = { BANCA: {}, CIRION: {}, LIBERTY: {} };
-    let RAW = []; const CI = new Map();
-    const MONTHS_ISO = ['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
-    const MONTHS_LBL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-    const GERS = ['BANCA','CIRION','LIBERTY'];
+
+    // ══════════════════════════════════════════════
+    // REAL JSON DATA (loaded from root files)
+    // ══════════════════════════════════════════════
+
+    let PROYECCION_RAW = [];
+    let PPTO_DIARIO = {};
+    let CIRION_ZONAS = {};
+    let CIRION_CATS = {};
+    let BANCA_ZONAS = {};
+    let LIBERTY_ZONAS = {};
+    let META_MES = { BANCA: {}, CIRION: {}, LIBERTY: {} };
+    // ══════════════════════════════════════════════
+    // AUTH — Desactivado: acceso público
+    // ══════════════════════════════════════════════
+    function doMSLogin() {}
+    function doDemo() {}
+    function doLogout() {}
+    function _enterApp() {}
+
+    // Arranque directo al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('app').classList.add('on');
+      initDash();
+    });
+
+    // ══════════════════════════════════════════════
+    // DATA STATE
+    // ══════════════════════════════════════════════
+    let RAW = [];
+    const CI = new Map(), LI = new Map(), BI = new Map(); // chart instances
+
+    const MONTHS_ISO = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09', '2026-10', '2026-11', '2026-12'];
+    const MONTHS_LBL = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const GERS = ['BANCA', 'CIRION', 'LIBERTY'];
     const GC = { BANCA: '#166534', CIRION: '#001D62', LIBERTY: '#0847a3' };
-    const PAL = ['#001D62', '#C5D336', '#166534', '#0847a3', '#9eaa25', '#22c55e', '#f59e0b', '#e8334a'];
-    const CT = { plugins: { legend: { labels: { color: '#5c6b8a', font: { family: 'Outfit', size: 11 } } }, tooltip: { backgroundColor: 'rgba(0,29,98,.95)' } } };
+    const PAL = ['#001D62', '#C5D336', '#166534', '#0847a3', '#9eaa25', '#22c55e', '#f59e0b', '#e8334a', '#6366f1', '#ec4899', '#14b8a6', '#f97316'];
+
+    const CT = {
+      plugins: {
+        legend: { labels: { color: '#5c6b8a', font: { family: 'Outfit', size: 11 }, boxWidth: 11, padding: 12 } },
+        tooltip: { backgroundColor: 'rgba(0,29,98,.95)', titleColor: '#C5D336', bodyColor: '#fff', borderColor: 'rgba(197,211,54,.28)', borderWidth: 1, padding: 11, cornerRadius: 7 }
+      }
+    };
+
+    function dc(id) { if (CI.has(id)) { CI.get(id).destroy(); CI.delete(id) } }
+    function mkC(id, type, data, opts = {}) {
+      dc(id);
+      const el = document.getElementById(id); if (!el) return;
+      const c = new Chart(el, { type, data, options: Object.assign({ responsive: true, maintainAspectRatio: false }, CT, opts) });
+      CI.set(id, c); return c;
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────
+    function fmtCOP(v) {
+      if (v === undefined || v === null || isNaN(v)) return '$0';
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(v);
+    }
+
+    function getRange(id1, id2) {
+      const d1 = document.getElementById(id1)?.value;
+      const d2 = document.getElementById(id2)?.value;
+      if (!d1 || !d2) return [d1 ? d1.slice(0, 7) : d2 ? d2.slice(0, 7) : MONTHS_ISO[0]];
+      const m1 = d1.slice(0, 7);
+      const m2 = d2.slice(0, 7);
+      const start = MONTHS_ISO.indexOf(m1);
+      const end = MONTHS_ISO.indexOf(m2);
+      if (start === -1 || end === -1) return [m1];
+      if (start > end) return [m1];
+      return MONTHS_ISO.slice(start, end + 1);
+    }
+    function getRangeDates(id1, id2) {
+      const d1 = document.getElementById(id1)?.value || '';
+      const d2 = document.getElementById(id2)?.value || '';
+      return { d1, d2 };
+    }
+    function pct(n, d) { return d ? Math.round(n / d * 100) : 0; }
+    function cClass(p) { return p >= 95 ? 'ok' : p >= 75 ? 'warn' : 'bad'; }
+    function cTClass(p) { return p >= 95 ? 'ok' : p >= 75 ? 'warn' : 'bad'; }
+    function sumBy(arr, key) { return arr.reduce((s, r) => s + (parseFloat(r[key]) || 0), 0); }
+    function cntBy(arr, key) { return arr.reduce((a, r) => { const v = r[key] || 'N/A'; a[v] = (a[v] || 0) + 1; return a; }, {}); }
+    function topN(obj, n = 8) { return Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n); }
+    function spClass(s) { const u = (s || '').toUpperCase(); if (u.includes('FINAL') || u.includes('COMPLET')) return 'fin'; if (u.includes('EJECUC')) return 'ejec'; if (u.includes('PEND')) return 'pend'; if (u.includes('CANCEL')) return 'canc'; return 'def'; }
+
+    // Meta / Presupuesto
+    function metaMes(ger, mes) {
+      if (ger === 'TODOS') return GERS.reduce((s, g) => s + metaMes(g, mes), 0);
+      if (Array.isArray(mes)) return mes.reduce((s, m) => s + ((META_MES[ger] && META_MES[ger][m]) || 0), 0);
+      return (META_MES[ger] && META_MES[ger][mes]) || 0;
+    }
+    function metaAnual(ger) {
+      if (ger === 'TODOS') return GERS.reduce((s, g) => s + metaAnual(g), 0);
+      return MONTHS_ISO.reduce((s, m) => s + metaMes(ger, m), 0);
+    }
+    function metaDia(ger, fecha) { return (PPTO_DIARIO[ger] && PPTO_DIARIO[ger][fecha]) || 0; }
+
+    // Real from RAW_DATA
+    function prodReal(ger, mes, d1, d2) {
+      const months = Array.isArray(mes) ? mes : [mes];
+      return sumBy(RAW.filter(r => {
+        const fecha = (r.FECHA_FINALIZACION || '');
+        const m = fecha.slice(0, 7);
+        if (!months.includes(m)) return false;
+        if (ger !== 'TODOS' && r.GERENCIA !== ger) return false;
+        if (d1 && fecha < d1) return false;
+        if (d2 && fecha > d2) return false;
+        return true;
+      }), 'VALOR_TOTAL');
+    }
+    function prodRealMes(mes) { return GERS.reduce((s, g) => s + prodReal(g, mes), 0); }
+    function prodAcumYTD(ger, hasta) {
+      const h = Array.isArray(hasta) ? hasta[hasta.length - 1] : hasta;
+      const idx = MONTHS_ISO.indexOf(h);
+      return MONTHS_ISO.slice(0, idx + 1).reduce((s, m) => s + prodReal(ger, m), 0);
+    }
+    function metaAcumYTD(ger, hasta) {
+      if (ger === 'TODOS') return GERS.reduce((s, g) => s + metaAcumYTD(g, hasta), 0);
+      const h = Array.isArray(hasta) ? hasta[hasta.length - 1] : hasta;
+      const idx = MONTHS_ISO.indexOf(h);
+      return MONTHS_ISO.slice(0, idx + 1).reduce((s, m) => s + metaMes(ger, m), 0);
+    }
+    // Daily data per gerencia/month from RAW
+    function rawDayMap(ger, mes) {
+      const m = {};
+      RAW.filter(r => r.GERENCIA === ger && (r.FECHA_FINALIZACION || '').slice(0, 7) === mes)
+        .forEach(r => { const d = (r.FECHA_FINALIZACION || '').slice(0, 10); if (d) m[d] = (m[d] || 0) + (parseFloat(r.VALOR_TOTAL) || 0); });
+      return m;
+    }
+
+    // ── Navigation ──────────────────────────────────────────────
+    let _curTab = 'resumen';
+    function gotoTab(name) {
+      document.querySelectorAll('.tp').forEach(p => p.classList.remove('on'));
+      document.querySelectorAll('.nav').forEach(n => n.classList.remove('act'));
+      const p = document.getElementById('tp-' + name); if (p) p.classList.add('on');
+      const n = document.getElementById('n-' + name); if (n) n.classList.add('act');
+      _curTab = name;
+      if (name === 'resumen') renderResumen();
+      if (name === 'diario') { toggleSubGer(); requestAnimationFrame(() => renderDiario()); }
+      if (name === 'zonas') renderZonas();
+      if (name === 'cirion') renderCirion();
+      if (name === 'liberty') renderLiberty();
+      if (name === 'banca') renderBanca();
+      if (name === 'detalle') { renderDetalleHero(); renderDetalle(); }
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────
     async function initDash() {
-      showBoot();
       try {
+        showBoot();
+        setBootStep('auth', 'ok');
+        setBootProgress(8, 'Iniciando lectura de archivos reales…');
         const { consolidado, proyeccion } = await loadRootData();
-        setBootStep('idx', 'run');
-        setBootProgress(85, 'Finalizando métricas…');
+        setBootStep('cons', 'ok');
+        setBootStep('proy', 'ok');
+        setBootProgress(78, 'Normalizando datos reales…');
         loadData(consolidado, proyeccion);
-        hideBoot();
+        setBootStep('idx', 'ok');
+        setBootProgress(100, 'Dashboard listo');
+        setTimeout(hideBoot, 350);
       } catch (err) {
-        console.error(err);
+        console.error('[boot]', err);
         fatalBoot(err.message || 'No fue posible cargar los archivos reales.');
       }
     }
@@ -2620,46 +3086,6 @@
         b.classList.toggle('on', b.textContent.toUpperCase() === g || (b.textContent === 'Consolidado' && g === 'TODOS'));
       });
       renderResumen();
-    }
-
-    
-    function renderProyectos() {
-      const ger = document.getElementById('pro-ger').value;
-      const range = getRange('pro-d1', 'pro-d2');
-      const { d1, d2 } = getRangeDates('pro-d1', 'pro-d2');
-      const lastMonth = range[range.length - 1];
-      
-      const filtered = RAW.filter(r => r.GERENCIA === ger && range.includes((r.FECHA_FINALIZACION||'').slice(0,7)) && (!d1||r.FECHA_FINALIZACION>=d1) && (!d2||r.FECHA_FINALIZACION<=d2));
-      const prod = sumBy(filtered, 'VALOR_TOTAL');
-      const meta = metaMes(ger, range);
-      const cp = pct(prod, meta);
-      const metaAnu = metaAnual(ger);
-      
-      document.getElementById('pro-metrics').innerHTML = `
-        <div class="estado-metric"><span class="estado-metric-val">${filtered.length}</span><span class="estado-metric-lbl">Actividades</span></div>
-        <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(prod)}</span><span class="estado-metric-lbl">Producción</span></div>
-        <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(meta)}</span><span class="estado-metric-lbl">Meta Periodo</span></div>
-        <div class="estado-metric highlight"><span class="estado-metric-val" style="color:${cp >= 95 ? '#4ade80' : cp >= 75 ? '#fbbf24' : '#f87171'}">${cp}%</span><span class="estado-metric-lbl">%Cump</span></div>
-        <div class="estado-metric highlight"><span class="estado-metric-val">${fmtCOP(metaAnu)}</span><span class="estado-metric-lbl">Meta Anual</span></div>
-        <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(prodAcumYTD(ger, lastMonth))}</span><span class="estado-metric-lbl">Acum. YTD</span></div>
-        <div class="estado-metric"><span class="estado-metric-val">${pct(prodAcumYTD(ger, lastMonth), metaAcumYTD(ger, lastMonth))}%</span><span class="estado-metric-lbl">%Cump YTD</span></div>`;
-      
-      const content = document.getElementById('pro-content');
-      content.innerHTML = `<div id="pro-card-box"></div><div class="card"><div class="ch"><div class="ct">Tendencia Mensual</div></div><div class="cw" style="height:350px"><canvas id="ch-pro-main"></canvas></div></div>`;
-      
-      if (ger === 'BANCA') {
-          document.getElementById('pro-card-box').innerHTML = renderUnifiedProjectCard('BANCA', range, d1, d2);
-      } else {
-          document.getElementById('pro-card-box').innerHTML = renderCompactProjectCard(ger, range, d1, d2);
-      }
-      
-      mkC('ch-pro-main', 'bar', { 
-        labels: MONTHS_LBL, 
-        datasets: [
-          { label: 'Real', data: MONTHS_ISO.map(m => prodReal(ger, m)), backgroundColor: GC[ger] },
-          { label: 'Meta', data: MONTHS_ISO.map(m => metaMes(ger, m)), type: 'line', borderColor: '#C5D336' }
-        ] 
-      });
     }
 
     function renderResumen() {
@@ -3692,6 +4118,66 @@
     let _dGer = 'todos', _dPage = 1, _dSrch = '', _dEst = '', _dD1 = '', _dD2 = '';
     const DET_SZ = 50;
 
+    function onDetGerChange() {
+      const g = document.getElementById('det-ger-sel')?.value || 'todos';
+      _dGer = g; _dPage = 1;
+      renderDetalleHero();
+      renderDetalle();
+    }
+
+    function renderDetalleHero() {
+      const d1 = document.getElementById('det-hero-d1')?.value || '';
+      const d2 = document.getElementById('det-hero-d2')?.value || '';
+      const gerSel = document.getElementById('det-ger-sel')?.value || 'todos';
+
+      let rows = gerSel === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === gerSel);
+      if (d1) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') >= d1);
+      if (d2) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') <= d2);
+
+      const gersToShow = gerSel === 'todos' ? GERS : [gerSel];
+      const band = document.getElementById('det-hero-band');
+      if (!band) return;
+
+      const total = sumBy(rows, 'VALOR_TOTAL');
+      const metaRows = (() => {
+        const months = [];
+        if (d1 && d2) {
+          const m1 = d1.slice(0,7), m2 = d2.slice(0,7);
+          const s = MONTHS_ISO.indexOf(m1), e = MONTHS_ISO.indexOf(m2);
+          if (s !== -1 && e !== -1) for(let i=s; i<=e; i++) months.push(MONTHS_ISO[i]);
+        }
+        if (!months.length) return 0;
+        return gersToShow.reduce((s,g) => s + metaMes(g, months), 0);
+      })();
+      const pctTotal = metaRows ? Math.round(total / metaRows * 100) : 0;
+
+      let html = `<div class="estado-metric highlight">
+        <div class="estado-metric-val">${fmtCOP(total)}</div>
+        <div class="estado-metric-lbl">Producción</div>
+      </div>
+      <div class="estado-metric highlight">
+        <div class="estado-metric-val">${pctTotal}%</div>
+        <div class="estado-metric-lbl">% Cumplimiento</div>
+      </div>`;
+
+      gersToShow.forEach(g => {
+        const gr = rows.filter(r => r.GERENCIA === g);
+        const gVal = sumBy(gr, 'VALOR_TOTAL');
+        const gActs = gr.length;
+        html += `<div class="estado-metric">
+          <div class="estado-metric-val">${fmtCOP(gVal)}</div>
+          <div class="estado-metric-lbl">${g} · Producción</div>
+        </div>
+        <div class="estado-metric">
+          <div class="estado-metric-val">${gActs.toLocaleString()}</div>
+          <div class="estado-metric-lbl">${g} · Actividades</div>
+        </div>`;
+      });
+
+      band.innerHTML = html;
+      band.style.gridTemplateColumns = `repeat(${2 + gersToShow.length * 2}, 1fr)`;
+    }
+
     const DCOLS = [
       { h: 'ID', k: 'ID_TA' }, { h: 'Proyecto', k: 'GERENCIA', t: 'ger' }, { h: 'Tipo Act.', k: 'TIPO_ACTIVIDAD' },
       { h: 'Estado', k: 'ESTADO_ACTIVIDAD', t: 'status' }, { h: 'Fecha', k: 'FECHA_FINALIZACION' },
@@ -3701,19 +4187,23 @@
 
     function setDetGer(g) {
       _dGer = g; _dPage = 1;
-      document.querySelectorAll('#det-pfg .pfb').forEach(b => b.classList.toggle('on', b.textContent.toLowerCase() === g.toLowerCase() || (b.textContent === 'Todos' && g === 'todos')));
+      const sel = document.getElementById('det-ger-sel');
+      if (sel) sel.value = g;
+      renderDetalleHero();
       renderDetalle();
     }
     function resetDet() {
-      _dSrch = ''; _dEst = ''; _dD1 = ''; _dD2 = ''; _dPage = 1;
-      ['det-srch', 'det-est', 'det-d1', 'det-d2'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+      _dSrch = ''; _dEst = ''; _dPage = 1;
+      ['det-srch', 'det-est'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
       renderDetalle();
     }
     function renderDetalle() {
       _dSrch = (document.getElementById('det-srch')?.value || '').toLowerCase();
       _dEst = document.getElementById('det-est')?.value || '';
-      _dD1 = document.getElementById('det-d1')?.value || '';
-      _dD2 = document.getElementById('det-d2')?.value || '';
+      _dD1 = document.getElementById('det-hero-d1')?.value || '';
+      _dD2 = document.getElementById('det-hero-d2')?.value || '';
+      const gerSel = document.getElementById('det-ger-sel')?.value || 'todos';
+      _dGer = gerSel;
 
       let rows = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
       if (_dSrch) rows = rows.filter(r => DCOLS.some(c => String(r[c.k] || '').toLowerCase().includes(_dSrch)));
@@ -3776,9 +4266,10 @@
       if (tab === 'detalle') {
         const srch = (document.getElementById('det-srch')?.value || '').toLowerCase();
         const est = document.getElementById('det-est')?.value || '';
-        const d1 = document.getElementById('det-d1')?.value || '';
-        const d2 = document.getElementById('det-d2')?.value || '';
-        data = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
+        const d1 = document.getElementById('det-hero-d1')?.value || '';
+        const d2 = document.getElementById('det-hero-d2')?.value || '';
+        const gerSel = document.getElementById('det-ger-sel')?.value || 'todos';
+        data = gerSel === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === gerSel);
         if (srch) data = data.filter(r => DCOLS.some(c => String(r[c.k] || '').toLowerCase().includes(srch)));
         if (est) data = data.filter(r => r.ESTADO_ACTIVIDAD === est);
         if (d1) data = data.filter(r => (r.FECHA_FINALIZACION || '') >= d1);
