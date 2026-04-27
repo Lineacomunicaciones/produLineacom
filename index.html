@@ -2170,57 +2170,37 @@
         <div class="sb-bot">Lineacom · v3.0<br><span id="sb-rows">0 registros</span></div>
       </nav>
 
-      <main class="main">
-        <div id="tp-resumen" class="tp on" style="padding:10px 18px; box-sizing:border-box">
 
-          <!-- Section 1: ESTADO GENERAL COMPAÑÍA Hero Banner -->
+      <main class="main">
+        <!-- ═══ RESUMEN ═══ -->
+        <div id="tp-resumen" class="tp on" style="padding:10px 18px; box-sizing:border-box">
           <div class="estado-hero fu" style="margin-bottom:8px; padding: 12px 20px">
             <div class="estado-hero-header">
-              <div class="estado-hero-title">
-                <div class="estado-hero-dot"></div>
-                <span class="estado-hero-label">Estado General Compañía</span>
-              </div>
+              <div class="estado-hero-title"><div class="estado-hero-dot"></div><span class="estado-hero-label">Estado General Compañía</span></div>
               <div style="display:flex; align-items:center; gap:10px">
-                <div class="f-group"
-                  style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
-                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Desde</label>
-                  <input type="date" id="res-d1" class="f-sel" value="2026-04-01" onchange="renderResumen()"
-                    style="font-size:10px; width:110px; color:#fff; background:transparent">
-                </div>
-                <div class="f-group"
-                  style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
-                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Hasta</label>
-                  <input type="date" id="res-d2" class="f-sel" value="2026-04-30" onchange="renderResumen()"
-                    style="font-size:10px; width:110px; color:#fff; background:transparent">
-                </div>
-                <button class="btn-exp" onclick="exportTab('resumen')"
-                  style="padding:5px 12px; font-size:10px; height:30px">📊 Exportar</button>
+                <div class="f-group"><label>Desde</label><input type="date" id="res-d1" class="f-sel" value="2026-04-01" onchange="renderResumen()"></div>
+                <div class="f-group"><label>Hasta</label><input type="date" id="res-d2" class="f-sel" value="2026-04-30" onchange="renderResumen()"></div>
+                <button class="btn-exp" onclick="exportTab('resumen')">📊 Exportar</button>
               </div>
             </div>
             <div id="res-band" class="estado-hero-metrics"></div>
           </div>
-
-          <!-- Section 2: Mosaic Summary Layout -->
+          
           <div style="display:grid; grid-template-columns: 0.8fr 1.1fr 1.1fr; grid-template-rows: auto 1fr; gap:12px; align-items: stretch; flex: 1; min-height: 520px; margin-bottom: 10px">
             <div id="res-grid-banca"></div>
             <div id="res-grid-cirion"></div>
             <div id="res-grid-liberty"></div>
             
-            <!-- Row 2: Distribution Chart (Col 1) and Trend Graph (Col 2-3) -->
-            <div class="card fu fu4" style="display:flex; flex-direction:column; min-height: 0; margin-bottom: 0">
-              <div class="ch" style="padding:10px 14px">
-                <div class="ct" style="font-size:13px">Distribución %</div>
-              </div>
-              <div class="cw" style="flex:1; padding:0 15px 15px; display:flex; align-items:center; justify-content:center">
-                <canvas id="ch-res-dona" style="max-height: 250px"></canvas>
-              </div>
+            <div class="card" style="grid-column: span 1">
+              <div class="ch"><div class="ct">Distribución %</div></div>
+              <div class="cw" style="height:250px"><canvas id="ch-res-dona"></canvas></div>
             </div>
             
-            <div class="card fu fu3" style="grid-column: span 2; display:flex; flex-direction:column; min-height: 0; margin-bottom: 0">
-              <div class="ch" style="padding:10px 14px">
+            <div class="card" style="grid-column: span 2">
+              <div class="ch">
                 <div style="display:flex; justify-content:space-between; align-items:center; width:100%">
-                  <div class="ct" style="font-size:13px">Tendencia Mensual</div>
-                  <div class="pills" id="res-trend-pills" style="padding:4px; scale:0.9; transform-origin:right">
+                  <div class="ct">Tendencia Mensual</div>
+                  <div class="pills" id="res-trend-pills">
                     <button class="pill on" onclick="setTrendGer('TODOS')">Consolidado</button>
                     <button class="pill" onclick="setTrendGer('CIRION')">Cirion</button>
                     <button class="pill" onclick="setTrendGer('LIBERTY')">Liberty</button>
@@ -2228,83 +2208,39 @@
                   </div>
                 </div>
               </div>
-              <div class="cw" style="flex:1; padding:5px 15px 15px"><canvas id="ch-res-tend"></canvas></div>
+              <div class="cw" style="height:250px"><canvas id="ch-res-tend"></canvas></div>
             </div>
           </div>
         </div>
-        <div id="tp-diario" class="tp" style="padding:10px 18px; box-sizing:border-box">
-          
-          <!-- Banner Superior Compacto -->
-          <div class="estado-hero fu fu1" style="display: flex; flex-direction: column; gap: 10px; padding: 12px 18px; margin-bottom: 10px">
-            
-            <!-- Fila 1: Título y Filtros Persistentes -->
-            <div style="display: grid; grid-template-columns: 2fr 3fr; gap: 15px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px">
-              <div>
-                <div style="font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 2px">Análisis Diario</div>
-                <div style="font-size: 9px; color: rgba(255,255,255,0.7)">Meta vs Producción · 2026</div>
-              </div>
 
-              <div style="display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 8px; justify-content: flex-end">
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Proyecto:</span>
-                  <select id="dia-ger" class="f-sel" style="background:#fff; color:#001D62; border:1px solid #ccc; height:24px; padding:0 8px; font-size:10px; font-weight:700; border-radius:4px" onchange="toggleSubGer(); renderDiario()">
-                    <option value="BANCA">Banca</option>
-                    <option value="CIRION">Cirion</option>
-                    <option value="LIBERTY">Liberty</option>
-                  </select>
-                </div>
-                <div id="dia-sub-group" style="display:none; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Sub:</span>
-                  <select id="dia-sub" class="f-sel" style="background:#fff; color:#166534; border:1px solid #ccc; height:24px; padding:0 8px; font-size:10px; font-weight:700; border-radius:4px" onchange="renderDiario()">
+        <!-- ═══ DIARIO ═══ -->
+        <div id="tp-diario" class="tp" style="padding:10px 18px; box-sizing:border-box">
+          <div class="estado-hero fu fu1" style="display: flex; flex-direction: column; gap: 10px; padding: 12px 18px; margin-bottom: 10px">
+            <div style="display: grid; grid-template-columns: 2fr 3fr; gap: 15px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px">
+              <div><div style="font-size: 14px; font-weight: 800; color: #fff">Análisis Diario</div></div>
+              <div style="display: flex; gap: 8px; align-items: center; justify-content: flex-end">
+                <select id="dia-ger" class="f-sel" onchange="toggleSubGer(); renderDiario()" style="background:#fff; border-radius:4px">
+                  <option value="BANCA">Banca</option>
+                  <option value="CIRION">Cirion</option>
+                  <option value="LIBERTY">Liberty</option>
+                </select>
+                <div id="dia-sub-group" style="display:none">
+                  <select id="dia-sub" class="f-sel" onchange="renderDiario()" style="background:#fff; border-radius:4px">
                     <option value="TODOS">Todos</option>
                     <option value="WOMPI">Wompi</option>
                     <option value="REDEBAN">Redeban</option>
                   </select>
                 </div>
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Desde:</span>
-                  <input type="date" id="dia-d1" class="f-sel" style="background:#fff; color:#333; border:1px solid #ccc; height:24px; padding:0 4px; font-size:10px; font-weight:700; border-radius:4px" value="2026-04-01" onchange="renderDiario()">
-                </div>
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Hasta:</span>
-                  <input type="date" id="dia-d2" class="f-sel" style="background:#fff; color:#333; border:1px solid #ccc; height:24px; padding:0 4px; font-size:10px; font-weight:700; border-radius:4px" value="2026-04-30" onchange="renderDiario()">
-                </div>
+                <input type="date" id="dia-d1" class="f-sel" value="2026-04-01" onchange="renderDiario()" style="background:#fff; border-radius:4px">
+                <input type="date" id="dia-d2" class="f-sel" value="2026-04-30" onchange="renderDiario()" style="background:#fff; border-radius:4px">
               </div>
             </div>
-
-            <!-- Fila 2: Cuadrícula de Métricas Dinámicas -->
             <div id="dia-metrics" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px"></div>
           </div>
-
-          <div style="flex: 1; min-height: 540px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px">
-            <!-- Gráfica Día a Día -->
-            <div class="card fu fu2" style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
-              <div class="ch" style="padding: 6px 14px">
-                <div>
-                  <div class="ct" style="font-size: 11px">Día a Día: Meta vs Producción Real</div>
-                  <div class="cs" id="dia-subtit" style="font-size: 9px"></div>
-                </div>
-                <div id="dia-legend-main" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:9px; color:var(--txm)">
-                  <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:#166534;opacity:.8;display:inline-block"></span>Producción</span>
-                  <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(239,68,68,0.3);display:inline-block"></span>Faltó</span>
-                  <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:2px;background:rgba(34,197,94,0.5);display:inline-block"></span>Superó</span>
-                  <span style="display:flex;align-items:center;gap:4px"><span style="width:18px;height:2px;background:#C5D336;display:inline-block"></span>Meta</span>
-                </div>
-              </div>
-              <div class="cw" style="flex: 1; min-height: 0"><canvas id="ch-dia-main"></canvas></div>
-            </div>
-
-            <!-- Gráfica Acumulada -->
-            <div class="card fu fu3" style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
-              <div class="ch" style="padding: 6px 14px">
-                <div>
-                  <div class="ct" style="font-size: 11px">Producción Acumulada vs Meta Acumulada</div>
-                </div>
-              </div>
-              <div class="cw" style="flex: 1; min-height: 0"><canvas id="ch-dia-acum"></canvas></div>
-            </div>
-          </div>
+          <div class="card"><div class="cw" style="height:350px"><canvas id="ch-dia-main"></canvas></div></div>
+          <div class="card"><div class="cw" style="height:250px"><canvas id="ch-dia-acum"></canvas></div></div>
         </div>
+
         <!-- ═══ PROYECTOS UNIFICADO ═══ -->
         <div id="tp-proyectos" class="tp" style="padding:10px 18px; box-sizing:border-box">
           <div class="estado-hero fu fu1" style="display: flex; flex-direction: column; gap: 10px; padding: 12px 18px; margin-bottom: 10px">
@@ -2314,178 +2250,120 @@
                 <div style="font-size: 9px; color: rgba(255,255,255,0.7)" id="pro-subtitle">Detalle por gerencia y periodo</div>
               </div>
               <div style="display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 8px; justify-content: flex-end">
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Proyecto:</span>
-                  <select id="pro-ger" class="f-sel" style="background:#fff; color:#001D62; border:1px solid #ccc; height:24px; padding:0 8px; font-size:10px; font-weight:700; border-radius:4px" onchange="renderProyectos()">
-                    <option value="CIRION">Cirion</option>
-                    <option value="LIBERTY">Liberty</option>
-                    <option value="BANCA">Banca</option>
-                  </select>
-                </div>
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Desde:</span>
-                  <input type="date" id="pro-d1" class="f-sel" style="background:#fff; color:#333; border:1px solid #ccc; height:24px; padding:0 4px; font-size:10px; font-weight:700; border-radius:4px" value="2026-04-01" onchange="renderProyectos()">
-                </div>
-                <div style="display:flex; align-items:center; gap:5px">
-                  <span style="color:#fff; font-size:9px; font-weight:800; text-transform:uppercase">Hasta:</span>
-                  <input type="date" id="pro-d2" class="f-sel" style="background:#fff; color:#333; border:1px solid #ccc; height:24px; padding:0 4px; font-size:10px; font-weight:700; border-radius:4px" value="2026-04-30" onchange="renderProyectos()">
-                </div>
-                <button class="btn-exp" onclick="exportTab(document.getElementById('pro-ger').value.toLowerCase())" style="padding:5px 12px; font-size:10px; height:24px">📊 Exportar</button>
+                <select id="pro-ger" class="f-sel" style="background:#fff; border-radius:4px" onchange="renderProyectos()">
+                  <option value="CIRION">Cirion</option>
+                  <option value="LIBERTY">Liberty</option>
+                  <option value="BANCA">Banca</option>
+                </select>
+                <input type="date" id="pro-d1" class="f-sel" value="2026-04-01" onchange="renderProyectos()" style="background:#fff; border-radius:4px">
+                <input type="date" id="pro-d2" class="f-sel" value="2026-04-30" onchange="renderProyectos()" style="background:#fff; border-radius:4px">
               </div>
             </div>
             <div id="pro-metrics" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px"></div>
           </div>
-          <div id="pro-content" class="fu fu2"></div>
+          <div id="pro-content"></div>
         </div>
-        <div id="tp-zonas" class="tp">
-          <div class="ph fu">
-            <div>
-              <div class="pt">Distribución por Zona</div>
-              <div class="ps">Meta presupuestada por zona / centro de costo · Cirion y Banca</div>
-            </div>
-            <div class="pa">
-              <div class="f-group">
-                <label>Proyecto</label>
-                <select id="zona-ger" class="f-sel" onchange="renderZonas()">
-                  <option value="CIRION">Cirion</option>
-                  <option value="BANCA">Banca</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="sband fu fu1" id="zona-band"></div>
-          <div class="slbl fu fu2">Valor Proyectado Anual por Zona</div>
-          <div class="g12 fu fu2">
-            <div class="card">
-              <div class="ch">
-                <div>
-                  <div class="ct">Zonas — Valor Anual Proyectado</div>
-                  <div class="cs">Suma 12 meses por centro de costo</div>
-                </div>
-              </div>
-              <div class="cw" style="height:320px"><canvas id="ch-zona-bar"></canvas></div>
-            </div>
-            </div>
-          </div>
-        </div>
+
+        <!-- ═══ DETALLE ═══ -->
         <div id="tp-detalle" class="tp">
-          <div class="ph fu">
-            <div>
-              <div class="pt">Detalle de Producción</div>
-              <div class="ps">Tabla completa de actividades · filtros · exportar</div>
-            </div>
-            <div class="pa">
-              <div class="pf" id="det-pfg">
-                <button class="pfb on" onclick="setDetGer('todos')">Todos</button>
-                <button class="pfb" onclick="setDetGer('CIRION')">Cirion</button>
-                <button class="pfb" onclick="setDetGer('LIBERTY')">Liberty</button>
-                <button class="pfb" onclick="setDetGer('BANCA')">Banca</button>
-              </div>
-              <button class="btn-exp" onclick="exportTab('detalle')">⬇ Excel</button>
-            </div>
-          </div>
-          <div class="fb fu fu1">
-            <div class="fr">
-              <div class="fg"><label>Buscar</label><input type="text" id="det-srch" placeholder="ID, lugar, coordinador…" oninput="renderDetalle()" style="min-width:190px"></div>
-              <div class="fg"><label>Estado</label><select id="det-est" onchange="renderDetalle()"><option value="">Todos</option></select></div>
-              <div class="fg"><label>Desde</label><input type="date" id="det-d1" onchange="renderDetalle()"></div>
-              <div class="fg"><label>Hasta</label><input type="date" id="det-d2" onchange="renderDetalle()"></div>
-              <div style="align-self:flex-end"><button class="btn-rst" onclick="resetDet()">↺</button></div>
-            </div>
-          </div>
-          <div class="card fu fu2"><div class="tw"><table class="dt" id="det-tbl"></table></div><div class="tf"><span id="det-cnt" style="font-family:'DM Mono',monospace;font-size:10.5px">—</span><div class="pg" id="det-pg"></div></div></div>
+           <div class="ph fu"><div><div class="pt">Detalle de Producción</div></div></div>
+           <div class="card"><div class="tw"><table class="dt" id="det-tbl"></table></div><div class="tf"><div id="det-cnt"></div></div></div>
         </div>
-        <div id="tp-carga" class="tp"><div class="ph fu"><div><div class="pt">Cargar Datos JSON</div></div></div><div class="card fu fu1" style="padding:28px"><div class="uz" id="uz" onclick="document.getElementById('fi').click()">📄 <p>Esta pantalla es solo informativa</p></div><input type="file" id="fi" style="display:none"></div></div>
       </main>
-    </div>
-  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <script>
     'use strict';
     Chart.register(ChartDataLabels);
-    let PROYECCION_RAW = [], PPTO_DIARIO = {}, CIRION_ZONAS = {}, CIRION_CATS = {}, BANCA_ZONAS = {}, LIBERTY_ZONAS = {}, META_MES = { BANCA: {}, CIRION: {}, LIBERTY: {} };
-    let RAW = []; const CI = new Map();
+
+    let RAW = [], PROYECCION_RAW = [], PPTO_DIARIO = {}, META_MES = { BANCA: {}, CIRION: {}, LIBERTY: {} };
+    let CIRION_ZONAS = {}, BANCA_ZONAS = {}, LIBERTY_ZONAS = {};
+    const CI = new Map();
     const MONTHS_ISO = ['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
     const MONTHS_LBL = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
     const GERS = ['BANCA','CIRION','LIBERTY'];
     const GC = { BANCA: '#166534', CIRION: '#001D62', LIBERTY: '#0847a3' };
-    const PAL = ['#001D62', '#C5D336', '#166534', '#0847a3', '#9eaa25', '#22c55e', '#f59e0b', '#e8334a'];
-    const CT = { plugins: { legend: { labels: { color: '#5c6b8a', font: { family: 'Outfit', size: 11 } } }, tooltip: { backgroundColor: 'rgba(0,29,98,.95)' } } };
+    const PAL = ['#001D62', '#166534', '#0847a3', '#C5D336', '#f59e0b', '#ef4444'];
+    const CT = { plugins: { legend: { labels: { font: { family: 'Outfit', size: 11 } } }, datalabels: { display: false } } };
+
+    function fmtCOP(v) { return new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', minimumFractionDigits:0 }).format(v || 0); }
+    function pct(n, d) { return d ? Math.round((n/d)*100) : 0; }
     function dc(id) { if(CI.has(id)){ CI.get(id).destroy(); CI.delete(id); } }
     function mkC(id, type, data, opts={}) { dc(id); const el = document.getElementById(id); if(!el) return; CI.set(id, new Chart(el, { type, data, options: Object.assign({ responsive:true, maintainAspectRatio:false }, CT, opts) })); }
-    function fmtCOP(v) { return new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP', minimumFractionDigits:0 }).format(v || 0); }
-    function toNum(v) { if(!v) return 0; if(typeof v === 'number') return v; return parseFloat(String(v).replace(/[^\d,.-]/g, '').replace(',', '.')) || 0; }
-    function pct(n, d) { return d ? Math.round((n/d)*100) : 0; }
     function sumBy(arr, k) { return arr.reduce((s, r) => s + (parseFloat(r[k])||0), 0); }
-    function cntBy(arr, k) { return arr.reduce((a, r) => { const v = r[k] || 'N/A'; a[v] = (a[v] || 0) + 1; return a; }, {}); }
-    function topN(obj, n=8) { return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n); }
-    function spClass(s) { const u=(s||'').toUpperCase(); if(u.includes('FINAL')) return 'fin'; if(u.includes('EJECUC')) return 'ejec'; if(u.includes('PEND')) return 'pend'; return 'def'; }
     function getRange(id1, id2) { const d1 = document.getElementById(id1)?.value, d2 = document.getElementById(id2)?.value; if(!d1 || !d2) return [new Date().toISOString().slice(0,7)]; const s = MONTHS_ISO.indexOf(d1.slice(0,7)), e = MONTHS_ISO.indexOf(d2.slice(0,7)); return s!==-1 && e!==-1 ? MONTHS_ISO.slice(s, e+1) : [d1.slice(0,7)]; }
     function getRangeDates(id1, id2) { return { d1: document.getElementById(id1)?.value || '', d2: document.getElementById(id2)?.value || '' }; }
+
     function metaMes(ger, mes) { if(ger==='TODOS') return GERS.reduce((s,g)=>s+metaMes(g,mes),0); if(Array.isArray(mes)) return mes.reduce((s,m)=>s+(META_MES[ger][m]||0), 0); return META_MES[ger][mes] || 0; }
     function metaAnual(ger) { return MONTHS_ISO.reduce((s,m)=>s+metaMes(ger,m),0); }
     function prodReal(ger, mes, d1='', d2='') { const months = Array.isArray(mes) ? mes : [mes]; return sumBy(RAW.filter(r => { if(ger!=='TODOS' && r.GERENCIA !== ger) return false; const f = r.FECHA_FINALIZACION || ''; if(!months.includes(f.slice(0,7))) return false; if(d1 && f < d1) return false; if(d2 && f > d2) return false; return true; }), 'VALOR_TOTAL'); }
-    function prodAcumYTD(ger, hasta) { const idx = MONTHS_ISO.indexOf(hasta); return MONTHS_ISO.slice(0, idx+1).reduce((s, m) => s + prodReal(ger, m), 0); }
-    function metaAcumYTD(ger, hasta) { const idx = MONTHS_ISO.indexOf(hasta); return MONTHS_ISO.slice(0, idx+1).reduce((s, m) => s + metaMes(ger, m), 0); }
-    function isWompi(r) { const ng=String(r.NEGOCIOGENERAL||'').toUpperCase(); if(ng.includes('WOMPI')) return true; const fields=[r.RED_ASOCIADA,r.TIPO_ACTIVIDAD,r.ZONA]; return fields.some(f=>String(f||'').toUpperCase().includes('WOMPI')); }
-    function isRedeban(r) { const ng=String(r.NEGOCIOGENERAL||'').toUpperCase(); if(ng.includes('REDEBAN')) return true; const fields=[r.RED_ASOCIADA,r.TIPO_ACTIVIDAD,r.ZONA]; return fields.some(f=>String(f||'').toUpperCase().includes('REDEBAN')); }
+
+    function isWompi(r) { return String(r.NEGOCIOGENERAL||'').toUpperCase().includes('WOMPI') || String(r.TIPO_ACTIVIDAD||'').toUpperCase().includes('WOMPI'); }
+    function isRedeban(r) { return String(r.NEGOCIOGENERAL||'').toUpperCase().includes('REDEBAN') || String(r.TIPO_ACTIVIDAD||'').toUpperCase().includes('REDEBAN'); }
     function prodSubReal(fn, range, d1, d2) { return RAW.filter(r => r.GERENCIA==='BANCA' && fn(r) && (Array.isArray(range)?range:[range]).includes((r.FECHA_FINALIZACION||'').slice(0,7)) && (!d1||r.FECHA_FINALIZACION>=d1) && (!d2||r.FECHA_FINALIZACION<=d2)).reduce((s,r)=>s+r.VALOR_TOTAL,0); }
     function metaSubMes(fn, mes) { return PROYECCION_RAW.filter(r => r.GERENCIA==='BANCA' && r.TIPO_PROYECCION==='MENSUAL' && (Array.isArray(mes)?mes:[mes]).includes((r.FECHA||'').slice(0,7)) && fn(r)).reduce((s,r)=>s+r.VALOR,0); }
-    function prodSubAcumYTD(fn, h) { const idx=MONTHS_ISO.indexOf(h); return MONTHS_ISO.slice(0,idx+1).reduce((s,m)=>s+prodSubReal(fn,m,'',''),0); }
-    function metaSubAcumYTD(fn, h) { const idx=MONTHS_ISO.indexOf(h); return MONTHS_ISO.slice(0,idx+1).reduce((s,m)=>s+metaSubMes(fn,m),0); }
+
+    function gotoTab(name) {
+      console.log('Navigating to:', name);
+      document.querySelectorAll('.tp').forEach(p => p.classList.remove('on'));
+      document.querySelectorAll('.nav').forEach(n => n.classList.remove('act'));
+      const p = document.getElementById('tp-'+name); if(p) p.classList.add('on');
+      const n = document.getElementById('n-'+name); if(n) n.classList.add('act');
+      if(name==='resumen') renderResumen();
+      if(name==='diario') renderDiario();
+      if(name==='proyectos') renderProyectos();
+    }
+
     let _trendGer = 'TODOS';
     function setTrendGer(g) { _trendGer = g; document.querySelectorAll('#res-trend-pills .pill').forEach(b => b.classList.toggle('on', b.textContent.toUpperCase()===g || (b.textContent==='Consolidado' && g==='TODOS'))); renderResumen(); }
+
     function renderResumen() {
       const range = getRange('res-d1', 'res-d2'); const { d1, d2 } = getRangeDates('res-d1', 'res-d2');
       const prodTot = prodReal('TODOS', range, d1, d2); const metaTot = metaMes('TODOS', range); const cp = pct(prodTot, metaTot);
-      const last = range[range.length-1]; const metaAnu = GERS.reduce((s,g)=>s+metaAnual(g),0);
-      document.getElementById('res-band').innerHTML = `<div class="estado-metric"><span class="estado-metric-val">${range.length===1?MONTHS_LBL[MONTHS_ISO.indexOf(range[0])]:'Periodo'}</span><span class="estado-metric-lbl">Periodo</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(prodTot)}</span><span class="estado-metric-lbl">Producción</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaTot)}</span><span class="estado-metric-lbl">Meta Mensual</span></div><div class="estado-metric highlight"><span class="estado-metric-val">${cp}%</span><span class="estado-metric-lbl">%Cump</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaAnu)}</span><span class="estado-metric-lbl">Meta Anual</span></div>`;
-      document.getElementById('res-grid-banca').innerHTML = renderUnifiedProjectCard('BANCA', range, d1, d2);
-      document.getElementById('res-grid-cirion').innerHTML = renderCompactProjectCard('CIRION', range, d1, d2);
-      document.getElementById('res-grid-liberty').innerHTML = renderCompactProjectCard('LIBERTY', range, d1, d2);
+      document.getElementById('res-band').innerHTML = `<div class="estado-metric"><span class="estado-metric-val">${range.length===1?MONTHS_LBL[MONTHS_ISO.indexOf(range[0])]:'Periodo'}</span><span class="estado-metric-lbl">Periodo</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(prodTot)}</span><span class="estado-metric-lbl">Producción</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaTot)}</span><span class="estado-metric-lbl">Meta</span></div><div class="estado-metric highlight"><span class="estado-metric-val">${cp}%</span><span class="estado-metric-lbl">%Cump</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaAnual('TODOS'))}</span><span class="estado-metric-lbl">Meta Anual</span></div>`;
+      document.getElementById('res-grid-banca').innerHTML = renderBancaCard(range, d1, d2);
+      document.getElementById('res-grid-cirion').innerHTML = renderGenericCard('CIRION', range, d1, d2);
+      document.getElementById('res-grid-liberty').innerHTML = renderGenericCard('LIBERTY', range, d1, d2);
       mkC('ch-res-dona', 'doughnut', { labels: GERS, datasets: [{ data: GERS.map(g=>prodReal(g,range,d1,d2)), backgroundColor: GERS.map(g=>GC[g]) }] });
       mkC('ch-res-tend', 'line', { labels: MONTHS_LBL, datasets: GERS.map(g=>({ label:g, data:MONTHS_ISO.map(m=>prodReal(g,m)), borderColor:GC[g] })) });
     }
-    function renderUnifiedProjectCard(ger, range, d1, d2) {
-      const p = prodReal(ger, range, d1, d2); const m = metaMes(ger, range); const c = pct(p,m); const last = range[range.length-1];
-      const pw = prodSubReal(isWompi, range, d1, d2); const mw = metaSubMes(isWompi, range); const cw = pct(pw, mw);
-      const pr = prodSubReal(isRedeban, range, d1, d2); const mr = metaSubMes(isRedeban, range); const cr = pct(pr, mr);
-      return `<div class="kpi-modern"><div class="km-head" style="background:${GC[ger]}"><span>${ger}</span></div><div class="km-body"><div style="font-size:20px;font-weight:800">${fmtCOP(p)}</div><div style="font-size:11px">Meta: ${fmtCOP(m)} · <b>${c}%</b></div><div style="margin-top:10px;border-top:1px solid #eee;padding-top:8px"><div style="display:flex;justify-content:space-between;font-size:10px"><span>Redeban: ${cr}%</span><span>Wompi: ${cw}%</span></div></div></div></div>`;
+
+    function renderBancaCard(range, d1, d2) {
+      const p = prodReal('BANCA', range, d1, d2), m = metaMes('BANCA', range), c = pct(p, m);
+      const pw = prodSubReal(isWompi, range, d1, d2), pr = prodSubReal(isRedeban, range, d1, d2);
+      return `<div class="kpi-modern"><div class="km-head" style="background:${GC.BANCA}"><span>BANCA</span></div><div class="km-body"><div style="font-size:20px;font-weight:800">${fmtCOP(p)}</div><div style="font-size:11px">Meta: ${fmtCOP(m)} · <b>${c}%</b></div><div style="margin-top:10px;font-size:10px">Redeban: ${fmtCOP(pr)} | Wompi: ${fmtCOP(pw)}</div></div></div>`;
     }
-    function renderCompactProjectCard(ger, range, d1, d2) {
-      const p = prodReal(ger, range, d1, d2); const m = metaMes(ger, range); const c = pct(p,m);
+    function renderGenericCard(ger, range, d1, d2) {
+      const p = prodReal(ger, range, d1, d2), m = metaMes(ger, range), c = pct(p, m);
       return `<div class="kpi-modern"><div class="km-head" style="background:${GC[ger]}"><span>${ger}</span></div><div class="km-body"><div style="font-size:20px;font-weight:800">${fmtCOP(p)}</div><div style="font-size:11px">Meta: ${fmtCOP(m)} · <b>${c}%</b></div></div></div>`;
     }
+
     function toggleSubGer() { const g=document.getElementById('dia-ger').value; document.getElementById('dia-sub-group').style.display=(g==='BANCA')?'block':'none'; }
     function renderDiario() {
       const ger = document.getElementById('dia-ger').value; const range = getRange('dia-d1', 'dia-d2');
-      const sub = document.getElementById('dia-sub').value; const fn = (sub==='WOMPI')?isWompi:(sub==='REDEBAN')?isRedeban:null;
       const ppto = PPTO_DIARIO[ger] || {}; const dates = Object.keys(ppto).filter(d => range.includes(d.slice(0,7))).sort();
-      let metaAc=0, realAc=0, dOk=0, dNo=0; const metaD=[], realD=[], metaA=[], realA=[];
+      let metaAc=0, realAc=0; const metaD=[], realD=[];
       dates.forEach(d => {
-        let m = ppto[d]; if(ger==='BANCA' && fn) m = PROYECCION_RAW.filter(r=>r.GERENCIA==='BANCA' && r.TIPO_PROYECCION==='DIARIA' && r.FECHA===d && fn(r)).reduce((s,r)=>s+r.VALOR,0);
-        const r = RAW.filter(x=>x.GERENCIA===ger && x.FECHA_FINALIZACION===d && (!fn||fn(x))).reduce((s,x)=>s+x.VALOR_TOTAL,0);
-        metaAc+=m; realAc+=r; if(m>0){ if(r>=m)dOk++; else dNo++; }
-        metaD.push(m); realD.push(r); metaA.push(metaAc); realA.push(realAc);
+        const m = ppto[d], r = RAW.filter(x=>x.GERENCIA===ger && x.FECHA_FINALIZACION===d).reduce((s,x)=>s+x.VALOR_TOTAL,0);
+        metaAc+=m; realAc+=r; metaD.push(m); realD.push(r);
       });
-      const cp = pct(realAc, metaAc);
-      document.getElementById('dia-metrics').innerHTML = `<div class="estado-metric"><span class="estado-metric-val">${fmtCOP(realAc)}</span><span class="estado-metric-lbl">Producción</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaAc)}</span><span class="estado-metric-lbl">Meta</span></div><div class="estado-metric highlight"><span class="estado-metric-val">${cp}%</span><span class="estado-metric-lbl">%Cump</span></div><div class="estado-metric"><span class="estado-metric-val">${dOk}</span><span class="estado-metric-lbl">Días OK</span></div><div class="estado-metric"><span class="estado-metric-val">${dNo}</span><span class="estado-metric-lbl">Días No</span></div>`;
+      document.getElementById('dia-metrics').innerHTML = `<div class="estado-metric"><span class="estado-metric-val">${fmtCOP(realAc)}</span><span class="estado-metric-lbl">Producción</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaAc)}</span><span class="estado-metric-lbl">Meta</span></div><div class="estado-metric highlight"><span class="estado-metric-val">${pct(realAc, metaAc)}%</span><span class="estado-metric-lbl">%Cump</span></div>`;
       mkC('ch-dia-main', 'bar', { labels: dates.map(d=>d.slice(5)), datasets: [{ label:'Real', data:realD, backgroundColor:GC[ger] }, { label:'Meta', data:metaD, type:'line', borderColor:'#C5D336' }] });
-      mkC('ch-dia-acum', 'line', { labels: dates.map(d=>d.slice(5)), datasets: [{ label:'Real', data:realA, borderColor:GC[ger], fill:true }, { label:'Meta', data:metaA, borderColor:'#C5D336' }] });
     }
+
     function renderProyectos() {
-      const ger = document.getElementById('pro-ger').value; const range = getRange('pro-d1', 'pro-d2'); const { d1, d2 } = getRangeDates('pro-d1', 'pro-d2');
-      const filtered = RAW.filter(r => r.GERENCIA===ger && range.includes((r.FECHA_FINALIZACION||'').slice(0,7)) && (!d1||r.FECHA_FINALIZACION>=d1) && (!d2||r.FECHA_FINALIZACION<=d2));
-      const prod = sumBy(filtered, 'VALOR_TOTAL'); const meta = metaMes(ger, range); const cp = pct(prod, meta); const metaAnu = metaAnual(ger);
-      document.getElementById('pro-metrics').innerHTML = `<div class="estado-metric"><span class="estado-metric-val">${filtered.length}</span><span class="estado-metric-lbl">Actividades</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(prod)}</span><span class="estado-metric-lbl">Producción</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(meta)}</span><span class="estado-metric-lbl">Meta Periodo</span></div><div class="estado-metric highlight"><span class="estado-metric-val">${cp}%</span><span class="estado-metric-lbl">%Cump</span></div><div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaAnu)}</span><span class="estado-metric-lbl">Meta Anual</span></div>`;
+      const ger = document.getElementById('pro-ger').value; const range = getRange('pro-d1', 'pro-d2');
+      const p = prodReal(ger, range), m = metaMes(ger, range), c = pct(p, m);
+      document.getElementById('pro-metrics').innerHTML = `<div class="estado-metric"><span class="estado-metric-val">${fmtCOP(p)}</span><span class="estado-metric-lbl">Producción</span></div><div class="estado-metric highlight"><span class="estado-metric-val">${c}%</span><span class="estado-metric-lbl">%Cump</span></div>`;
       document.getElementById('pro-content').innerHTML = `<div class="card"><div class="cw" style="height:350px"><canvas id="ch-pro-main"></canvas></div></div>`;
       mkC('ch-pro-main', 'bar', { labels: MONTHS_LBL, datasets: [{ label:'Real', data:MONTHS_ISO.map(m=>prodReal(ger,m)), backgroundColor:GC[ger] }, { label:'Meta', data:MONTHS_ISO.map(m=>metaMes(ger,m)), type:'line', borderColor:'#C5D336' }] });
     }
-    function renderZonas() { const ger=document.getElementById('zona-ger').value; const data=ger==='CIRION'?CIRION_ZONAS:BANCA_ZONAS; const topZ=Object.entries(data).sort((a,b)=>sumBy(Object.values(b[1]),'')-sumBy(Object.values(a[1]),'')).slice(0,8); mkC('ch-zona-bar', 'bar', { labels: topZ.map(x=>x[0]), datasets: [{ data: topZ.map(x=>sumBy(Object.values(x[1]),'')), backgroundColor:GC[ger] }] }, { indexAxis:'y' }); }
-    function renderDetalle() { const tbl=document.getElementById('det-tbl'); tbl.innerHTML='<tr><td>ID</td><td>Gerencia</td><td>Valor</td></tr>'+RAW.slice(0,50).map(r=>`<tr><td>${r.ID_TA}</td><td>${r.GERENCIA}</td><td>${fmtCOP(r.VALOR_TOTAL)}</td></tr>`).join(''); }
+
     async function initDash() {
+      console.log('Initializing Dashboard...');
       try {
         const cRes = await fetch('./consolidado.json.gz'); const pRes = await fetch('./proyeccion.json.gz');
+        if(!cRes.ok || !pRes.ok) throw new Error('Archivos no encontrados');
         const cBuf = await cRes.arrayBuffer(); const pBuf = await pRes.arrayBuffer();
         const cData = JSON.parse(pako.ungzip(new Uint8Array(cBuf), { to:'string' }));
         const pData = JSON.parse(pako.ungzip(new Uint8Array(pBuf), { to:'string' }));
@@ -2496,13 +2374,15 @@
           if(r.TIPO_PROYECCION==='DIARIA') { if(!PPTO_DIARIO[g]) PPTO_DIARIO[g]={}; PPTO_DIARIO[g][String(r.FECHA||'').slice(0,10)] = (PPTO_DIARIO[g][String(r.FECHA||'').slice(0,10)]||0) + (parseFloat(r.VALOR)||0); }
         });
         document.getElementById('sb-rows').textContent = RAW.length.toLocaleString();
-        document.getElementById('nc-p').textContent = RAW.length.toLocaleString();
         document.getElementById('lupd').textContent = 'Actualizado: ' + new Date().toLocaleDateString();
         renderResumen();
-      } catch(e) { console.error(e); }
+      } catch(e) {
+        console.error('Initialization Error:', e);
+        document.getElementById('lupd').textContent = 'Error de carga';
+      }
     }
-    function exportTab(t) { alert('Exportando ' + t); }
-    function resetDet() { renderDetalle(); }
+
+    window.onload = initDash;
   </script>
 </body>
 </html>
