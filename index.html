@@ -3705,22 +3705,23 @@
 
       // Gráfica acumulada con área de faltante
       const gapAcArr = metaAcArr.map((m, i) => Math.max(0, m - (realAcArr[i] || 0)));
-      mkC('ch-dia-acum', 'line', {
+      mkC('ch-dia-acum', 'bar', {
         labels: lbl,
         datasets: [
           {
             label: 'Meta Acumulada',
             data: metaAcArr,
-            borderColor: '#C5D336',
-            backgroundColor: 'rgba(197,211,54,.08)',
-            borderWidth: 2.5,
-            fill: false,
-            tension: .35,
-            borderDash: [5, 4],
-            pointRadius: 0,
+            borderColor: '#9eaa25',
+            backgroundColor: 'rgba(197,211,54, 0.3)',
+            borderWidth: 1,
+            borderRadius: 4,
+
+
+
+
             datalabels: {
               display: ctx => ctx.dataIndex === metaAcArr.length - 1,
-              anchor: 'end', align: 'right',
+              anchor: 'end', align: 'top',
               color: '#9eaa25',
               font: { family: "'DM Mono',monospace", weight: 'bold', size: 9 },
               formatter: v => 'Meta: ' + fmtCOPShort2(v)
@@ -3729,33 +3730,34 @@
           {
             label: 'Prod. Acumulada',
             data: realAcArr,
-            borderColor: color,
-            backgroundColor: color + '18',
-            borderWidth: 3,
-            fill: true,
-            tension: .35,
-            pointRadius: 2,
-            pointBackgroundColor: color,
+            backgroundColor: color + 'cc',
+            borderRadius: 4,
+
+
+
+
+
+
             datalabels: {
               display: ctx => ctx.dataIndex === realAcArr.length - 1,
-              anchor: 'end', align: 'right',
+              anchor: 'end', align: 'top',
               color: color,
               font: { family: "'DM Mono',monospace", weight: 'bold', size: 9 },
               formatter: v => 'Real: ' + fmtCOPShort2(v)
             }
-          },
-          {
-            label: 'Faltante Acumulado',
-            data: gapAcArr,
-            borderColor: 'rgba(239,68,68,0.4)',
-            backgroundColor: 'rgba(239,68,68,0.08)',
-            borderWidth: 1.5,
-            fill: false,
-            tension: .35,
-            pointRadius: 0,
-            borderDash: [3, 3],
-            datalabels: { display: false }
           }
+
+
+
+
+
+
+
+
+
+
+
+
         ]
       }, {
         plugins: {
