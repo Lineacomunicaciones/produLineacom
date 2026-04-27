@@ -4217,8 +4217,10 @@
       const sl = rows.slice((_dPage - 1) * DET_SZ, _dPage * DET_SZ);
 
       const t = document.getElementById('det-tbl');
-      if (!t) return;
-      if (!sl.length) { t.innerHTML = '<tbody><tr><td colspan="9" style="text-align:center;padding:50px;color:var(--txm)">Sin registros</td></tr></tbody>'; document.getElementById('det-cnt').textContent = '0'; document.getElementById('det-pg').innerHTML = ''; return; }
+      const cntEl = document.getElementById('det-cnt');
+      const pg = document.getElementById('det-pg');
+      if (!t || !cntEl || !pg) return;
+      if (!sl.length) { t.innerHTML = '<tbody><tr><td colspan="9" style="text-align:center;padding:50px;color:var(--txm)">Sin registros</td></tr></tbody>'; cntEl.textContent = '0'; pg.innerHTML = ''; return; }
 
       t.innerHTML = `<thead><tr>${DCOLS.map(c => `<th>${c.h}</th>`).join('')}</tr></thead><tbody>
     ${sl.map((r, i) => `<tr style="background:${i % 2 ? '' : 'rgba(0,29,98,.018)'}">
@@ -4232,8 +4234,7 @@
     </tr>`).join('')}
   </tbody>`;
 
-      document.getElementById('det-cnt').textContent = `${total.toLocaleString()} registros · pág ${_dPage}/${pages}`;
-      const pg = document.getElementById('det-pg');
+      cntEl.textContent = `${total.toLocaleString()} registros · pág ${_dPage}/${pages}`;
       const bs = [];
       bs.push(`<button class="pb2" onclick="setDP(${_dPage - 1})" ${_dPage === 1 ? 'disabled' : ''}>‹</button>`);
       const s = Math.max(1, _dPage - 2), e = Math.min(pages, _dPage + 2);
