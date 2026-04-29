@@ -4157,9 +4157,9 @@
         const redebanVal  = sumBy(redebanRows, 'VALOR_TOTAL');
         const wompiVal    = sumBy(wompiRows,   'VALOR_TOTAL');
 
-        // Redeban: CB vs POS → columna TIPO_RED
-        const redebanCB  = redebanRows.filter(r => /CB/i.test(r.TIPO_RED  || r.RED_ASOCIADA || ''));
-        const redebanPOS = redebanRows.filter(r => /POS/i.test(r.TIPO_RED || r.RED_ASOCIADA || ''));
+        // Redeban: CB vs POS → GERENCIA=BANCA + NEGOCIOGENERAL=REDEBAN + TIPO_NEGOCIO=CB|POS
+        const redebanCB  = redebanRows.filter(r => /\bCB\b/i.test(r.TIPO_NEGOCIO  || ''));
+        const redebanPOS = redebanRows.filter(r => /\bPOS\b/i.test(r.TIPO_NEGOCIO || ''));
         const redebanCBVal  = sumBy(redebanCB,  'VALOR_TOTAL');
         const redebanPOSVal = sumBy(redebanPOS, 'VALOR_TOTAL');
 
