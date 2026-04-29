@@ -4239,15 +4239,11 @@
         html += `<div class="estado-metric">
           <div class="estado-metric-val">${fmtCOP(gVal)}</div>
           <div class="estado-metric-lbl">${g} · Producción</div>
-        </div>
-        <div class="estado-metric">
-          <div class="estado-metric-val">${gr.length.toLocaleString()}</div>
-          <div class="estado-metric-lbl">${g} · Actividades</div>
         </div>`;
       });
 
       band.innerHTML = html;
-      band.style.gridTemplateColumns = `repeat(${2 + gersToShow.length * 2}, 1fr)`;
+      band.style.gridTemplateColumns = `repeat(${2 + gersToShow.length}, 1fr)`;
     }
 
     // ── Columnas por gerencia ──────────────────────────────────────────
