@@ -4267,6 +4267,14 @@
     };
 
     const _metricCharts = {};
+    const _panelViews   = {}; // vista activa por panel: 'bar' | 'donut' | 'rank' | 'treemap'
+
+    const VIEW_OPTS = [
+      { id: 'bar',     label: '▬ Barras'  },
+      { id: 'donut',   label: '◎ Donut'   },
+      { id: 'rank',    label: '☰ Ranking' },
+      { id: 'treemap', label: '⊞ Treemap' },
+    ];
 
     function renderMetricPanels(rows, ger) {
       const wrap = document.getElementById('det-metrics-wrap');
@@ -4283,33 +4291,58 @@
       }
 
       wrap.style.display = '';
-      const color = ger === 'LIBERTY' ? 'rgba(8,71,163,0.75)'
-                  : ger === 'CIRION'  ? 'rgba(0,29,98,0.75)'
-                  :                     'rgba(22,101,52,0.75)';
-      const colorLight = ger === 'LIBERTY' ? 'rgba(8,71,163,0.12)'
-                       : ger === 'CIRION'  ? 'rgba(0,29,98,0.10)'
-                       :                     'rgba(22,101,52,0.10)';
+      const colorSolid = ger === 'LIBERTY' ? '#0847a3'
+                       : ger === 'CIRION'  ? '#001D62'
+                       :                     '#166534';
+      const colorAlpha = ger === 'LIBERTY' ? 'rgba(8,71,163,0.75)'
+                       : ger === 'CIRION'  ? 'rgba(0,29,98,0.75)'
+                       :                     'rgba(22,101,52,0.75)';
+      const palette = [
+        colorAlpha,
+        colorAlpha.replace('0.75','0.60'),
+        colorAlpha.replace('0.75','0.45'),
+        colorAlpha.replace('0.75','0.35'),
+        colorAlpha.replace('0.75','0.28'),
+        colorAlpha.replace('0.75','0.22'),
+        colorAlpha.replace('0.75','0.17'),
+        colorAlpha.replace('0.75','0.13'),
+        colorAlpha.replace('0.75','0.10'),
+        colorAlpha.replace('0.75','0.08'),
+      ];
 
-      // Destruir charts anteriores si cambia el número de paneles
+      // Destruir charts anteriores de paneles que ya no están
       const panelIds = panels.map(p => `mc-${p.key}`);
       Object.keys(_metricCharts).forEach(id => {
         if (!panelIds.includes(id)) { _metricCharts[id]?.destroy(); delete _metricCharts[id]; }
       });
 
-      // Regenerar grid solo si cambia la gerencia
+      // Regenerar estructura HTML solo cuando cambia la gerencia
       if (grid.dataset.ger !== ger) {
         grid.dataset.ger = ger;
-        grid.innerHTML = panels.map(p => `
-          <div class="card fu1" style="padding:14px 16px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-              <div style="font-size:12px;font-weight:700;color:var(--tx)">${p.icon} ${p.label}</div>
-              <div id="mc-tot-${p.key}" style="font-size:10px;color:var(--txm)"></div>
+        Object.values(_metricCharts).forEach(c => c && c.destroy());
+        Object.keys(_metricCharts).forEach(k => delete _metricCharts[k]);
+        grid.innerHTML = panels.map(p => {
+          if (!_panelViews[p.key]) _panelViews[p.key] = 'bar';
+          const tabs = VIEW_OPTS.map(v =>
+            `<button id="pvt-${p.key}-${v.id}" onclick="setPanelView('${p.key}','${v.id}')"
+              style="padding:2px 8px;border-radius:4px;border:1px solid ${colorSolid};font-size:9px;cursor:pointer;
+              background:${_panelViews[p.key]===v.id?colorSolid:'transparent'};
+              color:${_panelViews[p.key]===v.id?'#fff':colorSolid};transition:all .15s">${v.label}</button>`
+          ).join('');
+          return `<div class="card fu1" style="padding:14px 16px" id="mc-card-${p.key}">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:6px;flex-wrap:wrap">
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--tx)">${p.icon} ${p.label}</div>
+                <div id="mc-tot-${p.key}" style="font-size:10px;color:var(--txm);margin-top:2px"></div>
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap">${tabs}</div>
             </div>
-            <div style="position:relative;height:200px"><canvas id="mc-${p.key}"></canvas></div>
-          </div>`).join('');
+            <div id="mc-body-${p.key}" style="position:relative;min-height:200px"></div>
+          </div>`;
+        }).join('');
       }
 
-      // Renderizar cada panel
+      // Datos por panel
       panels.forEach(p => {
         const map = {};
         rows.forEach(r => {
@@ -4318,54 +4351,192 @@
           map[k].val += (r.VALOR_TOTAL || 0);
           map[k].cnt++;
         });
-        const sorted = Object.entries(map).sort((a,b) => b[1].val - a[1].val).slice(0, 10);
-        const labels = sorted.map(([k]) => k.length > 24 ? k.slice(0,23)+'…' : k);
-        const vals   = sorted.map(([,v]) => v.val);
-        const cnts   = sorted.map(([,v]) => v.cnt);
-        const total  = rows.reduce((s,r) => s + (r.VALOR_TOTAL||0), 0);
-
+        const sorted = Object.entries(map).sort((a,b) => b[1].val - a[1].val);
+        const totalVal = rows.reduce((s,r) => s + (r.VALOR_TOTAL||0), 0);
         const totEl = document.getElementById(`mc-tot-${p.key}`);
-        if (totEl) totEl.textContent = `${sorted.length} grupos · ${fmtCOP(total)}`;
+        if (totEl) totEl.textContent = `${sorted.length} grupo${sorted.length!==1?'s':''} · ${fmtCOP(totalVal)}`;
+        drawPanel(p, sorted, totalVal, colorSolid, colorAlpha, palette, ger);
+      });
+    }
 
+    function setPanelView(key, view) {
+      _panelViews[key] = view;
+      // actualizar botones
+      VIEW_OPTS.forEach(v => {
+        const btn = document.getElementById(`pvt-${key}-${v.id}`);
+        if (!btn) return;
+        const ger = document.getElementById('det-ger-sel')?.value || 'todos';
+        const colorSolid = ger === 'LIBERTY' ? '#0847a3' : ger === 'CIRION' ? '#001D62' : '#166534';
+        btn.style.background = v.id === view ? colorSolid : 'transparent';
+        btn.style.color      = v.id === view ? '#fff'     : colorSolid;
+      });
+      // re-render solo ese panel
+      renderDetalle();
+    }
+
+    function drawPanel(p, sorted, totalVal, colorSolid, colorAlpha, palette, ger) {
+      const view  = _panelViews[p.key] || 'bar';
+      const body  = document.getElementById(`mc-body-${p.key}`);
+      if (!body) return;
+      const top10 = sorted.slice(0, 10);
+      const labels = top10.map(([k]) => k.length > 26 ? k.slice(0,25)+'…' : k);
+      const vals   = top10.map(([,v]) => v.val);
+      const cnts   = top10.map(([,v]) => v.cnt);
+
+      if (view === 'bar' || view === 'donut') {
+        // Canvas chart
+        if (!body.querySelector('canvas') || body.dataset.mode !== view) {
+          if (_metricCharts[`mc-${p.key}`]) { _metricCharts[`mc-${p.key}`].destroy(); delete _metricCharts[`mc-${p.key}`]; }
+          body.innerHTML = `<canvas id="mc-${p.key}" style="max-height:${view==='donut'?'240px':'220px'}"></canvas>`;
+          body.dataset.mode = view;
+          body.style.height = view === 'donut' ? '240px' : '220px';
+        }
         const canvas = document.getElementById(`mc-${p.key}`);
         if (!canvas) return;
         if (_metricCharts[`mc-${p.key}`]) { _metricCharts[`mc-${p.key}`].destroy(); }
 
-        _metricCharts[`mc-${p.key}`] = new Chart(canvas, {
-          type: 'bar',
-          data: {
-            labels,
-            datasets: [{
-              data: vals,
-              backgroundColor: color,
-              hoverBackgroundColor: color.replace('0.75','1'),
-              borderRadius: 4,
-              borderSkipped: false,
-            }]
-          },
-          options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              datalabels: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: ctx => `${fmtCOP(ctx.raw)}  (${cnts[ctx.dataIndex].toLocaleString()} act.)`
-                }
-              }
-            },
-            scales: {
-              x: {
-                ticks: { callback: v => fmtCOP(v), font: { size: 8.5 }, maxRotation: 0 },
-                grid: { color: 'rgba(0,0,0,0.05)' }
+        if (view === 'bar') {
+          _metricCharts[`mc-${p.key}`] = new Chart(canvas, {
+            type: 'bar',
+            data: { labels, datasets: [{ data: vals, backgroundColor: palette, borderRadius: 4, borderSkipped: false }] },
+            options: {
+              indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false }, datalabels: { display: false },
+                tooltip: { callbacks: { label: ctx => `${fmtCOP(ctx.raw)}  ·  ${cnts[ctx.dataIndex].toLocaleString()} act.` } }
               },
-              y: { ticks: { font: { size: 9 } }, grid: { display: false } }
+              scales: {
+                x: { ticks: { callback: v => fmtCOP(v), font: { size: 8 }, maxRotation: 0 }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                y: { ticks: { font: { size: 9 } }, grid: { display: false } }
+              }
             }
-          }
-        });
-      });
+          });
+        } else {
+          _metricCharts[`mc-${p.key}`] = new Chart(canvas, {
+            type: 'doughnut',
+            data: { labels, datasets: [{ data: vals, backgroundColor: palette, borderWidth: 2, borderColor: '#fff', hoverOffset: 6 }] },
+            options: {
+              responsive: true, maintainAspectRatio: false, cutout: '60%',
+              plugins: {
+                legend: { position: 'right', labels: { font: { size: 9 }, boxWidth: 10, padding: 6,
+                  generateLabels: chart => chart.data.labels.map((lbl,i) => ({
+                    text: `${lbl}  ${((vals[i]/totalVal)*100).toFixed(1)}%`,
+                    fillStyle: palette[i], strokeStyle: '#fff', lineWidth: 1, index: i,
+                    hidden: false,
+                  }))
+                }},
+                datalabels: { display: false },
+                tooltip: { callbacks: { label: ctx => `${fmtCOP(ctx.raw)}  ·  ${cnts[ctx.dataIndex].toLocaleString()} act.` } }
+              }
+            }
+          });
+        }
+
+      } else if (view === 'rank') {
+        if (_metricCharts[`mc-${p.key}`]) { _metricCharts[`mc-${p.key}`].destroy(); delete _metricCharts[`mc-${p.key}`]; }
+        body.dataset.mode = 'rank';
+        body.style.height = 'auto';
+        const maxVal = vals[0] || 1;
+        body.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">
+          ${sorted.map(([k,v],i) => {
+            const pct = totalVal ? (v.val/totalVal*100) : 0;
+            const bar = maxVal ? (v.val/maxVal*100) : 0;
+            const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="font-size:10px;color:var(--txm);font-weight:700;min-width:14px;text-align:center">${i+1}</span>`;
+            const kLabel = k.length > 28 ? k.slice(0,27)+'…' : k;
+            return `<div style="display:grid;grid-template-columns:20px 1fr auto;gap:6px;align-items:center">
+              <div style="text-align:center;font-size:13px">${medal}</div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                  <span style="font-size:10px;font-weight:600;color:var(--tx)" title="${k}">${kLabel}</span>
+                  <span style="font-size:9px;color:var(--txm)">${v.cnt.toLocaleString()} act.</span>
+                </div>
+                <div style="height:5px;border-radius:3px;background:var(--bg);overflow:hidden">
+                  <div style="height:100%;width:${bar.toFixed(1)}%;background:${colorSolid};border-radius:3px;transition:width .4s"></div>
+                </div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:10px;font-weight:700;color:${colorSolid};font-family:'DM Mono',monospace">${fmtCOP(v.val)}</div>
+                <div style="font-size:9px;color:var(--txm)">${pct.toFixed(1)}%</div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`;
+
+      } else if (view === 'treemap') {
+        if (_metricCharts[`mc-${p.key}`]) { _metricCharts[`mc-${p.key}`].destroy(); delete _metricCharts[`mc-${p.key}`]; }
+        body.dataset.mode = 'treemap';
+        body.style.height = '220px';
+        const W = body.offsetWidth || 340, H = 220;
+        body.innerHTML = `<svg width="${W}" height="${H}" style="border-radius:6px;overflow:hidden"></svg>`;
+        const svg = body.querySelector('svg');
+        const data = sorted.map(([k,v]) => ({ name: k, value: v.val, cnt: v.cnt }));
+        // simple squarified treemap
+        const total = data.reduce((s,d) => s+d.value, 0);
+        if (!total) return;
+        const rects = squarify(data, 0, 0, W, H);
+        const opacities = [1, .82, .66, .52, .41, .33, .26, .21, .17, .14, .11, .09, .07];
+        svg.innerHTML = rects.map((r, i) => {
+          const op = opacities[Math.min(i, opacities.length-1)];
+          const pct = (r.value/total*100).toFixed(1);
+          const lbl = r.name.length > 18 ? r.name.slice(0,17)+'…' : r.name;
+          const fw = r.x2 - r.x1, fh = r.y2 - r.y1;
+          const showLbl = fw > 50 && fh > 28;
+          const showVal = fw > 70 && fh > 44;
+          const fs = Math.min(10, Math.max(7, fw / 10));
+          return `<g>
+            <rect x="${r.x1+1}" y="${r.y1+1}" width="${fw-2}" height="${fh-2}"
+              rx="4" fill="${colorSolid}" fill-opacity="${op}" stroke="#fff" stroke-width="1.5">
+              <title>${r.name}: ${fmtCOP(r.value)} · ${r.cnt} act.</title>
+            </rect>
+            ${showLbl?`<text x="${r.x1+fw/2}" y="${r.y1+fh/2-(showVal?7:0)}" text-anchor="middle"
+              font-size="${fs}px" fill="${op>.4?'#fff':'var(--tx)'}" font-weight="600">${lbl}</text>`:''}
+            ${showVal?`<text x="${r.x1+fw/2}" y="${r.y1+fh/2+9}" text-anchor="middle"
+              font-size="${Math.max(7,fs-1)}px" fill="${op>.4?'rgba(255,255,255,0.85)':'var(--txm)'}">${pct}%</text>`:''}
+          </g>`;
+        }).join('');
+      }
+    }
+
+    // ── Squarify algorithm ────────────────────────────────────────────
+    function squarify(data, x1, y1, x2, y2) {
+      const total = data.reduce((s,d) => s+d.value, 0);
+      if (!total || !data.length) return [];
+      const out = [];
+      function layout(items, x1, y1, x2, y2) {
+        if (!items.length) return;
+        if (items.length === 1) { out.push({...items[0], x1, y1, x2, y2}); return; }
+        const W = x2-x1, H = y2-y1, tot = items.reduce((s,d) => s+d.value, 0);
+        let best = Infinity, col = [], rest = [...items];
+        for (let i=0; i<items.length; i++) {
+          const trial = rest.slice(0, i+1);
+          const trialTot = trial.reduce((s,d) => s+d.value, 0);
+          const frac = trialTot / tot;
+          const dim = W >= H ? H : W;
+          const other = W >= H ? W*frac : H*frac;
+          const ratio = trial.reduce((m,d) => {
+            const s = (d.value/trialTot) * dim * other;
+            const r = Math.max(dim/s*s, s/(dim/s*s)) / (dim*other); // simplified
+            return Math.max(m, r);
+          }, 0);
+          if (ratio <= best) { best = ratio; col = trial; }
+          else break;
+        }
+        const colTot = col.reduce((s,d) => s+d.value, 0);
+        const frac = colTot / tot;
+        if (W >= H) {
+          const cw = W * frac;
+          let cy = y1;
+          col.forEach(d => { const ch = H * d.value/colTot; out.push({...d, x1, y1:cy, x2:x1+cw, y2:cy+ch}); cy+=ch; });
+          layout(rest.slice(col.length), x1+cw, y1, x2, y2);
+        } else {
+          const ch = H * frac;
+          let cx = x1;
+          col.forEach(d => { const cw = W * d.value/colTot; out.push({...d, x1:cx, y1, x2:cx+cw, y2:y1+ch}); cx+=cw; });
+          layout(rest.slice(col.length), x1, y1+ch, x2, y2);
+        }
+      }
+      layout([...data].sort((a,b)=>b.value-a.value), x1, y1, x2, y2);
+      return out;
     }
 
     function setDetGer(g) {
