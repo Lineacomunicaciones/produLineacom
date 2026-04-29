@@ -2566,12 +2566,12 @@
         <!-- ═══ DETALLE ═══ -->
         <div id="tp-detalle" class="tp" style="padding:10px 18px; box-sizing:border-box">
 
-          <!-- Estado General Compañía Hero -->
+          <!-- Banner Detalle de Producción -->
           <div class="estado-hero fu" style="margin-bottom:14px; padding: 12px 20px">
             <div class="estado-hero-header">
               <div class="estado-hero-title">
                 <div class="estado-hero-dot"></div>
-                <span class="estado-hero-label">Estado General Compañía</span>
+                <span class="estado-hero-label" id="det-hero-title">Detalle de Producción</span>
               </div>
               <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
                 <!-- Filtro Gerencia -->
@@ -2603,13 +2603,6 @@
               </div>
             </div>
             <div id="det-hero-band" class="estado-hero-metrics"></div>
-          </div>
-
-          <div class="ph fu fu1" style="margin-bottom:10px">
-            <div>
-              <div class="pt">Detalle de Producción</div>
-              <div class="ps">Tabla completa de actividades · filtros · exportar</div>
-            </div>
           </div>
 
           <!-- Paneles de métricas por gerencia -->
@@ -4138,19 +4131,89 @@
     }
 
     function renderDetalleHero() {
-      const d1 = document.getElementById('det-hero-d1')?.value || '';
-      const d2 = document.getElementById('det-hero-d2')?.value || '';
-      const gerSel = document.getElementById('det-ger-sel')?.value || 'todos';
+      const d1     = document.getElementById('det-hero-d1')?.value  || '';
+      const d2     = document.getElementById('det-hero-d2')?.value  || '';
+      const gerSel = document.getElementById('det-ger-sel')?.value  || 'todos';
+      const titleEl = document.getElementById('det-hero-title');
+      const band    = document.getElementById('det-hero-band');
+      if (!band) return;
+
+      // Título dinámico
+      const titleMap = { BANCA:'Banca · Detalle de Producción', CIRION:'Cirion · Detalle de Producción', LIBERTY:'Liberty · Detalle de Producción' };
+      if (titleEl) titleEl.textContent = titleMap[gerSel] || 'Detalle de Producción';
 
       let rows = gerSel === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === gerSel);
       if (d1) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') >= d1);
       if (d2) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') <= d2);
 
-      const gersToShow = gerSel === 'todos' ? GERS : [gerSel];
-      const band = document.getElementById('det-hero-band');
-      if (!band) return;
+      // ── BANCA: métricas especializadas ───────────────────────────────
+      if (gerSel === 'BANCA') {
+        const totalBanca = sumBy(rows, 'VALOR_TOTAL');
+        const totalActs  = rows.length;
 
-      const total = sumBy(rows, 'VALOR_TOTAL');
+        // Por NEGOCIOGENERAL → Redeban vs Wompi
+        const redebanRows = rows.filter(r => (r.NEGOCIOGENERAL || '').toUpperCase().includes('REDEBAN'));
+        const wompiRows   = rows.filter(r => (r.NEGOCIOGENERAL || '').toUpperCase().includes('WOMPI'));
+        const redebanVal  = sumBy(redebanRows, 'VALOR_TOTAL');
+        const wompiVal    = sumBy(wompiRows,   'VALOR_TOTAL');
+
+        // Redeban: CB vs POS → columna TIPO_RED
+        const redebanCB  = redebanRows.filter(r => /CB/i.test(r.TIPO_RED  || r.RED_ASOCIADA || ''));
+        const redebanPOS = redebanRows.filter(r => /POS/i.test(r.TIPO_RED || r.RED_ASOCIADA || ''));
+        const redebanCBVal  = sumBy(redebanCB,  'VALOR_TOTAL');
+        const redebanPOSVal = sumBy(redebanPOS, 'VALOR_TOTAL');
+
+        // Wompi: CB / Rollos / Trimly / Venta Presente → columna TIPO_NEGOCIO
+        const wFilters = [
+          { lbl: 'Wompi CB',             test: v => /CB/i.test(v) && !/ROLL|TRIM|PRES/i.test(v) },
+          { lbl: 'Wompi Rollos',          test: v => /ROLL/i.test(v)   },
+          { lbl: 'Trimly',                test: v => /TRIM/i.test(v)   },
+          { lbl: 'Wompi Venta Presente',  test: v => /PRES/i.test(v)   },
+        ];
+        const wompiSubs = wFilters.map(f => {
+          const sub = wompiRows.filter(r => f.test(r.TIPO_NEGOCIO || ''));
+          return { lbl: f.lbl, val: sumBy(sub, 'VALOR_TOTAL'), cnt: sub.length };
+        });
+
+        // ── Construir HTML ────────────────────────────────────────────
+        const sep = `<div style="width:1px;background:rgba(255,255,255,0.2);margin:0 6px;align-self:stretch"></div>`;
+        const M = (val, lbl, highlight=false) =>
+          `<div class="estado-metric${highlight?' highlight':''}">
+            <div class="estado-metric-val">${fmtCOP(val)}</div>
+            <div class="estado-metric-lbl">${lbl}</div>
+          </div>`;
+        const Mn = (num, lbl) =>
+          `<div class="estado-metric">
+            <div class="estado-metric-val">${num.toLocaleString()}</div>
+            <div class="estado-metric-lbl">${lbl}</div>
+          </div>`;
+
+        band.innerHTML = `
+          ${M(totalBanca, 'Producción Banca', true)}
+          ${Mn(totalActs, 'Actividades')}
+          ${sep}
+          ${M(redebanVal, 'Redeban', true)}
+          ${M(redebanCBVal,  'Redeban CB')}
+          ${M(redebanPOSVal, 'Redeban POS')}
+          ${sep}
+          ${M(wompiVal, 'Wompi', true)}
+          ${wompiSubs.map(s => M(s.val, s.lbl)).join('')}
+        `;
+        // grid dinámico: 2 base + sep + 3 redeban + sep + 1+4 wompi = se auto-ajusta con flex
+        band.style.display = 'flex';
+        band.style.flexWrap = 'wrap';
+        band.style.gap = '8px';
+        band.style.gridTemplateColumns = '';
+        return;
+      }
+
+      // ── Modo general (Todas / Cirion / Liberty) ───────────────────────
+      band.style.display = '';
+      band.style.flexWrap = '';
+      band.style.gap = '';
+
+      const gersToShow  = gerSel === 'todos' ? GERS : [gerSel];
+      const total       = sumBy(rows, 'VALOR_TOTAL');
       const metaRows = (() => {
         const months = [];
         if (d1 && d2) {
@@ -4173,15 +4236,14 @@
       </div>`;
 
       gersToShow.forEach(g => {
-        const gr = rows.filter(r => r.GERENCIA === g);
+        const gr   = rows.filter(r => r.GERENCIA === g);
         const gVal = sumBy(gr, 'VALOR_TOTAL');
-        const gActs = gr.length;
         html += `<div class="estado-metric">
           <div class="estado-metric-val">${fmtCOP(gVal)}</div>
           <div class="estado-metric-lbl">${g} · Producción</div>
         </div>
         <div class="estado-metric">
-          <div class="estado-metric-val">${gActs.toLocaleString()}</div>
+          <div class="estado-metric-val">${gr.length.toLocaleString()}</div>
           <div class="estado-metric-lbl">${g} · Actividades</div>
         </div>`;
       });
