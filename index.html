@@ -5780,13 +5780,12 @@
     };
 
     const _metricCharts = {};
-    const _panelViews   = {}; // vista activa por panel: 'bar' | 'donut' | 'rank' | 'treemap'
+    const _panelViews   = {}; // vista activa por panel: 'bar' | 'donut' | 'rank'
 
     const VIEW_OPTS = [
-      { id: 'bar',     label: '▬ Barras'  },
-      { id: 'donut',   label: '◎ Donut'   },
-      { id: 'rank',    label: '☰ Ranking' },
-      { id: 'treemap', label: '⊞ Treemap' },
+      { id: 'bar',   label: '▬ Barras'  },
+      { id: 'donut', label: '◎ Donut'   },
+      { id: 'rank',  label: '☰ Ranking' },
     ];
 
     function renderMetricPanels(rows, ger) {
@@ -5976,81 +5975,7 @@
           }).join('')}
         </div>`;
 
-      } else if (view === 'treemap') {
-        if (_metricCharts[`mc-${p.key}`]) { _metricCharts[`mc-${p.key}`].destroy(); delete _metricCharts[`mc-${p.key}`]; }
-        body.dataset.mode = 'treemap';
-        body.style.height = '220px';
-        const W = body.offsetWidth || 340, H = 220;
-        body.innerHTML = `<svg width="${W}" height="${H}" style="border-radius:6px;overflow:hidden"></svg>`;
-        const svg = body.querySelector('svg');
-        const data = sorted.map(([k,v]) => ({ name: k, value: v.val, cnt: v.cnt }));
-        // simple squarified treemap
-        const total = data.reduce((s,d) => s+d.value, 0);
-        if (!total) return;
-        const rects = squarify(data, 0, 0, W, H);
-        const opacities = [1, .82, .66, .52, .41, .33, .26, .21, .17, .14, .11, .09, .07];
-        svg.innerHTML = rects.map((r, i) => {
-          const op = opacities[Math.min(i, opacities.length-1)];
-          const pct = (r.value/total*100).toFixed(1);
-          const lbl = r.name.length > 18 ? r.name.slice(0,17)+'…' : r.name;
-          const fw = r.x2 - r.x1, fh = r.y2 - r.y1;
-          const showLbl = fw > 50 && fh > 28;
-          const showVal = fw > 70 && fh > 44;
-          const fs = Math.min(10, Math.max(7, fw / 10));
-          return `<g>
-            <rect x="${r.x1+1}" y="${r.y1+1}" width="${fw-2}" height="${fh-2}"
-              rx="4" fill="${colorSolid}" fill-opacity="${op}" stroke="#fff" stroke-width="1.5">
-              <title>${r.name}: ${fmtCOP(r.value)} · ${r.cnt} act.</title>
-            </rect>
-            ${showLbl?`<text x="${r.x1+fw/2}" y="${r.y1+fh/2-(showVal?7:0)}" text-anchor="middle"
-              font-size="${fs}px" fill="${op>.4?'#fff':'var(--tx)'}" font-weight="600">${lbl}</text>`:''}
-            ${showVal?`<text x="${r.x1+fw/2}" y="${r.y1+fh/2+9}" text-anchor="middle"
-              font-size="${Math.max(7,fs-1)}px" fill="${op>.4?'rgba(255,255,255,0.85)':'var(--txm)'}">${pct}%</text>`:''}
-          </g>`;
-        }).join('');
       }
-    }
-
-    // ── Squarify algorithm ────────────────────────────────────────────
-    function squarify(data, x1, y1, x2, y2) {
-      const total = data.reduce((s,d) => s+d.value, 0);
-      if (!total || !data.length) return [];
-      const out = [];
-      function layout(items, x1, y1, x2, y2) {
-        if (!items.length) return;
-        if (items.length === 1) { out.push({...items[0], x1, y1, x2, y2}); return; }
-        const W = x2-x1, H = y2-y1, tot = items.reduce((s,d) => s+d.value, 0);
-        let best = Infinity, col = [], rest = [...items];
-        for (let i=0; i<items.length; i++) {
-          const trial = rest.slice(0, i+1);
-          const trialTot = trial.reduce((s,d) => s+d.value, 0);
-          const frac = trialTot / tot;
-          const dim = W >= H ? H : W;
-          const other = W >= H ? W*frac : H*frac;
-          const ratio = trial.reduce((m,d) => {
-            const s = (d.value/trialTot) * dim * other;
-            const r = Math.max(dim/s*s, s/(dim/s*s)) / (dim*other); // simplified
-            return Math.max(m, r);
-          }, 0);
-          if (ratio <= best) { best = ratio; col = trial; }
-          else break;
-        }
-        const colTot = col.reduce((s,d) => s+d.value, 0);
-        const frac = colTot / tot;
-        if (W >= H) {
-          const cw = W * frac;
-          let cy = y1;
-          col.forEach(d => { const ch = H * d.value/colTot; out.push({...d, x1, y1:cy, x2:x1+cw, y2:cy+ch}); cy+=ch; });
-          layout(rest.slice(col.length), x1+cw, y1, x2, y2);
-        } else {
-          const ch = H * frac;
-          let cx = x1;
-          col.forEach(d => { const cw = W * d.value/colTot; out.push({...d, x1:cx, y1, x2:cx+cw, y2:y1+ch}); cx+=cw; });
-          layout(rest.slice(col.length), x1, y1+ch, x2, y2);
-        }
-      }
-      layout([...data].sort((a,b)=>b.value-a.value), x1, y1, x2, y2);
-      return out;
     }
 
     function setDetGer(g) {
