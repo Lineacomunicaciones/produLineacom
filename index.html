@@ -2612,12 +2612,9 @@
             </div>
           </div>
 
-          <!-- Panel Centro de Costos (solo Cirion / Liberty) -->
-          <div id="det-cc-wrap" class="card fu fu1" style="display:none; margin-bottom:10px; padding:14px 18px">
-            <div class="ct" style="margin-bottom:8px">📊 Producción por Centro de Costos <span style="font-size:10px;color:var(--txm);font-weight:400">(Top 15)</span></div>
-            <div style="position:relative; height:260px">
-              <canvas id="det-cc-chart"></canvas>
-            </div>
+          <!-- Paneles de métricas por gerencia -->
+          <div id="det-metrics-wrap" style="display:none; margin-bottom:10px">
+            <div id="det-metrics-grid" style="display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr))"></div>
           </div>
 
           <div class="fb fu fu1">
@@ -4247,58 +4244,127 @@
       return (ger && ger !== 'todos') ? (DCOLS_BY_GER[ger] || DCOLS_COMUN) : DCOLS_COMUN;
     }
 
-    // ── CC chart ──────────────────────────────────────────────────────
-    let _ccChart = null;
-    function renderCCChart(rows, ger) {
-      const wrap = document.getElementById('det-cc-wrap');
-      if (!wrap) return;
-      const hasCentro = ['LIBERTY','CIRION'].includes(ger);
-      if (!hasCentro || !rows.length) { wrap.style.display = 'none'; return; }
+    // ── Configuración de paneles por gerencia ─────────────────────────
+    const METRIC_PANELS = {
+      LIBERTY: [
+        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
+        { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
+        { label: 'Centro de Costos', key: 'CENTRO_DE_COSTOS', icon: '💰' },
+        { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
+      ],
+      CIRION: [
+        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
+        { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
+        { label: 'Tipo de Negocio',  key: 'TIPO_NEGOCIO',     icon: '📋' },
+        { label: 'Zona',             key: 'ZONA',             icon: '📍' },
+        { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
+      ],
+      BANCA: [
+        { label: 'Tipología',        key: 'TIPOLOGIA',        icon: '🏷️' },
+        { label: 'Zona',             key: 'ZONA',             icon: '📍' },
+        { label: 'Tipo de Negocio',  key: 'TIPO_NEGOCIO',     icon: '📋' },
+      ],
+    };
+
+    const _metricCharts = {};
+
+    function renderMetricPanels(rows, ger) {
+      const wrap = document.getElementById('det-metrics-wrap');
+      const grid = document.getElementById('det-metrics-grid');
+      if (!wrap || !grid) return;
+
+      const panels = METRIC_PANELS[ger];
+      if (!panels || ger === 'todos' || !rows.length) {
+        wrap.style.display = 'none';
+        Object.values(_metricCharts).forEach(c => c && c.destroy());
+        Object.keys(_metricCharts).forEach(k => delete _metricCharts[k]);
+        grid.innerHTML = '';
+        return;
+      }
+
       wrap.style.display = '';
-      // agrupar por CENTRO_DE_COSTOS
-      const map = {};
-      rows.forEach(r => {
-        const cc = r.CENTRO_DE_COSTOS || 'Sin CC';
-        if (!map[cc]) map[cc] = { val: 0, cnt: 0 };
-        map[cc].val += (r.VALOR_TOTAL || 0);
-        map[cc].cnt++;
+      const color = ger === 'LIBERTY' ? 'rgba(8,71,163,0.75)'
+                  : ger === 'CIRION'  ? 'rgba(0,29,98,0.75)'
+                  :                     'rgba(22,101,52,0.75)';
+      const colorLight = ger === 'LIBERTY' ? 'rgba(8,71,163,0.12)'
+                       : ger === 'CIRION'  ? 'rgba(0,29,98,0.10)'
+                       :                     'rgba(22,101,52,0.10)';
+
+      // Destruir charts anteriores si cambia el número de paneles
+      const panelIds = panels.map(p => `mc-${p.key}`);
+      Object.keys(_metricCharts).forEach(id => {
+        if (!panelIds.includes(id)) { _metricCharts[id]?.destroy(); delete _metricCharts[id]; }
       });
-      const sorted = Object.entries(map).sort((a,b) => b[1].val - a[1].val).slice(0, 15);
-      const labels = sorted.map(([k]) => k.length > 22 ? k.slice(0,21)+'…' : k);
-      const vals   = sorted.map(([,v]) => v.val);
-      const cnts   = sorted.map(([,v]) => v.cnt);
-      const canvas = document.getElementById('det-cc-chart');
-      if (!canvas) return;
-      if (_ccChart) { _ccChart.destroy(); _ccChart = null; }
-      _ccChart = new Chart(canvas, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Producción',
-            data: vals,
-            backgroundColor: ger === 'LIBERTY' ? 'rgba(8,71,163,0.7)' : ger === 'CIRION' ? 'rgba(0,29,98,0.7)' : 'rgba(22,101,52,0.7)',
-            borderRadius: 4,
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            datalabels: { display: false },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${fmtCOP(ctx.raw)}  (${cnts[ctx.dataIndex]} act.)`,
-              }
-            }
+
+      // Regenerar grid solo si cambia la gerencia
+      if (grid.dataset.ger !== ger) {
+        grid.dataset.ger = ger;
+        grid.innerHTML = panels.map(p => `
+          <div class="card fu1" style="padding:14px 16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-size:12px;font-weight:700;color:var(--tx)">${p.icon} ${p.label}</div>
+              <div id="mc-tot-${p.key}" style="font-size:10px;color:var(--txm)"></div>
+            </div>
+            <div style="position:relative;height:200px"><canvas id="mc-${p.key}"></canvas></div>
+          </div>`).join('');
+      }
+
+      // Renderizar cada panel
+      panels.forEach(p => {
+        const map = {};
+        rows.forEach(r => {
+          const k = r[p.key] || 'Sin dato';
+          if (!map[k]) map[k] = { val: 0, cnt: 0 };
+          map[k].val += (r.VALOR_TOTAL || 0);
+          map[k].cnt++;
+        });
+        const sorted = Object.entries(map).sort((a,b) => b[1].val - a[1].val).slice(0, 10);
+        const labels = sorted.map(([k]) => k.length > 24 ? k.slice(0,23)+'…' : k);
+        const vals   = sorted.map(([,v]) => v.val);
+        const cnts   = sorted.map(([,v]) => v.cnt);
+        const total  = rows.reduce((s,r) => s + (r.VALOR_TOTAL||0), 0);
+
+        const totEl = document.getElementById(`mc-tot-${p.key}`);
+        if (totEl) totEl.textContent = `${sorted.length} grupos · ${fmtCOP(total)}`;
+
+        const canvas = document.getElementById(`mc-${p.key}`);
+        if (!canvas) return;
+        if (_metricCharts[`mc-${p.key}`]) { _metricCharts[`mc-${p.key}`].destroy(); }
+
+        _metricCharts[`mc-${p.key}`] = new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              data: vals,
+              backgroundColor: color,
+              hoverBackgroundColor: color.replace('0.75','1'),
+              borderRadius: 4,
+              borderSkipped: false,
+            }]
           },
-          scales: {
-            x: { ticks: { callback: v => fmtCOP(v), font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
-            y: { ticks: { font: { size: 9 } } }
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              datalabels: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ctx => `${fmtCOP(ctx.raw)}  (${cnts[ctx.dataIndex].toLocaleString()} act.)`
+                }
+              }
+            },
+            scales: {
+              x: {
+                ticks: { callback: v => fmtCOP(v), font: { size: 8.5 }, maxRotation: 0 },
+                grid: { color: 'rgba(0,0,0,0.05)' }
+              },
+              y: { ticks: { font: { size: 9 } }, grid: { display: false } }
+            }
           }
-        }
+        });
       });
     }
 
@@ -4349,8 +4415,8 @@
       fillSel('det-cc',   base.map(r => r.CENTRO_DE_COSTOS));
       fillSel('det-zona', base.map(r => r.ZONA || r.CIUDAD));
 
-      // Chart CC
-      renderCCChart(rows, _dGer);
+      // Paneles de métricas
+      renderMetricPanels(rows, _dGer);
 
       const DCOLS = getDCOLS(_dGer);
       const total = rows.length;
