@@ -2611,14 +2611,32 @@
               <div class="ps">Tabla completa de actividades · filtros · exportar</div>
             </div>
           </div>
+
+          <!-- Panel Centro de Costos (solo Cirion / Liberty) -->
+          <div id="det-cc-wrap" class="card fu fu1" style="display:none; margin-bottom:10px; padding:14px 18px">
+            <div class="ct" style="margin-bottom:8px">📊 Producción por Centro de Costos <span style="font-size:10px;color:var(--txm);font-weight:400">(Top 15)</span></div>
+            <div style="position:relative; height:260px">
+              <canvas id="det-cc-chart"></canvas>
+            </div>
+          </div>
+
           <div class="fb fu fu1">
-            <div class="fr">
+            <div class="fr" style="flex-wrap:wrap; gap:8px">
               <div class="fg"><label>Buscar</label><input type="text" id="det-srch"
-                  placeholder="ID, lugar, coordinador…" oninput="renderDetalle()" style="min-width:190px"></div>
+                  placeholder="ID, lugar, coordinador…" oninput="renderDetalle()" style="min-width:180px"></div>
               <div class="fg"><label>Estado</label><select id="det-est" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
-              <div style="align-self:flex-end"><button class="btn-rst" onclick="resetDet()">↺</button></div>
+              <div class="fg"><label>Tipo Actividad</label><select id="det-tipo" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
+              <div class="fg"><label>Centro de Costos</label><select id="det-cc" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
+              <div class="fg"><label>Ciudad / Zona</label><select id="det-zona" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
+              <div style="align-self:flex-end"><button class="btn-rst" onclick="resetDet()">↺ Limpiar</button></div>
             </div>
           </div>
           <div class="card fu fu2">
@@ -4175,12 +4193,114 @@
       band.style.gridTemplateColumns = `repeat(${2 + gersToShow.length * 2}, 1fr)`;
     }
 
-    const DCOLS = [
-      { h: 'ID', k: 'ID_TA' }, { h: 'Proyecto', k: 'GERENCIA', t: 'ger' }, { h: 'Tipo Act.', k: 'TIPO_ACTIVIDAD' },
-      { h: 'Estado', k: 'ESTADO_ACTIVIDAD', t: 'status' }, { h: 'Fecha', k: 'FECHA_FINALIZACION' },
-      { h: 'Valor Total', k: 'VALOR_TOTAL', t: 'cur' }, { h: 'Coordinador', k: 'COORDINADOR' },
-      { h: 'Ciudad/Zona', k: 'CIUDAD' }, { h: 'Lugar', k: 'LUGAR_EJECUCION' },
+    // ── Columnas por gerencia ──────────────────────────────────────────
+    const DCOLS_COMUN = [
+      { h: 'ID TA',       k: 'ID_TA' },
+      { h: 'Gerencia',    k: 'GERENCIA',          t: 'ger'    },
+      { h: 'Tipo Act.',   k: 'TIPO_ACTIVIDAD'                  },
+      { h: 'Estado',      k: 'ESTADO_ACTIVIDAD',  t: 'status'  },
+      { h: 'Fecha',       k: 'FECHA_FINALIZACION'              },
+      { h: 'Valor Total', k: 'VALOR_TOTAL',        t: 'cur'    },
+      { h: 'Lugar',       k: 'LUGAR_EJECUCION'                },
     ];
+    const DCOLS_BY_GER = {
+      LIBERTY: [
+        ...DCOLS_COMUN,
+        { h: 'Coordinador',    k: 'COORDINADOR'      },
+        { h: 'Ciudad',         k: 'CIUDAD'            },
+        { h: 'Centro Costos',  k: 'CENTRO_DE_COSTOS' },
+        { h: 'Base Operativa', k: 'BASE_OPERATIVA'   },
+        { h: 'V. Obra Civil',  k: 'VALOR_OBRA_CIVIL', t: 'cur' },
+        { h: 'V. Aprobado',    k: 'VALOR_APROBADO',   t: 'cur' },
+      ],
+      CIRION: [
+        ...DCOLS_COMUN,
+        { h: 'ID FO',          k: 'ID_FO'                       },
+        { h: 'Coordinador',    k: 'COORDINADOR'                  },
+        { h: 'Centro Costos',  k: 'CENTRO_DE_COSTOS'            },
+        { h: 'Base Operativa', k: 'BASE_OPERATIVA'               },
+        { h: 'Zona',           k: 'ZONA'                         },
+        { h: 'Tipo Negocio',   k: 'TIPO_NEGOCIO'                 },
+        { h: 'Item Factura',   k: 'ITEM_FACTURACION'             },
+        { h: 'V. Obra Civil',  k: 'VALOR_OBRA_CIVIL',  t: 'cur' },
+        { h: 'V. Material',    k: 'VALOR_MATERIAL',    t: 'cur' },
+        { h: 'V. Adicional',   k: 'VALOR_ADICIONAL',   t: 'cur' },
+        { h: 'V. Aprobado',    k: 'VALOR_APROBADO',    t: 'cur' },
+        { h: 'Descripción',    k: 'DESCRIPCION_ACTIVIDAD'        },
+      ],
+      BANCA: [
+        ...DCOLS_COMUN,
+        { h: 'ID FO',          k: 'ID_FO'                       },
+        { h: 'Técnico',        k: 'TECNICO'                      },
+        { h: 'Zona',           k: 'ZONA'                         },
+        { h: 'Tipo Negocio',   k: 'TIPO_NEGOCIO'                 },
+        { h: 'Forma Atención', k: 'FORMA_ATENCION'               },
+        { h: 'Tipología',      k: 'TIPOLOGIA'                    },
+        { h: 'Red Asociada',   k: 'RED_ASOCIADA'                 },
+        { h: 'Item Factura',   k: 'ITEM_FACTURACION'             },
+        { h: 'V. Entidad',     k: 'VALOR_ENTIDAD',    t: 'cur'  },
+        { h: 'V. Red',         k: 'VALOR_RED',        t: 'cur'  },
+        { h: 'Descripción',    k: 'DESCRIPCION_ACTIVIDAD'        },
+      ],
+    };
+    function getDCOLS(ger) {
+      return (ger && ger !== 'todos') ? (DCOLS_BY_GER[ger] || DCOLS_COMUN) : DCOLS_COMUN;
+    }
+
+    // ── CC chart ──────────────────────────────────────────────────────
+    let _ccChart = null;
+    function renderCCChart(rows, ger) {
+      const wrap = document.getElementById('det-cc-wrap');
+      if (!wrap) return;
+      const hasCentro = ['LIBERTY','CIRION'].includes(ger);
+      if (!hasCentro || !rows.length) { wrap.style.display = 'none'; return; }
+      wrap.style.display = '';
+      // agrupar por CENTRO_DE_COSTOS
+      const map = {};
+      rows.forEach(r => {
+        const cc = r.CENTRO_DE_COSTOS || 'Sin CC';
+        if (!map[cc]) map[cc] = { val: 0, cnt: 0 };
+        map[cc].val += (r.VALOR_TOTAL || 0);
+        map[cc].cnt++;
+      });
+      const sorted = Object.entries(map).sort((a,b) => b[1].val - a[1].val).slice(0, 15);
+      const labels = sorted.map(([k]) => k.length > 22 ? k.slice(0,21)+'…' : k);
+      const vals   = sorted.map(([,v]) => v.val);
+      const cnts   = sorted.map(([,v]) => v.cnt);
+      const canvas = document.getElementById('det-cc-chart');
+      if (!canvas) return;
+      if (_ccChart) { _ccChart.destroy(); _ccChart = null; }
+      _ccChart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Producción',
+            data: vals,
+            backgroundColor: ger === 'LIBERTY' ? 'rgba(8,71,163,0.7)' : ger === 'CIRION' ? 'rgba(0,29,98,0.7)' : 'rgba(22,101,52,0.7)',
+            borderRadius: 4,
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            datalabels: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${fmtCOP(ctx.raw)}  (${cnts[ctx.dataIndex]} act.)`,
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { callback: v => fmtCOP(v), font: { size: 9 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            y: { ticks: { font: { size: 9 } } }
+          }
+        }
+      });
+    }
 
     function setDetGer(g) {
       _dGer = g; _dPage = 1;
@@ -4191,54 +4311,82 @@
     }
     function resetDet() {
       _dSrch = ''; _dEst = ''; _dPage = 1;
-      ['det-srch', 'det-est'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+      ['det-srch','det-est','det-tipo','det-cc','det-zona'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
       renderDetalle();
     }
     function renderDetalle() {
       _dSrch = (document.getElementById('det-srch')?.value || '').toLowerCase();
-      _dEst = document.getElementById('det-est')?.value || '';
-      _dD1 = document.getElementById('det-hero-d1')?.value || '';
-      _dD2 = document.getElementById('det-hero-d2')?.value || '';
-      const gerSel = document.getElementById('det-ger-sel')?.value || 'todos';
+      _dEst  = document.getElementById('det-est')?.value  || '';
+      _dD1   = document.getElementById('det-hero-d1')?.value || '';
+      _dD2   = document.getElementById('det-hero-d2')?.value || '';
+      const gerSel  = document.getElementById('det-ger-sel')?.value  || 'todos';
+      const tipoSel = document.getElementById('det-tipo')?.value     || '';
+      const ccSel   = document.getElementById('det-cc')?.value       || '';
+      const zonaSel = document.getElementById('det-zona')?.value     || '';
       _dGer = gerSel;
 
       let rows = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
-      if (_dSrch) rows = rows.filter(r => DCOLS.some(c => String(r[c.k] || '').toLowerCase().includes(_dSrch)));
-      if (_dEst) rows = rows.filter(r => r.ESTADO_ACTIVIDAD === _dEst);
+      if (_dEst)   rows = rows.filter(r => r.ESTADO_ACTIVIDAD === _dEst);
+      if (tipoSel) rows = rows.filter(r => r.TIPO_ACTIVIDAD   === tipoSel);
+      if (ccSel)   rows = rows.filter(r => (r.CENTRO_DE_COSTOS || '') === ccSel);
+      if (zonaSel) rows = rows.filter(r => (r.ZONA || r.CIUDAD || '') === zonaSel);
       if (_dD1) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') >= _dD1);
       if (_dD2) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') <= _dD2);
+      if (_dSrch) {
+        const cols = getDCOLS(_dGer);
+        rows = rows.filter(r => cols.some(c => String(r[c.k] || '').toLowerCase().includes(_dSrch)));
+      }
 
+      // Poblar dropdowns dinámicamente
+      const fillSel = (id, vals) => {
+        const el = document.getElementById(id); if (!el) return;
+        const cur = el.value;
+        el.innerHTML = `<option value="">Todos</option>` + [...new Set(vals.filter(Boolean))].sort().map(v => `<option ${v===cur?'selected':''}>${v}</option>`).join('');
+        if (cur && [...el.options].some(o => o.value === cur)) el.value = cur;
+      };
+      const base = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
+      fillSel('det-tipo', base.map(r => r.TIPO_ACTIVIDAD));
+      fillSel('det-cc',   base.map(r => r.CENTRO_DE_COSTOS));
+      fillSel('det-zona', base.map(r => r.ZONA || r.CIUDAD));
+
+      // Chart CC
+      renderCCChart(rows, _dGer);
+
+      const DCOLS = getDCOLS(_dGer);
       const total = rows.length;
       const pages = Math.max(1, Math.ceil(total / DET_SZ));
       if (_dPage > pages) _dPage = pages;
       const sl = rows.slice((_dPage - 1) * DET_SZ, _dPage * DET_SZ);
 
-      const t = document.getElementById('det-tbl');
+      const t     = document.getElementById('det-tbl');
       const cntEl = document.getElementById('det-cnt');
-      const pg = document.getElementById('det-pg');
+      const pg    = document.getElementById('det-pg');
       if (!t || !cntEl || !pg) return;
-      if (!sl.length) { t.innerHTML = '<tbody><tr><td colspan="9" style="text-align:center;padding:50px;color:var(--txm)">Sin registros</td></tr></tbody>'; cntEl.textContent = '0'; pg.innerHTML = ''; return; }
+      if (!sl.length) {
+        t.innerHTML = `<tbody><tr><td colspan="${DCOLS.length}" style="text-align:center;padding:50px;color:var(--txm)">Sin registros</td></tr></tbody>`;
+        cntEl.textContent = '0 registros'; pg.innerHTML = ''; return;
+      }
 
       t.innerHTML = `<thead><tr>${DCOLS.map(c => `<th>${c.h}</th>`).join('')}</tr></thead><tbody>
-    ${sl.map((r, i) => `<tr style="background:${i % 2 ? '' : 'rgba(0,29,98,.018)'}">
-      ${DCOLS.map(c => {
-        const v = String(r[c.k] || '—');
-        if (c.t === 'ger') return `<td><span class="gb ${r[c.k] === 'CIRION' ? 'c' : r[c.k] === 'LIBERTY' ? 'l' : 'b'}">${v}</span></td>`;
-        if (c.t === 'status') return `<td><span class="sp ${spClass(v)}">${v}</span></td>`;
-        if (c.t === 'cur') return `<td style="font-family:'DM Mono',monospace;font-size:10.5px">${fmtCOP(r[c.k] || 0)}</td>`;
-        return `<td title="${v}">${v}</td>`;
-      }).join('')}
-    </tr>`).join('')}
-  </tbody>`;
+${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
+  ${DCOLS.map(c => {
+    const v = String(r[c.k] ?? '—');
+    if (c.t === 'ger')    return `<td><span class="gb ${r[c.k]==='CIRION'?'c':r[c.k]==='LIBERTY'?'l':'b'}">${v}</span></td>`;
+    if (c.t === 'status') return `<td><span class="sp ${spClass(v)}">${v}</span></td>`;
+    if (c.t === 'cur')    return `<td style="font-family:'DM Mono',monospace;font-size:10.5px;text-align:right">${fmtCOP(r[c.k]||0)}</td>`;
+    return `<td title="${v}" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v}</td>`;
+  }).join('')}
+</tr>`).join('')}
+</tbody>`;
 
       cntEl.textContent = `${total.toLocaleString()} registros · pág ${_dPage}/${pages}`;
       const bs = [];
-      bs.push(`<button class="pb2" onclick="setDP(${_dPage - 1})" ${_dPage === 1 ? 'disabled' : ''}>‹</button>`);
-      const s = Math.max(1, _dPage - 2), e = Math.min(pages, _dPage + 2);
-      if (s > 1) bs.push(`<button class="pb2" onclick="setDP(1)">1</button>${s > 2 ? '<span style="padding:0 3px;color:var(--txl)">…</span>' : ''}`);
-      for (let p = s; p <= e; p++)bs.push(`<button class="pb2 ${p === _dPage ? 'on' : ''}" onclick="setDP(${p})">${p}</button>`);
-      if (e < pages) bs.push(`${e < pages - 1 ? '<span style="padding:0 3px;color:var(--txl)">…</span>' : ''}<button class="pb2" onclick="setDP(${pages})">${pages}</button>`);
-      bs.push(`<button class="pb2" onclick="setDP(${_dPage + 1})" ${_dPage === pages ? 'disabled' : ''}>›</button>`);
+      bs.push(`<button class="pb2" onclick="setDP(${_dPage-1})" ${_dPage===1?'disabled':''}>‹</button>`);
+      const s = Math.max(1,_dPage-2), e = Math.min(pages,_dPage+2);
+      if (s>1) bs.push(`<button class="pb2" onclick="setDP(1)">1</button>${s>2?'<span style="padding:0 3px;color:var(--txl)">…</span>':''}`);
+      for (let p=s;p<=e;p++) bs.push(`<button class="pb2 ${p===_dPage?'on':''}" onclick="setDP(${p})">${p}</button>`);
+      if (e<pages) bs.push(`${e<pages-1?'<span style="padding:0 3px;color:var(--txl)">…</span>':''}<button class="pb2" onclick="setDP(${pages})">${pages}</button>`);
+      bs.push(`<button class="pb2" onclick="setDP(${_dPage+1})" ${_dPage===pages?'disabled':''}>›</button>`);
       pg.innerHTML = bs.join('');
     }
     function setDP(p) { _dPage = p; renderDetalle(); }
@@ -4262,16 +4410,25 @@
     function exportTab(tab) {
       let data = [];
       if (tab === 'detalle') {
-        const srch = (document.getElementById('det-srch')?.value || '').toLowerCase();
-        const est = document.getElementById('det-est')?.value || '';
-        const d1 = document.getElementById('det-hero-d1')?.value || '';
-        const d2 = document.getElementById('det-hero-d2')?.value || '';
-        const gerSel = document.getElementById('det-ger-sel')?.value || 'todos';
-        data = gerSel === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === gerSel);
-        if (srch) data = data.filter(r => DCOLS.some(c => String(r[c.k] || '').toLowerCase().includes(srch)));
-        if (est) data = data.filter(r => r.ESTADO_ACTIVIDAD === est);
-        if (d1) data = data.filter(r => (r.FECHA_FINALIZACION || '') >= d1);
-        if (d2) data = data.filter(r => (r.FECHA_FINALIZACION || '') <= d2);
+        const srch    = (document.getElementById('det-srch')?.value  || '').toLowerCase();
+        const est     = document.getElementById('det-est')?.value    || '';
+        const tipoSel = document.getElementById('det-tipo')?.value   || '';
+        const ccSel   = document.getElementById('det-cc')?.value     || '';
+        const zonaSel = document.getElementById('det-zona')?.value   || '';
+        const d1      = document.getElementById('det-hero-d1')?.value || '';
+        const d2      = document.getElementById('det-hero-d2')?.value || '';
+        const gerSel  = document.getElementById('det-ger-sel')?.value || 'todos';
+        const DCOLS   = getDCOLS(gerSel);
+        data = gerSel === 'todos' ? [...RAW] : RAW.filter(r => r.GERENCIA === gerSel);
+        if (est)     data = data.filter(r => r.ESTADO_ACTIVIDAD === est);
+        if (tipoSel) data = data.filter(r => r.TIPO_ACTIVIDAD   === tipoSel);
+        if (ccSel)   data = data.filter(r => (r.CENTRO_DE_COSTOS||'') === ccSel);
+        if (zonaSel) data = data.filter(r => (r.ZONA||r.CIUDAD||'')  === zonaSel);
+        if (d1) data = data.filter(r => (r.FECHA_FINALIZACION||'') >= d1);
+        if (d2) data = data.filter(r => (r.FECHA_FINALIZACION||'') <= d2);
+        if (srch) data = data.filter(r => DCOLS.some(c => String(r[c.k]||'').toLowerCase().includes(srch)));
+        // Mapear solo las columnas visibles con encabezados amigables
+        data = data.map(r => Object.fromEntries(DCOLS.map(c => [c.h, r[c.k] ?? ''])));
       } else if (tab === 'resumen') {
         const { d1, d2 } = getRangeDates('res-d1', 'res-d2');
         data = RAW.filter(r => {
