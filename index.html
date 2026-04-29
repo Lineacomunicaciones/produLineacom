@@ -2344,10 +2344,9 @@
           onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
         <div class="splash-logo-fallback" style="display:none">Línea <em>Com.</em></div>
       </div>
-      <div class="splash-title">Dashboard de Producción · 2026</div>
-      <div class="splash-headline">Datos de producción que<br>se mostrarán a continuación</div>
+      <div class="splash-title">Dashboard Producción Compañía</div>
       <div class="splash-desc">
-        Este reporte presenta el seguimiento en tiempo real de las actividades y metas de producción
+        Este reporte presenta el seguimiento de las actividades y metas de producción
         para las gerencias <strong style="color:#fff">Banca</strong>, <strong style="color:#fff">Cirion</strong>
         y <strong style="color:#fff">Liberty</strong>, incluyendo cumplimiento, tendencias y análisis detallado.
       </div>
@@ -2355,9 +2354,10 @@
         <div class="splash-tag"><span class="splash-tag-dot" style="background:#166534"></span>Producción vs. Meta mensual</div>
         <div class="splash-tag"><span class="splash-tag-dot" style="background:#001D62"></span>Análisis diario y acumulado</div>
         <div class="splash-tag"><span class="splash-tag-dot" style="background:#0847a3"></span>Cumplimiento por gerencia</div>
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#C5D336"></span>Proyección anual YTD</div>
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#C5D336"></span>Proyección anual</div>
         <div class="splash-tag"><span class="splash-tag-dot" style="background:#f59e0b"></span>Detalle de actividades</div>
         <div class="splash-tag"><span class="splash-tag-dot" style="background:#22c55e"></span>Distribución por zonas</div>
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#6366f1"></span>Inventario</div>
       </div>
       <button class="splash-btn" onclick="hideSplash()">Ingresar al Dashboard →</button>
       <div class="splash-footer">Línea Comunicaciones · Confidencial · Solo uso interno</div>
@@ -2407,8 +2407,8 @@
     <div class="abody">
       <nav class="sidebar">
         <div class="sb-sec">Vista</div>
-        <button class="nav" id="n-proyectos" onclick="gotoTab('proyectos')"> <span class="ni">🗂️</span><span
-            class="nl">Proyectos</span></button>
+        <button class="nav" id="n-inventario" onclick="gotoTab('inventario')"> <span class="ni">🗂️</span><span
+            class="nl">Inventario</span></button>
         <button class="nav act" id="n-resumen" onclick="gotoTab('resumen')"> <span class="ni">📊</span><span
             class="nl">Resumen</span></button>
         <button class="nav" id="n-diario" onclick="gotoTab('diario')"> <span class="ni">📅</span><span
@@ -2424,10 +2424,10 @@
       <main class="main">
 
         <!-- ═══ PROYECTOS ═══ -->
-        <div id="tp-proyectos" class="tp" style="padding:18px 18px; box-sizing:border-box">
+        <div id="tp-inventario" class="tp" style="padding:18px 18px; box-sizing:border-box">
           <div class="card fu" style="overflow:hidden">
             <div class="ch" style="padding:14px 20px; display:flex; align-items:center; justify-content:space-between">
-              <div class="ct" style="font-size:15px; font-weight:700">🗂️ Proyectos Asignados</div>
+              <div class="ct" style="font-size:15px; font-weight:700">🗂️ Inventario de Proyectos</div>
               <span style="font-size:11px; color:var(--txl); font-weight:500">11 proyectos · Línea de Comunicaciones</span>
             </div>
             <div style="overflow-x:auto; padding:0 0 8px">
@@ -5120,7 +5120,7 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       } else if (tab === 'proyeccion') {
         MONTHS_ISO.forEach((m, i) => {
           GERS.forEach(g => {
-            data.push({ 'Mes': MONTHS_LBL[i] + ' 2026', 'Proyecto': g, 'Meta Mensual': metaMes(g, m), 'Producción Real': prodReal(g, m), '%Cump': pct(prodReal(g, m), metaMes(g, m)), 'Variación': prodReal(g, m) - metaMes(g, m), 'Meta Acum YTD': metaAcumYTD(g, m), 'Prod Acum YTD': prodAcumYTD(g, m), '%Cump Acum': pct(prodAcumYTD(g, m), metaAcumYTD(g, m)) });
+            data.push({ 'Mes': MONTHS_LBL[i] + ' 2026', 'Proyecto': g, 'Meta Mensual': metaMes(g, m), 'Producción Real': prodReal(g, m), '%Cump': pct(prodReal(g, m), metaMes(g, m)), 'Variación': prodReal(g, m) - metaMes(g, m), 'Meta Acum': metaAcumYTD(g, m), 'Prod Acum': prodAcumYTD(g, m), '%Cump Acum': pct(prodAcumYTD(g, m), metaAcumYTD(g, m)) });
           });
         });
       }
