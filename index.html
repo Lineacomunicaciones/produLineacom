@@ -5662,7 +5662,38 @@
         return;
       }
 
-      // ── Modo general (Todas / Cirion / Liberty) ───────────────────────
+      // ── CIRION: métricas por tipo de negocio ────────────────────────
+      if (gerSel === 'CIRION') {
+        const totalCirion  = sumBy(rows, 'VALOR_TOTAL');
+        const assuranceRows = rows.filter(r => /ASSURANCE/i.test(r.TIPO_NEGOCIO || ''));
+        const deliveryRows  = rows.filter(r => /DELIVERY/i.test(r.TIPO_NEGOCIO  || ''));
+        const fijoRows      = rows.filter(r => /FIJO/i.test(r.TIPO_NEGOCIO      || ''));
+        const assuranceVal  = sumBy(assuranceRows, 'VALOR_TOTAL');
+        const deliveryVal   = sumBy(deliveryRows,  'VALOR_TOTAL');
+        const fijoVal       = sumBy(fijoRows,       'VALOR_TOTAL');
+
+        const sep = `<div style="width:1px;background:rgba(255,255,255,0.2);margin:0 6px;align-self:stretch"></div>`;
+        const M = (val, lbl, highlight=false) =>
+          `<div class="estado-metric${highlight?' highlight':''}">
+            <div class="estado-metric-val">${fmtCOP(val)}</div>
+            <div class="estado-metric-lbl">${lbl}</div>
+          </div>`;
+
+        band.innerHTML = `
+          ${M(totalCirion, 'Producción Total', true)}
+          ${sep}
+          ${M(assuranceVal, 'Assurance')}
+          ${M(deliveryVal,  'Delivery')}
+          ${M(fijoVal,      'Fijo')}
+        `;
+        band.style.display = 'flex';
+        band.style.flexWrap = 'wrap';
+        band.style.gap = '8px';
+        band.style.gridTemplateColumns = '';
+        return;
+      }
+
+      // ── Modo general (Todas / Liberty) ───────────────────────────────
       band.style.display = '';
       band.style.flexWrap = '';
       band.style.gap = '';
@@ -5768,7 +5799,6 @@
       CIRION: [
         { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
         { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
-        { label: 'Tipo de Negocio',  key: 'TIPO_NEGOCIO',     icon: '📋' },
         { label: 'Zona',             key: 'ZONA',             icon: '📍' },
         { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
       ],
