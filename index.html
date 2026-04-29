@@ -1812,6 +1812,223 @@
       opacity: 1
     }
 
+    /* ── SPLASH SCREEN ── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #001D62 0%, #012a84 60%, #0a3bb6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      transition: opacity .6s ease, visibility .6s ease;
+      overflow: hidden;
+    }
+
+    #splash.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #splash::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(197,211,54,.04) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(197,211,54,.04) 1px, transparent 1px);
+      background-size: 56px 56px;
+      pointer-events: none;
+    }
+
+    #splash::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 15% 25%, rgba(197,211,54,.15) 0%, transparent 55%),
+                  radial-gradient(ellipse 50% 55% at 85% 75%, rgba(197,211,54,.09) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .splash-orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: pulse 5s ease-in-out infinite;
+    }
+
+    .splash-orb1 {
+      width: 600px; height: 600px;
+      right: -180px; top: -180px;
+      background: radial-gradient(circle, rgba(197,211,54,.10) 0%, transparent 65%);
+    }
+
+    .splash-orb2 {
+      width: 400px; height: 400px;
+      left: -100px; bottom: -100px;
+      background: radial-gradient(circle, rgba(8,71,163,.35) 0%, transparent 65%);
+      animation-delay: 2.5s;
+    }
+
+    .splash-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      animation: fadeUp .7s cubic-bezier(.34,1.56,.64,1) both;
+      max-width: 680px;
+      width: 90vw;
+    }
+
+    .splash-logo-wrap {
+      background: rgba(255,255,255,.97);
+      border-radius: 28px;
+      padding: 32px 52px;
+      margin-bottom: 36px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.30), 0 4px 16px rgba(0,0,0,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 260px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .splash-logo-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #001D62, #C5D336, #166534, #001D62);
+      background-size: 300% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .splash-logo-wrap img {
+      height: 64px;
+      max-width: 280px;
+      object-fit: contain;
+    }
+
+    .splash-logo-fallback {
+      font-size: 28px;
+      font-weight: 900;
+      color: #001D62;
+      letter-spacing: -1px;
+    }
+
+    .splash-logo-fallback em {
+      color: #166534;
+      font-style: normal;
+    }
+
+    .splash-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(197,211,54,.9);
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .splash-headline {
+      font-size: 34px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      margin-bottom: 18px;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    .splash-headline span {
+      color: #C5D336;
+    }
+
+    .splash-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,.65);
+      text-align: center;
+      line-height: 1.75;
+      margin-bottom: 36px;
+      max-width: 540px;
+    }
+
+    .splash-sections {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 44px;
+    }
+
+    .splash-tag {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 16px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,.85);
+      white-space: nowrap;
+    }
+
+    .splash-tag-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .splash-btn {
+      padding: 15px 44px;
+      background: #C5D336;
+      color: #001D62;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: .3px;
+      box-shadow: 0 8px 28px rgba(197,211,54,.35);
+      transition: all .22s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .splash-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
+      transform: translateX(-100%);
+      transition: transform .5s;
+    }
+
+    .splash-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 36px rgba(197,211,54,.45);
+    }
+
+    .splash-btn:hover::after { transform: translateX(100%); }
+
+    .splash-btn:active { transform: translateY(0); }
+
+    .splash-footer {
+      margin-top: 22px;
+      font-size: 10.5px;
+      color: rgba(255,255,255,.3);
+      text-align: center;
+      letter-spacing: .5px;
+    }
+
     /* ── BOOT LOADER ── */
     #boot {
       position: fixed;
@@ -2116,6 +2333,36 @@
 <body>
 
   <!-- LOGIN REMOVED: acceso público -->
+
+  <!-- SPLASH SCREEN -->
+  <div id="splash">
+    <div class="splash-orb splash-orb1"></div>
+    <div class="splash-orb splash-orb2"></div>
+    <div class="splash-content">
+      <div class="splash-logo-wrap">
+        <img src="logo.png" alt="Línea Comunicaciones"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+        <div class="splash-logo-fallback" style="display:none">Línea <em>Com.</em></div>
+      </div>
+      <div class="splash-title">Dashboard de Producción · 2026</div>
+      <div class="splash-headline">Datos de producción que<br>se mostrarán a continuación</div>
+      <div class="splash-desc">
+        Este reporte presenta el seguimiento en tiempo real de las actividades y metas de producción
+        para las gerencias <strong style="color:#fff">Banca</strong>, <strong style="color:#fff">Cirion</strong>
+        y <strong style="color:#fff">Liberty</strong>, incluyendo cumplimiento, tendencias y análisis detallado.
+      </div>
+      <div class="splash-sections">
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#166534"></span>Producción vs. Meta mensual</div>
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#001D62"></span>Análisis diario y acumulado</div>
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#0847a3"></span>Cumplimiento por gerencia</div>
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#C5D336"></span>Proyección anual YTD</div>
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#f59e0b"></span>Detalle de actividades</div>
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#22c55e"></span>Distribución por zonas</div>
+      </div>
+      <button class="splash-btn" onclick="hideSplash()">Ingresar al Dashboard →</button>
+      <div class="splash-footer">Línea Comunicaciones · Confidencial · Solo uso interno</div>
+    </div>
+  </div>
 
   <!-- BOOT LOADER -->
   <div id="boot">
@@ -2698,6 +2945,12 @@
     let BANCA_ZONAS = {};
     let LIBERTY_ZONAS = {};
     let META_MES = { BANCA: {}, CIRION: {}, LIBERTY: {} };
+    // ── SPLASH ────────────────────────────────────────────────────
+    function hideSplash() {
+      const s = document.getElementById('splash');
+      if (s) s.classList.add('hidden');
+    }
+
     // ══════════════════════════════════════════════
     // AUTH — Desactivado: acceso público
     // ══════════════════════════════════════════════
