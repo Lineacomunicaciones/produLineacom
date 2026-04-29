@@ -4345,6 +4345,7 @@
         Object.values(_metricCharts).forEach(c => c && c.destroy());
         Object.keys(_metricCharts).forEach(k => delete _metricCharts[k]);
         grid.innerHTML = '';
+        grid.dataset.ger = '';
         return;
       }
 
@@ -4374,8 +4375,8 @@
         if (!panelIds.includes(id)) { _metricCharts[id]?.destroy(); delete _metricCharts[id]; }
       });
 
-      // Regenerar estructura HTML solo cuando cambia la gerencia
-      if (grid.dataset.ger !== ger) {
+      // Regenerar estructura HTML solo cuando cambia la gerencia o los charts fueron destruidos
+      if (grid.dataset.ger !== ger || Object.keys(_metricCharts).length === 0) {
         grid.dataset.ger = ger;
         Object.values(_metricCharts).forEach(c => c && c.destroy());
         Object.keys(_metricCharts).forEach(k => delete _metricCharts[k]);
