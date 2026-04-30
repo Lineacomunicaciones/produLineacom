@@ -5923,11 +5923,13 @@
           map[k].val += (r.VALOR_TOTAL || 0);
           map[k].cnt++;
         });
-        // Excluir entradas con valor 0 (ej: Faustino Cañizalez en Coordinador)
+        // Excluir entradas con valor 0 Y sin actividades
         const sorted = Object.entries(map)
-          .filter(([, v]) => v.val > 0 || v.cnt > 0)
+          .filter(([, v]) => v.val > 0 && v.cnt > 0)
           .map(([baseKey, v]) => {
             let displayKey = baseKey;
+            // Normalizar nombre
+            if (/faustino\s+ca[ñn]izale?s/i.test(displayKey)) displayKey = 'Faustino Cañizalez';
             if (p.key2 && v.cc && Object.keys(v.cc).length > 0) {
               const topCC = Object.entries(v.cc).sort((a,b) => b[1]-a[1])[0][0];
               displayKey = `${baseKey} · ${topCC}`;
