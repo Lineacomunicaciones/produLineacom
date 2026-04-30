@@ -3641,17 +3641,28 @@
                 <div class="estado-hero-dot"></div>
                 <span class="estado-hero-label">Estado General Compañía</span>
               </div>
-              <div style="display:flex; align-items:center; gap:10px">
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+                <!-- Filtro Cuatrimestre -->
+                <div class="f-group" style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
+                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Cuatrimestre</label>
+                  <select id="res-q" class="f-sel" onchange="applyResQ()"
+                    style="font-size:10px; color:#fff; background:transparent; border:none; outline:none; cursor:pointer; min-width:80px">
+                    <option value="" style="background:#001D62">Personalizado</option>
+                    <option value="Q1" style="background:#001D62">Q1 · Ene – Abr</option>
+                    <option value="Q2" style="background:#001D62">Q2 · May – Ago</option>
+                    <option value="Q3" style="background:#001D62">Q3 · Sep – Dic</option>
+                  </select>
+                </div>
                 <div class="f-group"
                   style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
                   <label style="font-size:8px; color:rgba(255,255,255,0.5)">Desde</label>
-                  <input type="date" id="res-d1" class="f-sel" value="2026-04-01" onchange="renderResumen()"
+                  <input type="date" id="res-d1" class="f-sel" value="2026-04-01" onchange="onResDateChange()"
                     style="font-size:10px; width:110px; color:#fff; background:transparent">
                 </div>
                 <div class="f-group"
                   style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
                   <label style="font-size:8px; color:rgba(255,255,255,0.5)">Hasta</label>
-                  <input type="date" id="res-d2" class="f-sel" value="2026-04-30" onchange="renderResumen()"
+                  <input type="date" id="res-d2" class="f-sel" value="2026-04-30" onchange="onResDateChange()"
                     style="font-size:10px; width:110px; color:#fff; background:transparent">
                 </div>
                 <button class="btn-exp" onclick="exportTab('resumen')"
@@ -4567,6 +4578,35 @@
       document.querySelectorAll('#res-trend-pills .pill').forEach(b => {
         b.classList.toggle('on', b.textContent.toUpperCase() === g || (b.textContent === 'Consolidado' && g === 'TODOS'));
       });
+      renderResumen();
+    }
+
+    // Rangos de cuatrimestres 2026
+    const Q_RANGES = {
+      Q1: { d1: '2026-01-01', d2: '2026-04-30' },
+      Q2: { d1: '2026-05-01', d2: '2026-08-31' },
+      Q3: { d1: '2026-09-01', d2: '2026-12-31' }
+    };
+
+    function applyResQ() {
+      const q = document.getElementById('res-q')?.value;
+      if (q && Q_RANGES[q]) {
+        const d1El = document.getElementById('res-d1');
+        const d2El = document.getElementById('res-d2');
+        if (d1El) d1El.value = Q_RANGES[q].d1;
+        if (d2El) d2El.value = Q_RANGES[q].d2;
+      }
+      renderResumen();
+    }
+
+    function onResDateChange() {
+      const d1 = document.getElementById('res-d1')?.value || '';
+      const d2 = document.getElementById('res-d2')?.value || '';
+      const qSel = document.getElementById('res-q');
+      if (qSel) {
+        const matched = Object.entries(Q_RANGES).find(([, r]) => r.d1 === d1 && r.d2 === d2);
+        qSel.value = matched ? matched[0] : '';
+      }
       renderResumen();
     }
 
