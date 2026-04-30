@@ -5801,14 +5801,12 @@
     // ── Configuración de paneles por gerencia ─────────────────────────
     const METRIC_PANELS = {
       LIBERTY: [
-        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
-        { label: 'Centro de Costos', key: 'CENTRO_DE_COSTOS', icon: '💰' },
+        { label: 'Base Operativa · Centro de Costos', key: 'BASE_OPERATIVA', key2: 'CENTRO_DE_COSTOS', icon: '🏢' },
         { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
         { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
       ],
       CIRION: [
-        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
-        { label: 'Centro de Costos', key: 'CENTRO_DE_COSTOS', icon: '💰' },
+        { label: 'Base Operativa · Centro de Costos', key: 'BASE_OPERATIVA', key2: 'CENTRO_DE_COSTOS', icon: '🏢' },
         { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
         { label: 'Zona',             key: 'ZONA',             icon: '📍' },
         { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
@@ -5900,11 +5898,21 @@
       panels.forEach(p => {
         const map = {};
         rows.forEach(r => {
-          let k = r[p.key] || 'Sin dato';
-          // Normalizar etiquetas
-          if (/^FIJO$/i.test(k.trim())) k = 'Abono Fijo';
-          // Excluir NO APLICA
-          if (/^NO\s*APLICA$/i.test(k.trim())) return;
+          let k;
+          if (p.key2) {
+            // Panel combinado: "Base Operativa · Centro de Costos"
+            const v1 = (r[p.key]  || '').trim();
+            const v2 = (r[p.key2] || '').trim();
+            const noAplica = /^NO\s*APLICA$/i;
+            const part1 = noAplica.test(v1) ? '' : v1;
+            const part2 = noAplica.test(v2) ? '' : v2;
+            if (!part1 && !part2) return;
+            k = part1 && part2 ? `${part1} · ${part2}` : (part1 || part2);
+          } else {
+            k = r[p.key] || 'Sin dato';
+            if (/^FIJO$/i.test(k.trim())) k = 'Abono Fijo';
+            if (/^NO\s*APLICA$/i.test(k.trim())) return;
+          }
           if (!map[k]) map[k] = { val: 0, cnt: 0 };
           map[k].val += (r.VALOR_TOTAL || 0);
           map[k].cnt++;
