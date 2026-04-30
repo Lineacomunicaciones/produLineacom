@@ -3642,15 +3642,16 @@
                 <span class="estado-hero-label">Estado General Compañía</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
-                <!-- Filtro Cuatrimestre -->
+                <!-- Filtro Trimestre -->
                 <div class="f-group" style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
-                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Cuatrimestre</label>
+                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Trimestre</label>
                   <select id="res-q" class="f-sel" onchange="applyResQ()"
                     style="font-size:10px; color:#fff; background:transparent; border:none; outline:none; cursor:pointer; min-width:80px">
                     <option value="" style="background:#001D62">Personalizado</option>
-                    <option value="Q1" style="background:#001D62">Q1 · Ene – Abr</option>
-                    <option value="Q2" style="background:#001D62">Q2 · May – Ago</option>
-                    <option value="Q3" style="background:#001D62">Q3 · Sep – Dic</option>
+                    <option value="Q1" style="background:#001D62">T1 · Ene – Mar</option>
+                    <option value="Q2" style="background:#001D62">T2 · Abr – Jun</option>
+                    <option value="Q3" style="background:#001D62">T3 · Jul – Sep</option>
+                    <option value="Q4" style="background:#001D62">T4 · Oct – Dic</option>
                   </select>
                 </div>
                 <div class="f-group"
@@ -4581,11 +4582,12 @@
       renderResumen();
     }
 
-    // Rangos de cuatrimestres 2026
+    // Rangos de trimestres 2026
     const Q_RANGES = {
-      Q1: { d1: '2026-01-01', d2: '2026-04-30' },
-      Q2: { d1: '2026-05-01', d2: '2026-08-31' },
-      Q3: { d1: '2026-09-01', d2: '2026-12-31' }
+      Q1: { d1: '2026-01-01', d2: '2026-03-31' },
+      Q2: { d1: '2026-04-01', d2: '2026-06-30' },
+      Q3: { d1: '2026-07-01', d2: '2026-09-30' },
+      Q4: { d1: '2026-10-01', d2: '2026-12-31' }
     };
 
     function applyResQ() {
@@ -5731,6 +5733,8 @@
           ${M(wompiVal, 'Wompi', true)}
           ${wompiSubs.map(s => M(s.val, s.lbl)).join('')}
           ${otrosVal > 0 ? sep + M(otrosVal, 'Otros', true) : ''}
+          ${sep}
+          ${Mn(totalActs, 'Actividades')}
         `;
         // grid dinámico: 2 base + sep + 3 redeban + sep + 1+4 wompi = se auto-ajusta con flex
         band.style.display = 'flex';
@@ -5757,12 +5761,21 @@
             <div class="estado-metric-lbl">${lbl}</div>
           </div>`;
 
+        const totalActsCirion = rows.length;
+        const Mn2 = (num, lbl) =>
+          `<div class="estado-metric">
+            <div class="estado-metric-val">${num.toLocaleString()}</div>
+            <div class="estado-metric-lbl">${lbl}</div>
+          </div>`;
+
         band.innerHTML = `
           ${M(totalCirion, 'Producción Total', true)}
           ${sep}
           ${M(assuranceVal, 'Assurance')}
           ${M(deliveryVal,  'Delivery')}
           ${M(fijoVal,      'Abono Fijo')}
+          ${sep}
+          ${Mn2(totalActsCirion, 'Actividades')}
         `;
         band.style.display = 'flex';
         band.style.flexWrap = 'wrap';
@@ -5794,10 +5807,19 @@
             <div class="estado-metric-lbl">${lbl}</div>
           </div>`;
 
+        const totalActsLiberty = rows.length;
+        const Mn3 = (num, lbl) =>
+          `<div class="estado-metric">
+            <div class="estado-metric-val">${num.toLocaleString()}</div>
+            <div class="estado-metric-lbl">${lbl}</div>
+          </div>`;
+
         band.innerHTML = `
           ${M(totalLiberty, 'Producción Total', true)}
           ${sep}
           ${M(abonoFijoVal, 'Abono Fijo')}
+          ${sep}
+          ${Mn3(totalActsLiberty, 'Actividades')}
         `;
         band.style.display = 'flex';
         band.style.flexWrap = 'wrap';
@@ -5843,8 +5865,12 @@
         </div>`;
       });
 
+      html += `<div class="estado-metric">
+        <div class="estado-metric-val">${rows.length.toLocaleString()}</div>
+        <div class="estado-metric-lbl">Actividades</div>
+      </div>`;
       band.innerHTML = html;
-      band.style.gridTemplateColumns = `repeat(${2 + gersToShow.length}, 1fr)`;
+      band.style.gridTemplateColumns = `repeat(${3 + gersToShow.length}, 1fr)`;
     }
 
     // ── Columnas por gerencia ──────────────────────────────────────────
