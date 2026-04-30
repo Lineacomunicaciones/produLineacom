@@ -1307,13 +1307,15 @@
     .tw {
       overflow-x: auto;
       overflow-y: auto;
-      max-height: 420px
+      max-height: calc(100vh - 380px);
+      min-height: 200px
     }
 
     .dt {
       width: 100%;
       border-collapse: collapse;
-      font-size: 11.5px
+      font-size: 11.5px;
+      min-width: 900px
     }
 
     .dt th {
@@ -1342,10 +1344,7 @@
       padding: 8px 12px;
       border-bottom: 1px solid #f0f2f8;
       color: var(--tx);
-      max-width: 180px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis
+      white-space: nowrap
     }
 
     .dt tr:hover td {
@@ -4024,7 +4023,7 @@
         </div>
 
         <!-- ═══ DETALLE ═══ -->
-        <div id="tp-detalle" class="tp" style="padding:10px 18px; box-sizing:border-box">
+        <div id="tp-detalle" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto; max-height:calc(100vh - 52px)">
 
           <!-- Banner Detalle de Producción -->
           <div class="estado-hero fu" style="margin-bottom:14px; padding: 12px 20px">
