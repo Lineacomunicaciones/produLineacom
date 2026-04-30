@@ -4082,6 +4082,12 @@
               <div class="fg" id="fg-negocio" style="display:none"><label>Tipo Negocio</label><select id="det-negocio" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
+              <div class="fg" id="fg-base" style="display:none"><label>Base Operativa</label><select id="det-base" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
+              <div class="fg" id="fg-coord" style="display:none"><label>Coordinador</label><select id="det-coord" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
               <div class="fg" id="fg-est" style="display:none"><label>Estado</label><select id="det-est" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
@@ -5823,19 +5829,17 @@
         { h: 'V. Aprobado',    k: 'VALOR_APROBADO',   t: 'cur' },
       ],
       CIRION: [
-        ...DCOLS_COMUN,
-        { h: 'ID FO',          k: 'ID_FO'                       },
-        { h: 'Coordinador',    k: 'COORDINADOR'                  },
-        { h: 'Centro Costos',  k: 'CENTRO_DE_COSTOS'            },
+        { h: 'ID TA',          k: 'ID_TA'                        },
+        { h: 'ID FO',          k: 'ID_FO'                        },
+        { h: 'Proyecto',       k: 'NEGOCIOGENERAL'               },
+        { h: 'Centro Costos',  k: 'CENTRO_DE_COSTOS'             },
         { h: 'Base Operativa', k: 'BASE_OPERATIVA'               },
-        { h: 'Zona',           k: 'ZONA'                         },
-        { h: 'Tipo Negocio',   k: 'TIPO_NEGOCIO'                 },
-        { h: 'Item Factura',   k: 'ITEM_FACTURACION'             },
-        { h: 'V. Obra Civil',  k: 'VALOR_OBRA_CIVIL',  t: 'cur' },
-        { h: 'V. Material',    k: 'VALOR_MATERIAL',    t: 'cur' },
-        { h: 'V. Adicional',   k: 'VALOR_ADICIONAL',   t: 'cur' },
-        { h: 'V. Aprobado',    k: 'VALOR_APROBADO',    t: 'cur' },
-        { h: 'Descripción',    k: 'DESCRIPCION_ACTIVIDAD'        },
+        { h: 'Tipo Act.',      k: 'TIPO_ACTIVIDAD'               },
+        { h: 'Coordinador',    k: 'COORDINADOR'                   },
+        { h: 'Valor Total',    k: 'VALOR_TOTAL',       t: 'cur'  },
+        { h: 'V. Obra Civil',  k: 'VALOR_OBRA_CIVIL',  t: 'cur'  },
+        { h: 'V. Material',    k: 'VALOR_MATERIAL',    t: 'cur'  },
+        { h: 'V. Adicional',   k: 'VALOR_ADICIONAL',   t: 'cur'  },
       ],
       BANCA: [
         { h: 'ID TA',          k: 'ID_TA'                       },
@@ -6113,7 +6117,7 @@
     }
     function resetDet() {
       _dSrch = ''; _dEst = ''; _dPage = 1;
-      ['det-srch','det-est','det-tipo','det-cc','det-zona','det-negocio','det-forma'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+      ['det-srch','det-est','det-tipo','det-cc','det-zona','det-negocio','det-forma','det-base','det-coord'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
       renderDetalle();
     }
     function renderDetalle() {
@@ -6127,18 +6131,23 @@
       const zonaSel   = document.getElementById('det-zona')?.value     || '';
       const negocioSel = document.getElementById('det-negocio')?.value || '';
       const formaSel  = document.getElementById('det-forma')?.value    || '';
+      const baseSel   = document.getElementById('det-base')?.value     || '';
+      const coordSel  = document.getElementById('det-coord')?.value    || '';
       _dGer = gerSel;
 
       // Mostrar/ocultar filtros según gerencia
-      const isTodos = gerSel === 'todos';
-      const isBanca = gerSel === 'BANCA';
+      const isTodos  = gerSel === 'todos';
+      const isBanca  = gerSel === 'BANCA';
+      const isCirion = gerSel === 'CIRION';
       const showFn = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? '' : 'none'; };
-      showFn('fg-est',     !isTodos && !isBanca);
-      showFn('fg-zona',    !isTodos);
+      showFn('fg-est',     !isTodos && !isBanca && !isCirion);
+      showFn('fg-zona',    !isTodos && !isBanca && !isCirion);
       showFn('fg-cc',      true);
       showFn('fg-tipo',    !isBanca);
       showFn('fg-negocio', isBanca);
       showFn('fg-forma',   isBanca);
+      showFn('fg-base',    isCirion);
+      showFn('fg-coord',   isCirion);
 
       let rows = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
       if (_dEst)      rows = rows.filter(r => r.ESTADO_ACTIVIDAD === _dEst);
@@ -6147,6 +6156,8 @@
       if (zonaSel)    rows = rows.filter(r => (r.ZONA || r.CIUDAD || '') === zonaSel);
       if (negocioSel) rows = rows.filter(r => (r.TIPO_NEGOCIO || '') === negocioSel);
       if (formaSel)   rows = rows.filter(r => (r.FORMA_ATENCION || '') === formaSel);
+      if (baseSel)    rows = rows.filter(r => (r.BASE_OPERATIVA || '') === baseSel);
+      if (coordSel)   rows = rows.filter(r => (r.COORDINADOR || '') === coordSel);
       if (_dD1) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') >= _dD1);
       if (_dD2) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') <= _dD2);
       if (_dSrch) {
@@ -6167,6 +6178,8 @@
       fillSel('det-zona',    base.map(r => r.ZONA || r.CIUDAD));
       fillSel('det-negocio', base.map(r => r.TIPO_NEGOCIO));
       fillSel('det-forma',   base.map(r => r.FORMA_ATENCION));
+      fillSel('det-base',    base.map(r => r.BASE_OPERATIVA));
+      fillSel('det-coord',   base.map(r => r.COORDINADOR));
 
       // Paneles de métricas
       renderMetricPanels(rows, _dGer);
@@ -6277,6 +6290,8 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
         const zonaSel    = document.getElementById('det-zona')?.value   || '';
         const negocioSel = document.getElementById('det-negocio')?.value || '';
         const formaSel   = document.getElementById('det-forma')?.value  || '';
+        const baseSel    = document.getElementById('det-base')?.value   || '';
+        const coordSel   = document.getElementById('det-coord')?.value  || '';
         const d1         = document.getElementById('det-hero-d1')?.value || '';
         const d2         = document.getElementById('det-hero-d2')?.value || '';
         const gerSel     = document.getElementById('det-ger-sel')?.value || 'todos';
@@ -6288,6 +6303,8 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
         if (zonaSel)    data = data.filter(r => (r.ZONA||r.CIUDAD||'')  === zonaSel);
         if (negocioSel) data = data.filter(r => (r.TIPO_NEGOCIO||'') === negocioSel);
         if (formaSel)   data = data.filter(r => (r.FORMA_ATENCION||'') === formaSel);
+        if (baseSel)    data = data.filter(r => (r.BASE_OPERATIVA||'') === baseSel);
+        if (coordSel)   data = data.filter(r => (r.COORDINADOR||'') === coordSel);
         if (d1) data = data.filter(r => (r.FECHA_FINALIZACION||'') >= d1);
         if (d2) data = data.filter(r => (r.FECHA_FINALIZACION||'') <= d2);
         if (srch) data = data.filter(r => DCOLS.some(c => String(r[c.k]||'').toLowerCase().includes(srch)));
