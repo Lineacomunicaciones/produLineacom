@@ -5630,14 +5630,15 @@
         const redebanCBVal  = sumBy(redebanCB,  'VALOR_TOTAL');
         const redebanPOSVal = sumBy(redebanPOS, 'VALOR_TOTAL');
 
-        // Wompi: Rollos Trim / CB / Venta Presente → columna TIPO_NEGOCIO
+        // Wompi: Rollos / CB / Venta Presente
+        // Rollos → busca en ITEM_FACTURACION: OC ROLLOS, OC ENVIO ROLLOS, OC VISITA ROLLOS
         const wFilters = [
-          { lbl: 'Wompi Rollos Trim',     test: v => /ROLL|TRIM/i.test(v)                        },
-          { lbl: 'Wompi CB',              test: v => /CB/i.test(v) && !/ROLL|TRIM|PRES/i.test(v) },
-          { lbl: 'Wompi Venta Presente',  test: v => /PRES/i.test(v)                             },
+          { lbl: 'Wompi Rollos',          test: (tn, item) => /OC[\s_]*(ENVIO[\s_]*)?ROLLOS|OC[\s_]*VISITA[\s_]*ROLLOS/i.test(item) },
+          { lbl: 'Wompi CB',              test: (tn, item) => /CB/i.test(tn) && !/ROLL|TRIM|PRES/i.test(tn)                          },
+          { lbl: 'Wompi Venta Presente',  test: (tn, item) => /PRES/i.test(tn)                                                       },
         ];
         const wompiSubs = wFilters.map(f => {
-          const sub = wompiRows.filter(r => f.test(r.TIPO_NEGOCIO || ''));
+          const sub = wompiRows.filter(r => f.test(r.TIPO_NEGOCIO || '', r.ITEM_FACTURACION || ''));
           return { lbl: f.lbl, val: sumBy(sub, 'VALOR_TOTAL'), cnt: sub.length };
         });
 
