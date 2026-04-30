@@ -5627,11 +5627,16 @@
         const totalBanca = sumBy(rows, 'VALOR_TOTAL');
         const totalActs  = rows.length;
 
-        // Por NEGOCIOGENERAL → Redeban vs Wompi
+        // Por NEGOCIOGENERAL → Redeban vs Wompi vs Otros
         const redebanRows = rows.filter(r => (r.NEGOCIOGENERAL || '').toUpperCase().includes('REDEBAN'));
         const wompiRows   = rows.filter(r => (r.NEGOCIOGENERAL || '').toUpperCase().includes('WOMPI'));
+        const otrosRows   = rows.filter(r => {
+          const ng = (r.NEGOCIOGENERAL || '').toUpperCase();
+          return !ng.includes('REDEBAN') && !ng.includes('WOMPI');
+        });
         const redebanVal  = sumBy(redebanRows, 'VALOR_TOTAL');
         const wompiVal    = sumBy(wompiRows,   'VALOR_TOTAL');
+        const otrosVal    = sumBy(otrosRows,   'VALOR_TOTAL');
 
         // Redeban: CB vs POS → GERENCIA=BANCA + NEGOCIOGENERAL=REDEBAN + TIPO_NEGOCIO=CB|POS
         const redebanCB  = redebanRows.filter(r => /\bCB\b/i.test(r.TIPO_NEGOCIO  || ''));
@@ -5674,6 +5679,7 @@
           ${sep}
           ${M(wompiVal, 'Wompi', true)}
           ${wompiSubs.map(s => M(s.val, s.lbl)).join('')}
+          ${otrosVal > 0 ? sep + M(otrosVal, 'Otros', true) : ''}
         `;
         // grid dinámico: 2 base + sep + 3 redeban + sep + 1+4 wompi = se auto-ajusta con flex
         band.style.display = 'flex';
