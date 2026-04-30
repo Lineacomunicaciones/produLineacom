@@ -5641,13 +5641,14 @@
 
         // Wompi: Rollos / CB / Venta Presente
         // Rollos → busca en ITEM_FACTURACION: OC ROLLOS, OC ENVIO ROLLOS, OC VISITA ROLLOS
+        const isRollos = r => /OC[\s_]*(ENVIO[\s_]*)?ROLLOS|OC[\s_]*VISITA[\s_]*ROLLOS/i.test(r.ITEM_FACTURACION || '');
         const wFilters = [
-          { lbl: 'Wompi Rollos',          test: (tn, item) => /OC[\s_]*(ENVIO[\s_]*)?ROLLOS|OC[\s_]*VISITA[\s_]*ROLLOS/i.test(item) },
-          { lbl: 'Wompi CB',              test: (tn, item) => /CB/i.test(tn) && !/ROLL|TRIM|PRES/i.test(tn)                          },
-          { lbl: 'Wompi Venta Presente',  test: (tn, item) => /PRES/i.test(tn)                                                       },
+          { lbl: 'Wompi Rollos',          test: (tn, item, r) => isRollos(r)                                                              },
+          { lbl: 'Wompi CB',              test: (tn, item, r) => /CB/i.test(tn) && !/ROLL|TRIM|PRES/i.test(tn) && !isRollos(r)           },
+          { lbl: 'Wompi Venta Presente',  test: (tn, item, r) => /PRES/i.test(tn)                                                         },
         ];
         const wompiSubs = wFilters.map(f => {
-          const sub = wompiRows.filter(r => f.test(r.TIPO_NEGOCIO || '', r.ITEM_FACTURACION || ''));
+          const sub = wompiRows.filter(r => f.test(r.TIPO_NEGOCIO || '', r.ITEM_FACTURACION || '', r));
           return { lbl: f.lbl, val: sumBy(sub, 'VALOR_TOTAL'), cnt: sub.length };
         });
 
