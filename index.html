@@ -4072,17 +4072,17 @@
           <div class="fb fu fu1">
             <div class="fr" style="flex-wrap:wrap; gap:8px">
               <div class="fg"><label>Buscar</label><input type="text" id="det-srch"
-                  placeholder="ID, lugar, coordinador…" oninput="renderDetalle()" style="min-width:180px"></div>
-              <div class="fg"><label>Estado</label><select id="det-est" onchange="renderDetalle()">
+                  placeholder="ID, lugar, tipo actividad…" oninput="renderDetalle()" style="min-width:180px"></div>
+              <div class="fg" id="fg-cc"><label>Centro de Costos</label><select id="det-cc" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
-              <div class="fg"><label>Tipo Actividad</label><select id="det-tipo" onchange="renderDetalle()">
+              <div class="fg" id="fg-tipo"><label>Tipo Actividad</label><select id="det-tipo" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
-              <div class="fg"><label>Centro de Costos</label><select id="det-cc" onchange="renderDetalle()">
+              <div class="fg" id="fg-est" style="display:none"><label>Estado</label><select id="det-est" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
-              <div class="fg"><label>Ciudad / Zona</label><select id="det-zona" onchange="renderDetalle()">
+              <div class="fg" id="fg-zona" style="display:none"><label>Ciudad / Zona</label><select id="det-zona" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
               <div style="align-self:flex-end"><button class="btn-rst" onclick="resetDet()">↺ Limpiar</button></div>
@@ -6121,6 +6121,14 @@
       const ccSel   = document.getElementById('det-cc')?.value       || '';
       const zonaSel = document.getElementById('det-zona')?.value     || '';
       _dGer = gerSel;
+
+      // Mostrar/ocultar filtros según gerencia
+      const isTodos = gerSel === 'todos';
+      const showFn = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? '' : 'none'; };
+      showFn('fg-est',  !isTodos);
+      showFn('fg-zona', !isTodos);
+      showFn('fg-cc',   true);
+      showFn('fg-tipo', true);
 
       let rows = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
       if (_dEst)   rows = rows.filter(r => r.ESTADO_ACTIVIDAD === _dEst);
