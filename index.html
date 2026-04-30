@@ -5801,12 +5801,14 @@
     // ── Configuración de paneles por gerencia ─────────────────────────
     const METRIC_PANELS = {
       LIBERTY: [
-        { label: 'Base Operativa · Centro de Costos', key: 'BASE_OPERATIVA', key2: 'CENTRO_DE_COSTOS', icon: '🏢' },
+        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
+        { label: 'Centro de Costos', key: 'CENTRO_DE_COSTOS', icon: '💰' },
         { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
         { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
       ],
       CIRION: [
-        { label: 'Base Operativa · Centro de Costos', key: 'BASE_OPERATIVA', key2: 'CENTRO_DE_COSTOS', icon: '🏢' },
+        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
+        { label: 'Centro de Costos', key: 'CENTRO_DE_COSTOS', icon: '💰' },
         { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
         { label: 'Zona',             key: 'ZONA',             icon: '📍' },
         { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
@@ -5900,24 +5902,38 @@
         rows.forEach(r => {
           let k;
           if (p.key2) {
-            // Panel combinado: "Base Operativa · Centro de Costos"
+            // Panel combinado: agrupa por key (BASE_OPERATIVA), muestra key2 en tooltip
             const v1 = (r[p.key]  || '').trim();
-            const v2 = (r[p.key2] || '').trim();
             const noAplica = /^NO\s*APLICA$/i;
-            const part1 = noAplica.test(v1) ? '' : v1;
-            const part2 = noAplica.test(v2) ? '' : v2;
-            if (!part1 && !part2) return;
-            k = part1 && part2 ? `${part1} · ${part2}` : (part1 || part2);
+            if (!v1 || noAplica.test(v1)) return;
+            k = v1;
+            // Guardar centros de costos asociados para el tooltip
+            if (!map[k]) map[k] = { val: 0, cnt: 0, cc: {} };
+            const v2 = (r[p.key2] || '').trim();
+            if (v2 && !noAplica.test(v2)) {
+              const ccClean = v2.replace(/\s+\d{4}-\d{4}$/, '').trim();
+              map[k].cc[ccClean] = (map[k].cc[ccClean] || 0) + 1;
+            }
           } else {
             k = r[p.key] || 'Sin dato';
             if (/^FIJO$/i.test(k.trim())) k = 'Abono Fijo';
             if (/^NO\s*APLICA$/i.test(k.trim())) return;
           }
-          if (!map[k]) map[k] = { val: 0, cnt: 0 };
+          if (!map[k]) map[k] = { val: 0, cnt: 0, cc: map[k]?.cc || {} };
           map[k].val += (r.VALOR_TOTAL || 0);
           map[k].cnt++;
         });
-        const sorted = Object.entries(map).sort((a,b) => b[1].val - a[1].val);
+        // Excluir entradas con valor 0 (ej: Faustino Cañizalez en Coordinador)
+        const sorted = Object.entries(map)
+          .filter(([, v]) => v.val > 0 || v.cnt > 0)
+          .map(([baseKey, v]) => {
+            let displayKey = baseKey;
+            if (p.key2 && v.cc && Object.keys(v.cc).length > 0) {
+              const topCC = Object.entries(v.cc).sort((a,b) => b[1]-a[1])[0][0];
+              displayKey = `${baseKey} · ${topCC}`;
+            }
+            return [displayKey, v];
+          }).sort((a,b) => b[1].val - a[1].val);
         const totalVal = rows.reduce((s,r) => s + (r.VALOR_TOTAL||0), 0);
         const totEl = document.getElementById(`mc-tot-${p.key}`);
         if (totEl) totEl.textContent = `${sorted.length} grupo${sorted.length!==1?'s':''} · ${fmtCOP(totalVal)}`;
