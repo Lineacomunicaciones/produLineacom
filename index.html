@@ -4079,10 +4079,16 @@
               <div class="fg" id="fg-tipo"><label>Tipo Actividad</label><select id="det-tipo" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
+              <div class="fg" id="fg-negocio" style="display:none"><label>Tipo Negocio</label><select id="det-negocio" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
               <div class="fg" id="fg-est" style="display:none"><label>Estado</label><select id="det-est" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
               <div class="fg" id="fg-zona" style="display:none"><label>Ciudad / Zona</label><select id="det-zona" onchange="renderDetalle()">
+                  <option value="">Todos</option>
+                </select></div>
+              <div class="fg" id="fg-forma" style="display:none"><label>Forma Atención</label><select id="det-forma" onchange="renderDetalle()">
                   <option value="">Todos</option>
                 </select></div>
               <div style="align-self:flex-end"><button class="btn-rst" onclick="resetDet()">↺ Limpiar</button></div>
@@ -5837,6 +5843,7 @@
         { h: 'Centro Costos',  k: 'CENTRO_DE_COSTOS'            },
         { h: 'Proyecto',       k: 'NEGOCIOGENERAL'              },
         { h: 'Tipo Negocio',   k: 'TIPO_NEGOCIO'                },
+        { h: 'Zona',           k: 'ZONA'                        },
         { h: 'Fecha',          k: 'FECHA_FINALIZACION'          },
         { h: 'Lugar',          k: 'LUGAR_EJECUCION'             },
         { h: 'Forma Atención', k: 'FORMA_ATENCION'              },
@@ -6106,7 +6113,7 @@
     }
     function resetDet() {
       _dSrch = ''; _dEst = ''; _dPage = 1;
-      ['det-srch','det-est','det-tipo','det-cc','det-zona'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+      ['det-srch','det-est','det-tipo','det-cc','det-zona','det-negocio','det-forma'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
       renderDetalle();
     }
     function renderDetalle() {
@@ -6114,25 +6121,32 @@
       _dEst  = document.getElementById('det-est')?.value  || '';
       _dD1   = document.getElementById('det-hero-d1')?.value || '';
       _dD2   = document.getElementById('det-hero-d2')?.value || '';
-      const gerSel  = document.getElementById('det-ger-sel')?.value  || 'todos';
-      const tipoSel = document.getElementById('det-tipo')?.value     || '';
-      const ccSel   = document.getElementById('det-cc')?.value       || '';
-      const zonaSel = document.getElementById('det-zona')?.value     || '';
+      const gerSel    = document.getElementById('det-ger-sel')?.value  || 'todos';
+      const tipoSel   = document.getElementById('det-tipo')?.value     || '';
+      const ccSel     = document.getElementById('det-cc')?.value       || '';
+      const zonaSel   = document.getElementById('det-zona')?.value     || '';
+      const negocioSel = document.getElementById('det-negocio')?.value || '';
+      const formaSel  = document.getElementById('det-forma')?.value    || '';
       _dGer = gerSel;
 
       // Mostrar/ocultar filtros según gerencia
       const isTodos = gerSel === 'todos';
+      const isBanca = gerSel === 'BANCA';
       const showFn = (id, show) => { const el = document.getElementById(id); if (el) el.style.display = show ? '' : 'none'; };
-      showFn('fg-est',  !isTodos);
-      showFn('fg-zona', !isTodos);
-      showFn('fg-cc',   true);
-      showFn('fg-tipo', true);
+      showFn('fg-est',     !isTodos && !isBanca);
+      showFn('fg-zona',    !isTodos);
+      showFn('fg-cc',      true);
+      showFn('fg-tipo',    !isBanca);
+      showFn('fg-negocio', isBanca);
+      showFn('fg-forma',   isBanca);
 
       let rows = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
-      if (_dEst)   rows = rows.filter(r => r.ESTADO_ACTIVIDAD === _dEst);
-      if (tipoSel) rows = rows.filter(r => r.TIPO_ACTIVIDAD   === tipoSel);
-      if (ccSel)   rows = rows.filter(r => (r.CENTRO_DE_COSTOS || '') === ccSel);
-      if (zonaSel) rows = rows.filter(r => (r.ZONA || r.CIUDAD || '') === zonaSel);
+      if (_dEst)      rows = rows.filter(r => r.ESTADO_ACTIVIDAD === _dEst);
+      if (tipoSel)    rows = rows.filter(r => r.TIPO_ACTIVIDAD   === tipoSel);
+      if (ccSel)      rows = rows.filter(r => (r.CENTRO_DE_COSTOS || '') === ccSel);
+      if (zonaSel)    rows = rows.filter(r => (r.ZONA || r.CIUDAD || '') === zonaSel);
+      if (negocioSel) rows = rows.filter(r => (r.TIPO_NEGOCIO || '') === negocioSel);
+      if (formaSel)   rows = rows.filter(r => (r.FORMA_ATENCION || '') === formaSel);
       if (_dD1) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') >= _dD1);
       if (_dD2) rows = rows.filter(r => (r.FECHA_FINALIZACION || '') <= _dD2);
       if (_dSrch) {
@@ -6148,9 +6162,11 @@
         if (cur && [...el.options].some(o => o.value === cur)) el.value = cur;
       };
       const base = _dGer === 'todos' ? RAW : RAW.filter(r => r.GERENCIA === _dGer);
-      fillSel('det-tipo', base.map(r => r.TIPO_ACTIVIDAD));
-      fillSel('det-cc',   base.map(r => r.CENTRO_DE_COSTOS));
-      fillSel('det-zona', base.map(r => r.ZONA || r.CIUDAD));
+      fillSel('det-tipo',    base.map(r => r.TIPO_ACTIVIDAD));
+      fillSel('det-cc',      base.map(r => r.CENTRO_DE_COSTOS));
+      fillSel('det-zona',    base.map(r => r.ZONA || r.CIUDAD));
+      fillSel('det-negocio', base.map(r => r.TIPO_NEGOCIO));
+      fillSel('det-forma',   base.map(r => r.FORMA_ATENCION));
 
       // Paneles de métricas
       renderMetricPanels(rows, _dGer);
@@ -6254,20 +6270,24 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
     function exportTab(tab) {
       let data = [];
       if (tab === 'detalle') {
-        const srch    = (document.getElementById('det-srch')?.value  || '').toLowerCase();
-        const est     = document.getElementById('det-est')?.value    || '';
-        const tipoSel = document.getElementById('det-tipo')?.value   || '';
-        const ccSel   = document.getElementById('det-cc')?.value     || '';
-        const zonaSel = document.getElementById('det-zona')?.value   || '';
-        const d1      = document.getElementById('det-hero-d1')?.value || '';
-        const d2      = document.getElementById('det-hero-d2')?.value || '';
-        const gerSel  = document.getElementById('det-ger-sel')?.value || 'todos';
-        const DCOLS   = getDCOLS(gerSel);
+        const srch       = (document.getElementById('det-srch')?.value  || '').toLowerCase();
+        const est        = document.getElementById('det-est')?.value    || '';
+        const tipoSel    = document.getElementById('det-tipo')?.value   || '';
+        const ccSel      = document.getElementById('det-cc')?.value     || '';
+        const zonaSel    = document.getElementById('det-zona')?.value   || '';
+        const negocioSel = document.getElementById('det-negocio')?.value || '';
+        const formaSel   = document.getElementById('det-forma')?.value  || '';
+        const d1         = document.getElementById('det-hero-d1')?.value || '';
+        const d2         = document.getElementById('det-hero-d2')?.value || '';
+        const gerSel     = document.getElementById('det-ger-sel')?.value || 'todos';
+        const DCOLS      = getDCOLS(gerSel);
         data = gerSel === 'todos' ? [...RAW] : RAW.filter(r => r.GERENCIA === gerSel);
-        if (est)     data = data.filter(r => r.ESTADO_ACTIVIDAD === est);
-        if (tipoSel) data = data.filter(r => r.TIPO_ACTIVIDAD   === tipoSel);
-        if (ccSel)   data = data.filter(r => (r.CENTRO_DE_COSTOS||'') === ccSel);
-        if (zonaSel) data = data.filter(r => (r.ZONA||r.CIUDAD||'')  === zonaSel);
+        if (est)        data = data.filter(r => r.ESTADO_ACTIVIDAD === est);
+        if (tipoSel)    data = data.filter(r => r.TIPO_ACTIVIDAD   === tipoSel);
+        if (ccSel)      data = data.filter(r => (r.CENTRO_DE_COSTOS||'') === ccSel);
+        if (zonaSel)    data = data.filter(r => (r.ZONA||r.CIUDAD||'')  === zonaSel);
+        if (negocioSel) data = data.filter(r => (r.TIPO_NEGOCIO||'') === negocioSel);
+        if (formaSel)   data = data.filter(r => (r.FORMA_ATENCION||'') === formaSel);
         if (d1) data = data.filter(r => (r.FECHA_FINALIZACION||'') >= d1);
         if (d2) data = data.filter(r => (r.FECHA_FINALIZACION||'') <= d2);
         if (srch) data = data.filter(r => DCOLS.some(c => String(r[c.k]||'').toLowerCase().includes(srch)));
