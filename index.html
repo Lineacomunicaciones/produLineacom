@@ -5372,8 +5372,11 @@
         datasets: [{ data: catTotals.map(([, v]) => v), backgroundColor: ['#001D62', '#0847a3', '#166534'], borderWidth: 0, hoverOffset: 5 }]
       }, { cutout: '63%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
 
-      // Top zonas Cirion
-      const zTot = Object.entries(CIRION_ZONAS).map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)]).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      // Top zonas Cirion — excluir NO APLICA
+      const zTot = Object.entries(CIRION_ZONAS)
+        .filter(([z]) => !/^NO\s*APLICA$/i.test(z.trim()))
+        .map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)])
+        .sort((a, b) => b[1] - a[1]).slice(0, 8);
       mkC('ch-cir-zona', 'bar', {
         labels: zTot.map(([z]) => z.length > 16 ? z.slice(0, 16) + '…' : z),
         datasets: [{ label: 'Meta anual', data: zTot.map(([, v]) => v), backgroundColor: '#C5D336', borderRadius: 5, borderSkipped: false }]
@@ -5470,7 +5473,10 @@
         scales: { y: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, x: { ticks: { color: '#5c6b8a' }, grid: { display: false } } }
       });
 
-      const zonaLTot = Object.entries(LIBERTY_ZONAS).map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)]).sort((a, b) => b[1] - a[1]);
+      const zonaLTot = Object.entries(LIBERTY_ZONAS)
+        .filter(([z]) => !/^NO\s*APLICA$/i.test(z.trim()))
+        .map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)])
+        .sort((a, b) => b[1] - a[1]);
       const zonaLTop = zonaLTot.slice(0, 6);
       mkC('ch-lib-zona', 'doughnut', {
         labels: zonaLTop.map(([z]) => z),
@@ -5478,7 +5484,8 @@
       }, { cutout: '60%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
 
       const tipL = cntBy(l, 'TIPO_ACTIVIDAD');
-      const topT = topN(tipL, 7);
+      const tipLFiltered = Object.fromEntries(Object.entries(tipL).filter(([k]) => !/^NO\s*APLICA$/i.test(k.trim())));
+      const topT = topN(tipLFiltered, 7);
       mkC('ch-lib-tipo', 'bar', {
         labels: topT.map(([k]) => k.length > 18 ? k.slice(0, 18) + '…' : k),
         datasets: [{ label: 'Actividades', data: topT.map(([, v]) => v), backgroundColor: '#0847a3', borderRadius: 5, borderSkipped: false }]
@@ -5555,8 +5562,11 @@
         scales: { x: { ticks: { color: '#5c6b8a' }, grid: { color: 'rgba(0,0,0,.05)' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } }
       });
 
-      // Top zonas banca
-      const zTotB = Object.entries(BANCA_ZONAS).map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)]).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      // Top zonas banca — excluir NO APLICA
+      const zTotB = Object.entries(BANCA_ZONAS)
+        .filter(([z]) => !/^NO\s*APLICA$/i.test(z.trim()))
+        .map(([z, mv]) => [z, Object.values(mv).reduce((s, v) => s + v, 0)])
+        .sort((a, b) => b[1] - a[1]).slice(0, 8);
       mkC('ch-ban-zona', 'bar', {
         labels: zTotB.map(([z]) => z.length > 16 ? z.slice(0, 16) + '…' : z),
         datasets: [{ label: 'Meta anual', data: zTotB.map(([, v]) => v), backgroundColor: '#166534', borderRadius: 5, borderSkipped: false }]
@@ -5684,7 +5694,7 @@
           ${sep}
           ${M(assuranceVal, 'Assurance')}
           ${M(deliveryVal,  'Delivery')}
-          ${M(fijoVal,      'Fijo')}
+          ${M(fijoVal,      'Abono Fijo')}
         `;
         band.style.display = 'flex';
         band.style.flexWrap = 'wrap';
@@ -5889,7 +5899,11 @@
       panels.forEach(p => {
         const map = {};
         rows.forEach(r => {
-          const k = r[p.key] || 'Sin dato';
+          let k = r[p.key] || 'Sin dato';
+          // Normalizar etiquetas
+          if (/^FIJO$/i.test(k.trim())) k = 'Abono Fijo';
+          // Excluir NO APLICA
+          if (/^NO\s*APLICA$/i.test(k.trim())) return;
           if (!map[k]) map[k] = { val: 0, cnt: 0 };
           map[k].val += (r.VALOR_TOTAL || 0);
           map[k].cnt++;
