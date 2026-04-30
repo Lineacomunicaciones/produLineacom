@@ -57,12 +57,17 @@
       background: var(--bg);
       color: var(--tx);
       min-height: 100vh;
-      overflow-x: hidden
+      overflow-x: hidden;
+      text-transform: uppercase
     }
 
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px
+    }
+
+    input, select, textarea, option {
+      text-transform: uppercase
     }
 
     ::-webkit-scrollbar-track {
@@ -5808,11 +5813,10 @@
         { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
       ],
       CIRION: [
-        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
-        { label: 'Centro de Costos', key: 'CENTRO_DE_COSTOS', icon: '💰' },
-        { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
-        { label: 'Zona',             key: 'ZONA',             icon: '📍' },
-        { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
+        { label: 'BASE OPERATIVA',   key: 'BASE_OPERATIVA',   icon: '🏢' },
+        { label: 'CENTRO DE COSTOS', key: 'CENTRO_DE_COSTOS', icon: '💰' },
+        { label: 'TIPO DE ACTIVIDAD',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
+        { label: 'COORDINADOR',      key: 'COORDINADOR',      icon: '👤' },
       ],
       BANCA: [
         { label: 'Centro de Costos', key: 'CENTRO_DE_COSTOS', icon: '💰' },
