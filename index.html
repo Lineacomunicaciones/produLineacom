@@ -5713,7 +5713,42 @@
         return;
       }
 
-      // ── Modo general (Todas / Liberty) ───────────────────────────────
+      // ── LIBERTY: métricas específicas ────────────────────────────────
+      if (gerSel === 'LIBERTY') {
+        const totalLiberty = sumBy(rows, 'VALOR_TOTAL');
+
+        // Abono Fijo: actividades cuyo TIPO_ACTIVIDAD coincide con los 4 conceptos definidos
+        const abonoFijoTypes = [
+          /INSPECTOR\s+MOTORIZADO.*CALI/i,
+          /MEDIDOR\s+DE\s+NODOS.*CALI/i,
+          /ABONO\s+FIJO\s+CUADRILLA.*LIBERTY/i,
+          /RECORREDOR\s+PROYECTISTA.*LIBERTY/i,
+        ];
+        const abonoFijoRows = rows.filter(r =>
+          abonoFijoTypes.some(rx => rx.test(r.TIPO_ACTIVIDAD || ''))
+        );
+        const abonoFijoVal = sumBy(abonoFijoRows, 'VALOR_TOTAL');
+
+        const sep = `<div style="width:1px;background:rgba(255,255,255,0.2);margin:0 6px;align-self:stretch"></div>`;
+        const M = (val, lbl, highlight=false) =>
+          `<div class="estado-metric${highlight?' highlight':''}">
+            <div class="estado-metric-val">${fmtCOP(val)}</div>
+            <div class="estado-metric-lbl">${lbl}</div>
+          </div>`;
+
+        band.innerHTML = `
+          ${M(totalLiberty, 'Producción Total', true)}
+          ${sep}
+          ${M(abonoFijoVal, 'Abono Fijo')}
+        `;
+        band.style.display = 'flex';
+        band.style.flexWrap = 'wrap';
+        band.style.gap = '8px';
+        band.style.gridTemplateColumns = '';
+        return;
+      }
+
+      // ── Modo general (Todas) ──────────────────────────────────────────
       band.style.display = '';
       band.style.flexWrap = '';
       band.style.gap = '';
