@@ -61,6 +61,10 @@
       text-transform: uppercase
     }
 
+    #splash, #splash * {
+      text-transform: none
+    }
+
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px
@@ -5968,7 +5972,7 @@
       const body  = document.getElementById(`mc-body-${p.key}`);
       if (!body) return;
       const top10 = sorted.slice(0, 10);
-      const labels = top10.map(([k]) => k.length > 26 ? k.slice(0,25)+'…' : k);
+      const labels = top10.map(([k]) => { const u = k.toUpperCase(); return u.length > 26 ? u.slice(0,25)+'…' : u; });
       const vals   = top10.map(([,v]) => v.val);
       const cnts   = top10.map(([,v]) => v.cnt);
 
@@ -6031,12 +6035,12 @@
             const pct = totalVal ? (v.val/totalVal*100) : 0;
             const bar = maxVal ? (v.val/maxVal*100) : 0;
             const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="font-size:10px;color:var(--txm);font-weight:700;min-width:14px;text-align:center">${i+1}</span>`;
-            const kLabel = k.length > 28 ? k.slice(0,27)+'…' : k;
+            const kLabel = k.toUpperCase(); const kLabelTrunc = kLabel.length > 28 ? kLabel.slice(0,27)+'…' : kLabel;
             return `<div style="display:grid;grid-template-columns:20px 1fr auto;gap:6px;align-items:center">
               <div style="text-align:center;font-size:13px">${medal}</div>
               <div>
                 <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-                  <span style="font-size:10px;font-weight:600;color:var(--tx)" title="${k}">${kLabel}</span>
+                  <span style="font-size:10px;font-weight:600;color:var(--tx)" title="${k}">${kLabelTrunc}</span>
                   <span style="font-size:9px;color:var(--txm)">${v.cnt.toLocaleString()} act.</span>
                 </div>
                 <div style="height:5px;border-radius:3px;background:var(--bg);overflow:hidden">
