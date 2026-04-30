@@ -1886,8 +1886,8 @@
       align-items: center;
       gap: 0;
       animation: fadeUp .7s cubic-bezier(.34,1.56,.64,1) both;
-      max-width: 680px;
-      width: 90vw;
+      max-width: 780px;
+      width: 92vw;
     }
 
     .splash-logo-wrap {
@@ -1933,21 +1933,21 @@
     }
 
     .splash-title {
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 800;
       color: rgba(197,211,54,.9);
       letter-spacing: 3.5px;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       text-align: center;
     }
 
     .splash-headline {
-      font-size: 34px;
+      font-size: 42px;
       font-weight: 900;
       color: #fff;
       letter-spacing: -1px;
-      margin-bottom: 18px;
+      margin-bottom: 22px;
       text-align: center;
       line-height: 1.15;
     }
@@ -1957,31 +1957,31 @@
     }
 
     .splash-desc {
-      font-size: 14px;
+      font-size: 16.5px;
       color: rgba(255,255,255,.65);
       text-align: center;
-      line-height: 1.75;
-      margin-bottom: 36px;
-      max-width: 540px;
+      line-height: 1.8;
+      margin-bottom: 40px;
+      max-width: 600px;
     }
 
     .splash-sections {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
-      margin-bottom: 44px;
+      margin-bottom: 48px;
     }
 
     .splash-tag {
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding: 7px 16px;
+      gap: 8px;
+      padding: 9px 20px;
       background: rgba(255,255,255,.09);
       border: 1px solid rgba(255,255,255,.16);
       border-radius: 999px;
-      font-size: 12px;
+      font-size: 13.5px;
       font-weight: 600;
       color: rgba(255,255,255,.85);
       white-space: nowrap;
@@ -2352,14 +2352,14 @@
           onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
         <div class="splash-logo-fallback" style="display:none">Línea <em>Com.</em></div>
       </div>
-      <div class="splash-title">Dashboard Producción Compañía</div>
+      <div class="splash-headline">Dashboard Producción <span>Compañía</span></div>
       <div class="splash-desc">
         Este reporte presenta el seguimiento de las actividades y metas de producción
         para las gerencias <strong style="color:#fff">Banca</strong>, <strong style="color:#fff">Cirion</strong>
         y <strong style="color:#fff">Liberty</strong>, incluyendo cumplimiento, tendencias y análisis detallado.
       </div>
       <div class="splash-sections">
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#166534"></span>Producción vs. Meta mensual</div>
+        <div class="splash-tag"><span class="splash-tag-dot" style="background:#166534"></span>Producción vs. Meta periodo</div>
         <div class="splash-tag"><span class="splash-tag-dot" style="background:#001D62"></span>Análisis diario y acumulado</div>
         <div class="splash-tag"><span class="splash-tag-dot" style="background:#0847a3"></span>Cumplimiento por gerencia</div>
         <div class="splash-tag"><span class="splash-tag-dot" style="background:#C5D336"></span>Proyección anual</div>
@@ -3882,7 +3882,7 @@
               <div class="ch">
                 <div>
                   <div class="ct">Proyectado vs Real · Tendencia</div>
-                  <div class="cs">Meta mensual vs ejecución real</div>
+                  <div class="cs">Meta periodo vs ejecución real</div>
                 </div>
               </div>
               <div class="cw" style="height:260px"><canvas id="ch-cir-pvr"></canvas></div>
@@ -3925,7 +3925,7 @@
               <div class="ch">
                 <div>
                   <div class="ct">Proyectado vs Real</div>
-                  <div class="cs">Meta mensual vs producción real</div>
+                  <div class="cs">Meta periodo vs producción real</div>
                 </div>
               </div>
               <div class="cw" style="height:260px"><canvas id="ch-lib-pvr"></canvas></div>
@@ -3987,7 +3987,7 @@
               <div class="ch">
                 <div>
                   <div class="ct">Proyectado vs Real</div>
-                  <div class="cs">Meta mensual vs producción real</div>
+                  <div class="cs">Meta periodo vs producción real</div>
                 </div>
               </div>
               <div class="cw" style="height:250px"><canvas id="ch-ban-pvr"></canvas></div>
@@ -4592,7 +4592,7 @@
         resBand.innerHTML = `
           <div class="estado-metric"><span class="estado-metric-val">${rangeLbl}</span><span class="estado-metric-lbl">Periodo</span></div>
           <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(prodTot)}</span><span class="estado-metric-lbl">Producción</span></div>
-          <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaTot)}</span><span class="estado-metric-lbl">Meta Mensual</span></div>
+          <div class="estado-metric"><span class="estado-metric-val">${fmtCOP(metaTot)}</span><span class="estado-metric-lbl">Meta Periodo</span></div>
           <div class="estado-metric"><span class="estado-metric-val" style="color:${cump >= 95 ? '#4ade80' : cump >= 75 ? '#fbbf24' : '#f87171'}">${cump}%</span><span class="estado-metric-lbl">%Cump Periodo</span></div>
           <div class="estado-metric highlight"><span class="estado-metric-val">${fmtCOP(metaAnualTotal)}</span><span class="estado-metric-lbl">Meta Anual 2026</span></div>
           <div class="estado-metric"><span class="estado-metric-val" style="color:${cumpAcumTotal >= 95 ? '#4ade80' : cumpAcumTotal >= 75 ? '#fbbf24' : '#f87171'}">${cumpAcumTotal}%</span><span class="estado-metric-lbl">%Cump Año</span></div>`;
@@ -5840,6 +5840,8 @@
         { h: 'Proyecto',       k: 'NEGOCIOGENERAL'               },
         { h: 'Centro Costos',  k: 'CENTRO_DE_COSTOS'             },
         { h: 'Base Operativa', k: 'BASE_OPERATIVA'               },
+        { h: 'Zona',           k: 'ZONA'                         },
+        { h: 'Lugar',          k: 'LUGAR_EJECUCION'              },
         { h: 'Tipo Act.',      k: 'TIPO_ACTIVIDAD'               },
         { h: 'Fecha',          k: 'FECHA_FINALIZACION'            },
         { h: 'Coordinador',    k: 'COORDINADOR'                   },
@@ -6356,7 +6358,7 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       } else if (tab === 'proyeccion') {
         MONTHS_ISO.forEach((m, i) => {
           GERS.forEach(g => {
-            data.push({ 'Mes': MONTHS_LBL[i] + ' 2026', 'Proyecto': g, 'Meta Mensual': metaMes(g, m), 'Producción Real': prodReal(g, m), '%Cump': pct(prodReal(g, m), metaMes(g, m)), 'Variación': prodReal(g, m) - metaMes(g, m), 'Meta Acum': metaAcumYTD(g, m), 'Prod Acum': prodAcumYTD(g, m), '%Cump Acum': pct(prodAcumYTD(g, m), metaAcumYTD(g, m)) });
+            data.push({ 'Mes': MONTHS_LBL[i] + ' 2026', 'Proyecto': g, 'Meta Periodo': metaMes(g, m), 'Producción Real': prodReal(g, m), '%Cump': pct(prodReal(g, m), metaMes(g, m)), 'Variación': prodReal(g, m) - metaMes(g, m), 'Meta Acum': metaAcumYTD(g, m), 'Prod Acum': prodAcumYTD(g, m), '%Cump Acum': pct(prodAcumYTD(g, m), metaAcumYTD(g, m)) });
           });
         });
       }
