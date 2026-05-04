@@ -4369,9 +4369,21 @@
           const tendTitle = document.querySelector('#ch-res-tend')?.closest('.card')?.querySelector('.ct');
           if (tendTitle) tendTitle.textContent = 'Tendencia Mensual · ' + perms.resumenChartGerencia.charAt(0) + perms.resumenChartGerencia.slice(1).toLowerCase();
         }
-        // Ajustar el grid del resumen para que la card visible ocupe más espacio
+        // Ajustar el grid del resumen según los grids visibles
         const resGrid = document.querySelector('#tp-resumen > div[style*="grid-template-columns"]');
-        if (resGrid) {
+        const hasCirionLiberty = perms.resumenVisibleGrids.includes('res-grid-cirion') && perms.resumenVisibleGrids.includes('res-grid-liberty');
+        if (resGrid && hasCirionLiberty) {
+          // Cirion y Liberty: 2 columnas iguales, dona oculta, tendencia full-width
+          resGrid.style.gridTemplateColumns = '1fr 1fr';
+          resGrid.style.gridTemplateRows = 'auto auto';
+          resGrid.style.minHeight = 'auto';
+          // Ocultar dona
+          const donaCard = document.querySelector('#ch-res-dona')?.closest('.card');
+          if (donaCard) donaCard.style.display = 'none';
+          // Tendencia ocupa las 2 columnas
+          const tendCard = document.querySelector('#ch-res-tend')?.closest('.card');
+          if (tendCard) tendCard.style.gridColumn = 'span 2';
+        } else if (resGrid) {
           resGrid.style.gridTemplateColumns = '1fr';
           resGrid.style.gridTemplateRows = 'auto';
           resGrid.style.minHeight = 'auto';
