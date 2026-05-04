@@ -4284,7 +4284,18 @@
     const RESTRICTED_USERS = {
       'andrea.hoyos@lineacom.co': {
         allowedTabs: ['resumen', 'detalle'],
-        defaultTab: 'resumen',
+        defaultTab:  'resumen',
+        forceGerencia: 'CIRION',
+        lockGerencia: false,
+        allowedGerencias: ['CIRION', 'LIBERTY'],
+        // En Resumen: ve Cirion y Liberty, arranca en Cirion
+        resumenVisibleGrids: ['res-grid-cirion', 'res-grid-liberty'],
+        resumenHideCharts: false,
+        resumenChartGerencia: 'CIRION'  // dona y tendencia filtrados a Cirion por defecto
+      },
+      'lini.hernandez@lineacom.co': {
+        allowedTabs: ['resumen', 'detalle'],
+        defaultTab:  'resumen',
         forceGerencia: 'BANCA',
         lockGerencia: true,
         // En Resumen: dona muestra Redeban vs Wompi
@@ -4292,26 +4303,16 @@
         resumenHideCharts: false,
         resumenChartGerencia: 'BANCA'  // dona Redeban vs Wompi, tendencia filtrada a Banca
       },
-      'lini.hernandez@lineacom.co': {
-        allowedTabs: ['resumen', 'detalle'],
-        defaultTab:  'resumen',
-        forceGerencia: 'BANCA',
-        lockGerencia: true,
-        // En Resumen: solo ver estado general + card de su proyecto (dona normal)
-        resumenVisibleGrids: ['res-grid-banca'],
-        resumenHideCharts: false,
-        resumenChartGerencia: null  // dona normal de gerencias
-      },
       'eduardo.garcia@lineacom.co': {
         allowedTabs: ['resumen', 'detalle'],
         defaultTab:  'resumen',
-        forceGerencia: 'LIBERTY',
-        lockGerencia: false,
+        forceGerencia: 'CIRION',
+        lockGerencia: true,
         allowedGerencias: ['CIRION', 'LIBERTY'],
-        // En Resumen: solo ver estado general + card de su proyecto (Liberty)
-        resumenVisibleGrids: ['res-grid-liberty'],
+        // En Resumen: ve Cirion y Liberty (estilo Banca pero con sus proyectos)
+        resumenVisibleGrids: ['res-grid-cirion', 'res-grid-liberty'],
         resumenHideCharts: false,
-        resumenChartGerencia: 'LIBERTY'  // dona y tendencia filtrados a su proyecto
+        resumenChartGerencia: 'CIRION'  // dona y tendencia filtrados a Cirion
       }
     };
 
