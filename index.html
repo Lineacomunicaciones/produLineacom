@@ -3762,7 +3762,7 @@
                   </div>
                 </div>
               </div>
-              <div class="cw" style="flex:1; padding:5px 15px 15px"><canvas id="ch-res-tend"></canvas></div>
+              <div class="cw" style="flex:1; padding:5px 15px 15px; min-height:320px"><canvas id="ch-res-tend"></canvas></div>
             </div>
           </div>
         </div>
@@ -4282,25 +4282,25 @@
     ];
 
     const RESTRICTED_USERS = {
-      'lini.hernandez@lineacom.co': {
+      'andrea.hoyos@lineacom.co': {
         allowedTabs: ['resumen', 'detalle'],
         defaultTab: 'resumen',
         forceGerencia: 'BANCA',
         lockGerencia: true,
-        // En Resumen: solo ver estado general + card de su proyecto
+        // En Resumen: dona muestra Redeban vs Wompi
         resumenVisibleGrids: ['res-grid-banca'],
         resumenHideCharts: false,
-        resumenChartGerencia: 'BANCA'  // dona y tendencia filtrados a su proyecto
+        resumenChartGerencia: 'BANCA'  // dona Redeban vs Wompi, tendencia filtrada a Banca
       },
-      'andrea.hoyos@lineacom.co': {
+      'lini.hernandez@lineacom.co': {
         allowedTabs: ['resumen', 'detalle'],
         defaultTab:  'resumen',
         forceGerencia: 'BANCA',
         lockGerencia: true,
-        // En Resumen: solo ver estado general + card de su proyecto
+        // En Resumen: solo ver estado general + card de su proyecto (dona normal)
         resumenVisibleGrids: ['res-grid-banca'],
         resumenHideCharts: false,
-        resumenChartGerencia: 'BANCA'  // dona y tendencia filtrados a su proyecto
+        resumenChartGerencia: null  // dona normal de gerencias
       },
       'eduardo.garcia@lineacom.co': {
         allowedTabs: ['resumen', 'detalle'],
