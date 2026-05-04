@@ -2585,7 +2585,7 @@
         <div class="sb-sec" style="margin-top:6px">Producción</div>
         <button class="nav" id="n-detalle" onclick="gotoTab('detalle')"> <span class="ni">📋</span><span
             class="nl">Detalle</span></button>
-        <button class="nav" id="n-accesos" onclick="gotoTab('accesos')" style="display:none"> <span class="ni">👁️</span><span
+        <button class="nav" id="n-accesos" onclick="gotoTab('accesos')" style="display:none"> <span class="ni"></span><span
             class="nl">Accesos</span></button>
 
         <div class="sb-bot">Lineacom · v3.0<br><span id="sb-rows">0 registros</span></div>
@@ -5559,7 +5559,7 @@
       const cumplAcum = pct(prodAcum, metaSubAcumVal);
       return `<div style="background:${bgColor}; border-radius:8px; border:1px solid ${accentColor}22; padding:8px 10px; display:flex; flex-direction:column; gap:5px">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px">
-            <span style="font-size:10px; font-weight:800; color:${accentColor}">${emoji} ${label}</span>
+            <span style="font-size:10px; font-weight:800; color:${accentColor}">${label}</span>
             <span style="font-size:9px; font-weight:700; color:${cumplPeriodo>=100?'var(--ok)':'var(--bad)'}; font-family:'DM Mono',monospace">${cumplPeriodo}%</span>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px">
@@ -5602,13 +5602,13 @@
       const progresoAnual = pct(prodA, metaAnualVal);
       const cumplPeriodo = pct(prod, meta);
       const faltantePeriodo = Math.max(0, meta - prod);
-      const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
+      const icons = { CIRION: '', LIBERTY: '', BANCA: '' };
 
       // Sub-proyectos Banca con datos reales
       let subProyHtml = '';
       if (ger === 'BANCA') {
-        const wHtml = renderSubProyectoCard('Wompi', '💳', '#166534', 'rgba(22,101,52,.06)', isWompi, range, d1, d2, lastMonth);
-        const rHtml = renderSubProyectoCard('Redeban', '🏦', '#0847a3', 'rgba(8,71,163,.06)', isRedeban, range, d1, d2, lastMonth);
+        const wHtml = renderSubProyectoCard('Wompi', '', '#166534', 'rgba(22,101,52,.06)', isWompi, range, d1, d2, lastMonth);
+        const rHtml = renderSubProyectoCard('Redeban', '', '#0847a3', 'rgba(8,71,163,.06)', isRedeban, range, d1, d2, lastMonth);
       subProyHtml = `
           <div style="margin-top:2px; border-top:1px solid var(--border); padding-top:4px">
             <div style="font-size:8px; font-weight:800; color:var(--txl); text-transform:uppercase; letter-spacing:.6px; margin-bottom:4px">Subproyectos</div>
@@ -5624,7 +5624,6 @@
       <div class="kpi-modern" style="--hover-color:${color}; overflow:hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 100%; width: 100%">
         <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 8px 15px; display:flex; justify-content:space-between; align-items:center">
           <span class="km-title" style="font-size:14px; color:#fff">${ger}</span>
-          <span class="km-icon" style="font-size:14px">${icons[ger] || '📈'}</span>
         </div>
         <div style="padding:10px 15px; display:flex; flex-direction:column; gap:8px">
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
@@ -5676,7 +5675,7 @@
       const progresoAnual = pct(prodA, metaAnualVal);
       const cumplPeriodo = pct(prod, meta);
       const faltantePeriodo = Math.max(0, meta - prod);
-      const icons = { CIRION: '🔵', LIBERTY: '🟢', BANCA: '🏦' };
+      const icons = { CIRION: '', LIBERTY: '', BANCA: '' };
 
       const barColorPeriodo = cumplPeriodo >= 100 ? 'var(--ok)' : cumplPeriodo >= 70 ? 'var(--warn)' : 'var(--bad)';
 
@@ -5684,7 +5683,6 @@
       <div class="kpi-modern" style="--hover-color:${color}; overflow:hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.05); height: 100%; width: 100%">
         <div class="km-head" style="background:${color}; border-radius:var(--r) var(--r) 0 0; padding: 8px 15px; display:flex; justify-content:space-between; align-items:center">
           <span class="km-title" style="font-size:14px; color:#fff">${ger}</span>
-          <span class="km-icon" style="font-size:14px">${icons[ger] || '📈'}</span>
         </div>
         <div style="padding:10px 15px; display:flex; flex-direction:column; gap:8px">
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
@@ -6614,13 +6612,13 @@
     // ── Configuración de paneles por gerencia ─────────────────────────
     const METRIC_PANELS = {
       LIBERTY: [
-        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '🏢' },
+        { label: 'Base Operativa',   key: 'BASE_OPERATIVA',   icon: '' },
         { label: 'Centro de Costos', key: 'CENTRO_DE_COSTOS', icon: '💰' },
         { label: 'Tipo de Actividad',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
         { label: 'Coordinador',      key: 'COORDINADOR',      icon: '👤' },
       ],
       CIRION: [
-        { label: 'BASE OPERATIVA',   key: 'BASE_OPERATIVA',   icon: '🏢' },
+        { label: 'BASE OPERATIVA',   key: 'BASE_OPERATIVA',   icon: '' },
         { label: 'CENTRO DE COSTOS', key: 'CENTRO_DE_COSTOS', icon: '💰' },
         { label: 'TIPO DE ACTIVIDAD',key: 'TIPO_ACTIVIDAD',   icon: '🔧' },
         { label: 'COORDINADOR',      key: 'COORDINADOR',      icon: '👤' },
