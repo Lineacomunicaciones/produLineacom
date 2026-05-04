@@ -4283,7 +4283,7 @@
 
     const RESTRICTED_USERS = {
       'andrea.hoyos@lineacom.co': {
-        allowedTabs: ['resumen', 'detalle'],
+        allowedTabs: ['resumen', 'detalle', 'inventario'],
         defaultTab:  'resumen',
         forceGerencia: 'CIRION',
         lockGerencia: false,
@@ -4291,20 +4291,24 @@
         // En Resumen: ve Cirion y Liberty, arranca en Cirion
         resumenVisibleGrids: ['res-grid-cirion', 'res-grid-liberty'],
         resumenHideCharts: false,
-        resumenChartGerencia: 'CIRION'  // dona y tendencia filtrados a Cirion por defecto
+        resumenChartGerencia: 'CIRION',  // dona y tendencia filtrados a Cirion por defecto
+        inventarioLinea: 'WIPEN',        // inventario filtrado y bloqueado a WIPEN
+        inventarioGerente: 'EDUARDO'     // solo proyectos de Eduardo
       },
       'lini.hernandez@lineacom.co': {
-        allowedTabs: ['resumen', 'detalle'],
+        allowedTabs: ['resumen', 'detalle', 'inventario'],
         defaultTab:  'resumen',
         forceGerencia: 'BANCA',
         lockGerencia: true,
         // En Resumen: dona muestra Redeban vs Wompi
         resumenVisibleGrids: ['res-grid-banca'],
         resumenHideCharts: false,
-        resumenChartGerencia: 'BANCA'  // dona Redeban vs Wompi, tendencia filtrada a Banca
+        resumenChartGerencia: 'BANCA',  // dona Redeban vs Wompi, tendencia filtrada a Banca
+        inventarioLinea: 'BANCA',       // inventario filtrado y bloqueado a BANCA
+        inventarioGerente: 'LINI'       // solo proyectos de Lini
       },
       'eduardo.garcia@lineacom.co': {
-        allowedTabs: ['resumen', 'detalle'],
+        allowedTabs: ['resumen', 'detalle', 'inventario'],
         defaultTab:  'resumen',
         forceGerencia: 'CIRION',
         lockGerencia: true,
@@ -4312,7 +4316,9 @@
         // En Resumen: ve Cirion y Liberty (estilo Banca pero con sus proyectos)
         resumenVisibleGrids: ['res-grid-cirion', 'res-grid-liberty'],
         resumenHideCharts: false,
-        resumenChartGerencia: 'CIRION'  // dona y tendencia filtrados a Cirion
+        resumenChartGerencia: 'CIRION',  // dona y tendencia filtrados a Cirion
+        inventarioLinea: 'WIPEN',        // inventario filtrado y bloqueado a WIPEN
+        inventarioGerente: 'EDUARDO'     // solo proyectos de Eduardo
       }
     };
 
@@ -4438,6 +4444,30 @@
           }
           onDetGerChange();
         }
+      }
+
+      // 5. Si tiene filtro de inventario restringido, aplicar y bloquear los selects
+      if (perms.allowedTabs.includes('inventario') && (perms.inventarioLinea || perms.inventarioGerente)) {
+        // Aplicar filtros
+        const invLinea   = document.getElementById('inv-linea');
+        const invGerente = document.getElementById('inv-gerente');
+        if (invLinea && perms.inventarioLinea) {
+          invLinea.value    = perms.inventarioLinea;
+          invLinea.disabled = true;
+          invLinea.style.opacity    = '0.7';
+          invLinea.style.cursor     = 'not-allowed';
+        }
+        if (invGerente && perms.inventarioGerente) {
+          invGerente.value    = perms.inventarioGerente;
+          invGerente.disabled = true;
+          invGerente.style.opacity  = '0.7';
+          invGerente.style.cursor   = 'not-allowed';
+        }
+        // Actualizar el contador con la etiqueta correcta
+        const invLabel = perms.inventarioLinea || perms.inventarioGerente || '';
+        const countEl  = document.getElementById('inv-count');
+        if (countEl) countEl.dataset.invLabel = invLabel;
+        filterInventario();
       }
     }
 
@@ -6787,6 +6817,10 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       const gerente = document.getElementById('inv-gerente')?.value || '';
       const fuente  = document.getElementById('inv-fuente')?.value  || '';
 
+      // Filtros adicionales bloqueados por permisos de usuario
+      const forcedLinea   = (_currentUserPerms && _currentUserPerms.inventarioLinea)   ? _currentUserPerms.inventarioLinea   : '';
+      const forcedGerente = (_currentUserPerms && _currentUserPerms.inventarioGerente) ? _currentUserPerms.inventarioGerente : '';
+
       const rows = document.querySelectorAll('#tbody-inventario tr');
       let visible = 0;
       rows.forEach(tr => {
@@ -6795,27 +6829,40 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
         const dGer    = tr.dataset.gerente || '';
         const dFuente = tr.dataset.fuente  || '';
 
-        const ok = (!srch    || text.includes(srch))
-                && (!linea   || dLinea   === linea)
-                && (!gerente || dGer     === gerente)
-                && (!fuente  || dFuente.startsWith(fuente));
+        const ok = (!srch         || text.includes(srch))
+                && (!linea        || dLinea === linea)
+                && (!gerente      || dGer   === gerente)
+                && (!fuente       || dFuente.startsWith(fuente))
+                && (!forcedLinea  || dLinea === forcedLinea)
+                && (!forcedGerente|| dGer   === forcedGerente);
 
         tr.style.display = ok ? '' : 'none';
         if (ok) visible++;
       });
 
       const countEl = document.getElementById('inv-count');
-      if (countEl) countEl.textContent = `${visible} de 141 proyectos · Línea de Comunicaciones`;
+      if (countEl) {
+        const label = (_currentUserPerms && _currentUserPerms.inventarioLinea)
+          ? _currentUserPerms.inventarioLinea
+          : 'Línea de Comunicaciones';
+        countEl.textContent = `${visible} proyectos · ${label}`;
+      }
 
       const emptyEl = document.getElementById('inv-empty');
       if (emptyEl) emptyEl.style.display = visible === 0 ? 'block' : 'none';
     }
 
     function resetInventario() {
-      ['inv-search','inv-linea','inv-gerente','inv-fuente'].forEach(id => {
+      // No limpiar filtros bloqueados por permisos
+      ['inv-search', 'inv-fuente'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
+      // Solo limpiar linea/gerente si no están bloqueados
+      const invLinea   = document.getElementById('inv-linea');
+      const invGerente = document.getElementById('inv-gerente');
+      if (invLinea   && !invLinea.disabled)   invLinea.value   = '';
+      if (invGerente && !invGerente.disabled) invGerente.value = '';
       filterInventario();
     }
 
