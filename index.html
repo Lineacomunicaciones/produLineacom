@@ -171,416 +171,413 @@
     }
 
     /* ══════════════════════════════════════════════
-       LOGIN SCREEN — diseño split responsivo v2
+       LOGIN SCREEN v3 — tarjeta central + fondo hero
        ══════════════════════════════════════════════ */
     #login-screen {
       position: fixed;
       inset: 0;
-      display: grid;
-      grid-template-columns: 1fr 440px;
       z-index: 9999;
       overflow: hidden;
       transition: opacity .5s ease, visibility .5s ease;
-      background: #000d2e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #login-screen.hidden {
       opacity: 0;
       visibility: hidden;
-      pointer-events: none
+      pointer-events: none;
     }
 
-    /* ── Fondo global: gradiente + grid sutil ── */
-    #login-screen::before {
-      content: '';
+    /* Fondo: imagen de marca con capa oscura */
+    .ls-bg {
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 80% 70% at 0% 10%,  rgba(8,71,163,.55)   0%, transparent 55%),
-        radial-gradient(ellipse 60% 60% at 100% 90%, rgba(22,101,52,.35)  0%, transparent 55%),
-        radial-gradient(ellipse 50% 50% at 60% 40%,  rgba(0,29,98,.70)    0%, transparent 65%),
-        linear-gradient(160deg, #000d2e 0%, #001a55 60%, #001240 100%);
-      pointer-events: none;
+        linear-gradient(135deg,
+          #000d2e 0%,
+          #001545 30%,
+          #001D62 60%,
+          #002070 100%);
       z-index: 0;
     }
 
-    /* Grid de puntos */
-    #login-screen::after {
+    /* Grid de líneas finas */
+    .ls-bg::before {
       content: '';
       position: absolute;
       inset: 0;
       background-image:
-        radial-gradient(circle, rgba(197,211,54,.18) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-      mask-image: radial-gradient(ellipse 90% 90% at 30% 50%, black 30%, transparent 100%);
-      -webkit-mask-image: radial-gradient(ellipse 90% 90% at 30% 50%, black 30%, transparent 100%);
+        linear-gradient(rgba(197,211,54,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(197,211,54,.06) 1px, transparent 1px);
+      background-size: 64px 64px;
     }
 
-    /* ── Orbs animados ── */
-    .ls-orb1, .ls-orb2, .ls-orb3 {
+    /* Luz central tipo spotlight */
+    .ls-bg::after {
+      content: '';
       position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 0;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 70% at 50% 45%,
+        rgba(8,71,163,.55) 0%,
+        transparent 70%);
     }
 
+    /* Orbs de color */
     .ls-orb1 {
-      width: 700px; height: 700px;
-      left: -200px; top: -200px;
-      background: radial-gradient(circle, rgba(197,211,54,.07) 0%, transparent 60%);
-      animation: pulse 7s ease-in-out infinite;
+      position: absolute; z-index: 1; border-radius: 50%; pointer-events: none;
+      width: 800px; height: 800px; top: -300px; left: -200px;
+      background: radial-gradient(circle, rgba(22,101,52,.20) 0%, transparent 60%);
+      animation: pulse 8s ease-in-out infinite;
     }
 
     .ls-orb2 {
-      width: 500px; height: 500px;
-      left: 20%; bottom: -150px;
-      background: radial-gradient(circle, rgba(8,71,163,.22) 0%, transparent 60%);
-      animation: pulse 9s ease-in-out infinite 3s;
+      position: absolute; z-index: 1; border-radius: 50%; pointer-events: none;
+      width: 600px; height: 600px; bottom: -200px; right: -100px;
+      background: radial-gradient(circle, rgba(197,211,54,.10) 0%, transparent 60%);
+      animation: pulse 10s ease-in-out infinite 4s;
     }
 
     .ls-orb3 {
-      width: 300px; height: 300px;
-      right: 440px; top: 15%;
-      background: radial-gradient(circle, rgba(22,101,52,.18) 0%, transparent 65%);
-      animation: pulse 6s ease-in-out infinite 1.5s;
+      position: absolute; z-index: 1; border-radius: 50%; pointer-events: none;
+      width: 350px; height: 350px; top: 60%; left: 10%;
+      background: radial-gradient(circle, rgba(8,71,163,.30) 0%, transparent 65%);
+      animation: pulse 7s ease-in-out infinite 2s;
     }
 
-    /* ══ PANEL IZQUIERDO ══ */
-    .ls-left {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-      padding: clamp(32px, 5vw, 72px) clamp(32px, 5vw, 80px);
-      gap: 0;
-      overflow: hidden;
-    }
-
-    /* Línea divisoria vertical elegante */
-    .ls-left::after {
-      content: '';
-      position: absolute;
-      top: 10%; right: 0; bottom: 10%;
-      width: 1px;
-      background: linear-gradient(
-        to bottom,
-        transparent,
-        rgba(197,211,54,.3) 25%,
-        rgba(197,211,54,.5) 50%,
-        rgba(197,211,54,.3) 75%,
-        transparent
-      );
-    }
-
-    /* Logo */
-    .ls-logo-wrap {
-      background: rgba(255,255,255,.96);
-      border-radius: 18px;
-      padding: 18px 40px;
-      margin-bottom: 40px;
-      box-shadow: 0 16px 48px rgba(0,0,0,.35), 0 4px 12px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.8);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      animation: fadeUp .7s .05s cubic-bezier(.34,1.56,.64,1) both;
-    }
-
-    .ls-logo-wrap::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #001D62 0%, #C5D336 35%, #166534 65%, #001D62 100%);
-      background-size: 250% 100%;
-      animation: shimmer 3s linear infinite;
-    }
-
-    .ls-logo-wrap img {
-      height: 52px;
-      max-width: 220px;
-      object-fit: contain;
-      display: block;
-    }
-
-    .ls-logo-fallback {
-      font-size: 22px;
-      font-weight: 900;
-      color: #001D62;
-      letter-spacing: -1px;
-      white-space: nowrap;
-    }
-
-    .ls-logo-fallback em { color: #166534; font-style: normal; }
-
-    /* Eyebrow */
-    .ls-eyebrow {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-      animation: fadeUp .6s .12s both;
-    }
-
-    .ls-eyebrow-line {
-      width: 32px; height: 2px;
-      background: #C5D336;
-      border-radius: 2px;
-    }
-
-    .ls-eyebrow-txt {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 3.5px;
-      color: #C5D336;
-      text-transform: uppercase;
-    }
-
-    /* Titular */
-    .ls-headline {
-      font-size: clamp(28px, 3.5vw, 48px);
-      font-weight: 900;
-      color: #fff;
-      letter-spacing: -1.5px;
-      line-height: 1.1;
-      margin-bottom: 6px;
-      animation: fadeUp .6s .18s both;
-    }
-
-    .ls-headline-sub {
-      font-size: clamp(22px, 2.5vw, 36px);
-      font-weight: 900;
-      color: #C5D336;
-      letter-spacing: -1px;
-      line-height: 1.1;
-      margin-bottom: 24px;
-      animation: fadeUp .6s .22s both;
-    }
-
-    /* Descripción */
-    .ls-desc {
-      font-size: clamp(13px, 1.1vw, 15.5px);
-      color: rgba(255,255,255,.58);
-      line-height: 1.9;
-      margin-bottom: 36px;
-      max-width: 520px;
-      animation: fadeUp .6s .28s both;
-    }
-
-    .ls-desc strong { color: rgba(255,255,255,.9); font-weight: 600; }
-
-    /* Tags de módulos en grid */
-    .ls-modules {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px 16px;
-      margin-bottom: 0;
-      max-width: 520px;
-      animation: fadeUp .6s .34s both;
-    }
-
-    .ls-mod-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .ls-mod-icon {
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,.08);
-    }
-
-    .ls-mod-txt {
-      font-size: 12.5px;
-      font-weight: 600;
-      color: rgba(255,255,255,.75);
-      line-height: 1.3;
-    }
-
-    /* Badge confidencial */
-    .ls-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 36px;
-      padding: 6px 14px;
-      border: 1px solid rgba(197,211,54,.2);
-      border-radius: 999px;
-      font-size: 10.5px;
-      font-weight: 600;
-      color: rgba(197,211,54,.65);
-      letter-spacing: .5px;
-      animation: fadeUp .6s .4s both;
-    }
-
-    .ls-badge::before {
-      content: '';
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: #C5D336;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    /* ══ PANEL DERECHO (formulario) ══ */
-    .ls-right {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 28px;
-      background: rgba(0,5,20,.45);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-left: 1px solid rgba(255,255,255,.06);
-    }
-
-    /* Card del formulario */
-    .lcard {
-      background: rgba(255,255,255,.97);
-      border-radius: 24px;
-      padding: 48px 40px 40px;
-      width: 100%;
-      max-width: 360px;
+    /* ── Contenedor principal: logo encima + tarjeta abajo ── */
+    .ls-wrap {
       position: relative;
       z-index: 2;
-      animation: fadeUp .6s .1s cubic-bezier(.34,1.56,.64,1) both;
-      box-shadow:
-        0 32px 80px rgba(0,0,0,.4),
-        0 8px 24px rgba(0,0,0,.2),
-        inset 0 1px 0 rgba(255,255,255,.9);
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 1080px;
+      padding: 24px 20px;
+      gap: 32px;
     }
 
-    /* Línea superior shimmer */
-    .lcard::before {
+    /* Bloque superior: logo + eslogan */
+    .ls-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      animation: fadeUp .6s .05s both;
+    }
+
+    .ls-logo-pill {
+      background: rgba(255,255,255,.96);
+      border-radius: 16px;
+      padding: 14px 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.2);
+    }
+
+    .ls-logo-pill::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
+      top: 0; left: 0; right: 0; height: 3px;
       background: linear-gradient(90deg, #001D62 0%, #C5D336 40%, #166534 70%, #001D62 100%);
       background-size: 250% 100%;
       animation: shimmer 3s linear infinite;
     }
 
-    /* Watermark decorativo en la card */
-    .lcard::after {
-      content: '⬡';
+    .ls-logo-pill img {
+      height: 46px;
+      max-width: 200px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .ls-logo-pill .ls-logo-fb {
+      font-size: 20px;
+      font-weight: 900;
+      color: #001D62;
+      letter-spacing: -1px;
+      display: none;
+    }
+
+    .ls-logo-pill .ls-logo-fb em { color: #166534; font-style: normal; }
+
+    .ls-tagline {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: rgba(197,211,54,.8);
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* ── Tarjeta principal: dos columnas ── */
+    .ls-card {
+      background: rgba(255,255,255,.97);
+      border-radius: 28px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 920px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      box-shadow:
+        0 40px 100px rgba(0,0,0,.45),
+        0 12px 32px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.8);
+      animation: fadeUp .65s .15s cubic-bezier(.22,1,.36,1) both;
+    }
+
+    /* Franja superior shimmer */
+    .ls-card::before {
+      content: '';
       position: absolute;
-      bottom: -20px; right: -10px;
-      font-size: 120px;
-      color: rgba(0,29,98,.04);
+      top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, #001D62 0%, #C5D336 35%, #166534 65%, #001D62 100%);
+      background-size: 250% 100%;
+      animation: shimmer 3s linear infinite;
+      border-radius: 28px 28px 0 0;
+    }
+
+    /* ── Lado izquierdo: info ── */
+    .ls-info {
+      padding: 52px 48px;
+      background: #001D62;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Textura en el panel izquierdo */
+    .ls-info::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(197,211,54,.06) 1px, transparent 1px);
+      background-size: 28px 28px;
       pointer-events: none;
-      line-height: 1;
     }
 
-    /* Responsive ──────────────────────────────── */
-
-    /* Tablet landscape */
-    @media (max-width: 1024px) {
-      #login-screen { grid-template-columns: 1fr 380px; }
+    /* Acento decorativo en esquina */
+    .ls-info::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; right: -60px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      border: 1px solid rgba(197,211,54,.12);
+      pointer-events: none;
     }
 
-    /* Tablet portrait / mobile landscape */
-    @media (max-width: 768px) {
-      #login-screen {
+    .ls-info-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ls-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .ls-brand-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #C5D336;
+      animation: pulse 2.5s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .ls-brand-name {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: rgba(255,255,255,.45);
+      text-transform: uppercase;
+    }
+
+    .ls-info-title {
+      font-size: clamp(22px, 2.8vw, 32px);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .ls-info-title em {
+      color: #C5D336;
+      font-style: normal;
+    }
+
+    .ls-info-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,.5);
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+
+    .ls-info-sub strong { color: rgba(255,255,255,.85); font-weight: 600; }
+
+    /* Lista de módulos */
+    .ls-features {
+      list-style: none;
+      padding: 0; margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ls-feat {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: rgba(255,255,255,.65);
+      font-weight: 500;
+    }
+
+    .ls-feat-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Badges gerencias */
+    .ls-gers {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .ls-ger {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      border: 1px solid;
+    }
+
+    /* ── Lado derecho: formulario ── */
+    .ls-form {
+      padding: 52px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #fff;
+    }
+
+    .ls-form-eyebrow {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #001D62;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      opacity: .55;
+    }
+
+    .ls-form-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #001D62;
+      letter-spacing: -.4px;
+      margin-bottom: 8px;
+    }
+
+    .ls-form-desc {
+      font-size: 12.5px;
+      color: #718096;
+      line-height: 1.65;
+      margin-bottom: 32px;
+    }
+
+    .ls-form-desc strong { color: #2d3748; }
+
+    /* botón MS ya tiene estilos abajo (.btn-ms) */
+
+    .ls-form-footer {
+      margin-top: 28px;
+      font-size: 10.5px;
+      color: #b0bbd6;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    /* Separador decorativo en form */
+    .ls-form-sep {
+      width: 32px; height: 3px;
+      background: #C5D336;
+      border-radius: 2px;
+      margin-bottom: 28px;
+    }
+
+    /* ── Breakpoints ── */
+
+    /* Laptop pequeño */
+    @media (max-width: 860px) {
+      .ls-card { grid-template-columns: 1fr 300px; }
+      .ls-info { padding: 40px 36px; }
+      .ls-form { padding: 40px 32px; }
+    }
+
+    /* Tablet portrait y mobile landscape */
+    @media (max-width: 680px) {
+      .ls-wrap { gap: 24px; padding: 20px 16px; }
+      .ls-card {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        overflow-y: auto;
+        grid-template-rows: auto auto;
+        max-width: 420px;
+        border-radius: 22px;
       }
-      .ls-left {
-        padding: 40px 28px 32px;
-        align-items: center;
-        text-align: center;
+      .ls-info {
+        padding: 36px 32px 28px;
+        order: 1;
       }
-      .ls-left::after { display: none; }
-      .ls-logo-wrap { margin-bottom: 28px; }
-      .ls-eyebrow { justify-content: center; }
-      .ls-desc { text-align: center; }
-      .ls-modules {
-        grid-template-columns: 1fr 1fr;
-        justify-items: start;
-        width: 100%;
-        max-width: 400px;
+      .ls-info-title { font-size: 22px; }
+      .ls-features { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .ls-form {
+        padding: 32px;
+        order: 2;
       }
       .ls-orb3 { display: none; }
-      .ls-right {
-        padding: 28px 20px 48px;
-        border-left: none;
-        border-top: 1px solid rgba(255,255,255,.06);
-        background: rgba(0,5,20,.55);
-      }
-      .lcard { max-width: 400px; padding: 40px 32px 34px; }
     }
 
     /* Mobile portrait */
-    @media (max-width: 480px) {
-      .ls-left { padding: 32px 20px 24px; }
-      .ls-modules { grid-template-columns: 1fr; max-width: 260px; }
-      .ls-headline { letter-spacing: -.5px; }
-      .lcard { padding: 36px 24px 30px; border-radius: 20px; }
+    @media (max-width: 420px) {
+      .ls-logo-pill { padding: 12px 28px; }
+      .ls-logo-pill img { height: 38px; }
+      .ls-info { padding: 28px 24px 24px; }
+      .ls-form { padding: 28px 24px 36px; }
+      .ls-features { grid-template-columns: 1fr; }
+      .ls-gers { display: none; }
     }
 
-    /* ── resto del login (estilos reutilizados) ── */
+    /* ── estilos reutilizados por la card de formulario ── */
     #login { display: none; }
 
     #login.hidden {
       opacity: 0;
       visibility: hidden;
-      pointer-events: none
+      pointer-events: none;
     }
 
-    #login::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 65% 70% at 10% 20%, rgba(197, 211, 54, .16) 0%, transparent 60%), radial-gradient(ellipse 55% 60% at 90% 80%, rgba(197, 211, 54, .10) 0%, transparent 60%);
-      pointer-events: none
-    }
+    #login::before, #login::after { display: none; }
 
-    #login::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(197, 211, 54, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(197, 211, 54, .05) 1px, transparent 1px);
-      background-size: 48px 48px;
-      pointer-events: none
-    }
+    .llogo { display: none; }
 
+    .ltitle { display: none; }
 
-    .llogo {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 32px
-    }
-
-    .ltitle {
-      font-size: 21px;
-      font-weight: 800;
-      color: var(--azul);
-      margin-bottom: 5px;
-      letter-spacing: -.3px;
-      text-align: center
-    }
-
-    .ldesc {
-      font-size: 12.5px;
-      color: var(--txm);
-      margin-bottom: 32px;
-      text-align: center;
-      line-height: 1.6
-    }
+    .ldesc { display: none; }
 
     .lerr {
       background: #fff1f2;
@@ -590,7 +587,7 @@
       color: var(--bad);
       font-size: 12.5px;
       margin-bottom: 14px;
-      display: none
+      display: none;
     }
 
     .btn-ms {
@@ -600,86 +597,58 @@
       align-items: center;
       justify-content: center;
       gap: 11px;
-      background: var(--azul);
+      background: #001D62;
       color: #fff;
       border: none;
-      border-radius: var(--rs);
+      border-radius: 12px;
       font-family: 'Outfit', sans-serif;
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: all .2s;
       position: relative;
-      overflow: hidden
+      overflow: hidden;
+      letter-spacing: .1px;
     }
 
     .btn-ms::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, .1) 50%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.12) 50%, transparent 100%);
       transform: translateX(-100%);
-      transition: transform .4s
+      transition: transform .4s;
     }
 
-    .btn-ms:hover {
-      background: var(--azul2);
-      box-shadow: 0 4px 18px rgba(0, 29, 98, .4)
-    }
-
-    .btn-ms:hover::after {
-      transform: translateX(100%)
-    }
-
-    .btn-ms:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-      transform: none
-    }
+    .btn-ms:hover { background: #052c8a; box-shadow: 0 4px 20px rgba(0,29,98,.35); }
+    .btn-ms:hover::after { transform: translateX(100%); }
+    .btn-ms:disabled { opacity: .6; cursor: not-allowed; }
 
     .div-or {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #c0cce0;
-      font-size: 11.5px;
-      font-weight: 500;
-      margin: 16px 0
+      display: flex; align-items: center; gap: 10px;
+      color: #c0cce0; font-size: 11.5px; font-weight: 500; margin: 16px 0;
     }
 
-    .div-or::before,
-    .div-or::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border)
+    .div-or::before, .div-or::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
     }
 
     .btn-demo {
-      width: 100%;
-      padding: 11px;
+      width: 100%; padding: 11px;
       background: transparent;
       border: 1.5px solid var(--border);
       border-radius: var(--rs);
       color: var(--txm);
       font-family: 'Outfit', sans-serif;
-      font-size: 12.5px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all .2s
+      font-size: 12.5px; font-weight: 500;
+      cursor: pointer; transition: all .2s;
     }
 
-    .btn-demo:hover {
-      border-color: var(--lima2);
-      color: var(--tx)
-    }
+    .btn-demo:hover { border-color: var(--lima2); color: var(--tx); }
 
     .lfooter {
-      margin-top: 24px;
-      text-align: center;
-      font-size: 11px;
-      color: #c0cce0;
-      line-height: 1.7
+      margin-top: 24px; text-align: center;
+      font-size: 11px; color: #c0cce0; line-height: 1.7;
     }
 
     /* ── APP ── */
@@ -2428,109 +2397,104 @@
 
 <body>
 
-  <!-- LOGIN SCREEN — split responsivo v2 -->
+  <!-- LOGIN SCREEN v3 — tarjeta central con fondo inmersivo -->
   <div id="login-screen">
+
+    <!-- Fondo -->
+    <div class="ls-bg"></div>
     <div class="ls-orb1"></div>
     <div class="ls-orb2"></div>
     <div class="ls-orb3"></div>
 
-    <!-- ══ Panel izquierdo: identidad + info del dashboard ══ -->
-    <div class="ls-left">
+    <!-- Contenedor central -->
+    <div class="ls-wrap">
 
-      <!-- Logo -->
-      <div class="ls-logo-wrap">
-        <img src="logo.png" alt="Línea Comunicaciones"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-        <div class="ls-logo-fallback" style="display:none">Línea <em>Com.</em></div>
+      <!-- Logo encima -->
+      <div class="ls-header">
+        <div class="ls-logo-pill">
+          <img src="logo.png" alt="Línea Comunicaciones"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+          <span class="ls-logo-fb">Línea <em>Com.</em></span>
+        </div>
+        <div class="ls-tagline">Dashboard de Producción · 2026</div>
       </div>
 
-      <!-- Eyebrow -->
-      <div class="ls-eyebrow">
-        <div class="ls-eyebrow-line"></div>
-        <div class="ls-eyebrow-txt">Línea Comunicaciones · 2026</div>
-      </div>
+      <!-- Tarjeta principal -->
+      <div class="ls-card">
 
-      <!-- Titular -->
-      <div class="ls-headline">Dashboard</div>
-      <div class="ls-headline-sub">Producción Compañía</div>
+        <!-- Info izquierda -->
+        <div class="ls-info">
+          <div class="ls-info-inner">
+            <div class="ls-brand-row">
+              <div class="ls-brand-dot"></div>
+              <div class="ls-brand-name">Línea Comunicaciones</div>
+            </div>
 
-      <!-- Descripción -->
-      <div class="ls-desc">
-        Seguimiento integral de actividades y metas de producción para las gerencias
-        <strong>Banca</strong>, <strong>Cirion</strong> y <strong>Liberty</strong>.
-        Cumplimiento, tendencias y análisis detallado en tiempo real.
-      </div>
+            <div class="ls-info-title">Seguimiento<br>de <em>Producción</em></div>
+            <div class="ls-info-sub">
+              Monitoreo integral para las gerencias
+              <strong>Banca</strong>, <strong>Cirion</strong> y <strong>Liberty</strong>.
+              Datos en tiempo real, cumplimiento y proyecciones.
+            </div>
 
-      <!-- Módulos en grid -->
-      <div class="ls-modules">
-        <div class="ls-mod-item">
-          <div class="ls-mod-icon" style="background:rgba(22,101,52,.2)">📊</div>
-          <span class="ls-mod-txt">Producción vs. Meta</span>
-        </div>
-        <div class="ls-mod-item">
-          <div class="ls-mod-icon" style="background:rgba(0,29,98,.3)">📅</div>
-          <span class="ls-mod-txt">Análisis diario</span>
-        </div>
-        <div class="ls-mod-item">
-          <div class="ls-mod-icon" style="background:rgba(8,71,163,.25)">🎯</div>
-          <span class="ls-mod-txt">Cumplimiento gerencias</span>
-        </div>
-        <div class="ls-mod-item">
-          <div class="ls-mod-icon" style="background:rgba(197,211,54,.12)">📈</div>
-          <span class="ls-mod-txt">Proyección anual</span>
-        </div>
-        <div class="ls-mod-item">
-          <div class="ls-mod-icon" style="background:rgba(245,158,11,.12)">📋</div>
-          <span class="ls-mod-txt">Detalle actividades</span>
-        </div>
-        <div class="ls-mod-item">
-          <div class="ls-mod-icon" style="background:rgba(34,197,94,.12)">🗺️</div>
-          <span class="ls-mod-txt">Distribución por zonas</span>
-        </div>
-        <div class="ls-mod-item">
-          <div class="ls-mod-icon" style="background:rgba(99,102,241,.15)">🗂️</div>
-          <span class="ls-mod-txt">Inventario proyectos</span>
-        </div>
-        <div class="ls-mod-item">
-          <div class="ls-mod-icon" style="background:rgba(236,51,74,.1)">👁️</div>
-          <span class="ls-mod-txt">Registro de accesos</span>
-        </div>
-      </div>
+            <div class="ls-gers">
+              <span class="ls-ger" style="color:#86efac;border-color:rgba(134,239,172,.3);background:rgba(134,239,172,.08)">BANCA</span>
+              <span class="ls-ger" style="color:#93c5fd;border-color:rgba(147,197,253,.3);background:rgba(147,197,253,.08)">CIRION</span>
+              <span class="ls-ger" style="color:#c4b5fd;border-color:rgba(196,181,253,.3);background:rgba(196,181,253,.08)">LIBERTY</span>
+            </div>
 
-      <div class="ls-badge">● Confidencial · Solo uso interno</div>
-    </div>
+            <ul class="ls-features">
+              <li class="ls-feat">
+                <span class="ls-feat-dot" style="background:#C5D336"></span>
+                Producción vs. Meta — periodo y acumulado
+              </li>
+              <li class="ls-feat">
+                <span class="ls-feat-dot" style="background:#60a5fa"></span>
+                Análisis diario y tendencia mensual
+              </li>
+              <li class="ls-feat">
+                <span class="ls-feat-dot" style="background:#4ade80"></span>
+                Cumplimiento por gerencia y zona
+              </li>
+              <li class="ls-feat">
+                <span class="ls-feat-dot" style="background:#f59e0b"></span>
+                Proyección anual y detalle de actividades
+              </li>
+              <li class="ls-feat">
+                <span class="ls-feat-dot" style="background:#a78bfa"></span>
+                Inventario completo de proyectos
+              </li>
+            </ul>
+          </div>
+        </div>
 
-    <!-- ══ Panel derecho: formulario de acceso ══ -->
-    <div class="ls-right">
-      <div class="lcard">
-        <div class="llogo" style="margin-bottom:16px">
-          <div style="width:44px;height:44px;border-radius:10px;background:#001D62;display:flex;align-items:center;justify-content:center;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23" style="width:22px;height:22px;">
+        <!-- Formulario derecho -->
+        <div class="ls-form">
+          <div class="ls-form-eyebrow">Acceso corporativo</div>
+          <div class="ls-form-title">Bienvenido</div>
+          <div class="ls-form-sep"></div>
+          <div class="ls-form-desc">
+            Exclusivo para cuentas <strong>@lineacom.co</strong>.<br>
+            Inicia sesión con tu cuenta Microsoft corporativa.
+          </div>
+          <div class="lerr" id="login-error"></div>
+          <button class="btn-ms" id="msLoginBtn" onclick="doMicrosoftLogin()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23" style="width:20px;height:20px;flex-shrink:0;">
               <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
               <rect x="12" y="1" width="10" height="10" fill="#7fba00"/>
               <rect x="1" y="12" width="10" height="10" fill="#00a4ef"/>
               <rect x="12" y="12" width="10" height="10" fill="#ffb900"/>
             </svg>
+            Iniciar sesión con Microsoft
+          </button>
+          <div class="ls-form-footer">
+            Línea Comunicaciones · Confidencial · Solo uso interno<br>
+            <span style="opacity:.55">v3.0 · 2026</span>
           </div>
         </div>
-        <div class="ltitle">Bienvenido</div>
-        <div class="ldesc">Acceso exclusivo para cuentas <strong>@lineacom.co</strong>.<br>Inicia sesión con tu cuenta corporativa de Microsoft.</div>
-        <div class="lerr" id="login-error"></div>
-        <button class="btn-ms" id="msLoginBtn" onclick="doMicrosoftLogin()">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23" style="width:20px;height:20px;flex-shrink:0;">
-            <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
-            <rect x="12" y="1" width="10" height="10" fill="#7fba00"/>
-            <rect x="1" y="12" width="10" height="10" fill="#00a4ef"/>
-            <rect x="12" y="12" width="10" height="10" fill="#ffb900"/>
-          </svg>
-          Iniciar sesión con Microsoft
-        </button>
-        <div class="lfooter">
-          Línea Comunicaciones · Confidencial · Solo uso interno<br>
-          <span style="opacity:.6">v3.0 · 2026</span>
-        </div>
-      </div>
-    </div>
+
+      </div><!-- /ls-card -->
+    </div><!-- /ls-wrap -->
   </div>
 
   <!-- BOOT LOADER -->
