@@ -4276,12 +4276,20 @@
     // ══════════════════════════════════════════════
     // Lista blanca: acceso completo
     const FULL_ACCESS_USERS = [
-      'andrea.hoyos@lineacom.co',
+      
       'luz.molina@lineacom.co',
       'yazmin.gil@lineacom.co'
     ];
 
     const RESTRICTED_USERS = {
+      'andrea.hoyos@lineacom.co': {
+        allowedTabs: ['resumen', 'detalle'],
+        defaultTab: 'resumen',
+        forceGerencia: 'BANCA',
+        lockGerencia: true,
+        resumenVisibleGrids: ['res-grid-banca'],
+        resumenHideCharts: true
+      },
       'lini.hernandez@lineacom.co': {
         allowedTabs: ['resumen', 'detalle'],
         defaultTab:  'resumen',
