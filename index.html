@@ -61,7 +61,7 @@
       text-transform: uppercase
     }
 
-    #splash, #splash * {
+    #login-screen, #login-screen * {
       text-transform: none
     }
 
@@ -170,14 +170,13 @@
       animation-delay: .2s
     }
 
-    /* ── LOGIN ── */
+    /* ── LOGIN SCREEN (split layout) ── */
     #login-screen {
       position: fixed;
       inset: 0;
-      background: var(--azul);
+      background: linear-gradient(135deg, #001D62 0%, #012a84 60%, #0a3bb6 100%);
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: stretch;
       z-index: 9999;
       overflow: hidden;
       transition: opacity .45s, visibility .45s
@@ -189,21 +188,184 @@
       pointer-events: none
     }
 
+    /* Grid overlay global */
     #login-screen::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 65% 70% at 10% 20%, rgba(197, 211, 54, .16) 0%, transparent 60%), radial-gradient(ellipse 55% 60% at 90% 80%, rgba(197, 211, 54, .10) 0%, transparent 60%);
-      pointer-events: none
+      background-image: linear-gradient(rgba(197,211,54,.05) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(197,211,54,.05) 1px, transparent 1px);
+      background-size: 56px 56px;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    #login-screen::after {
+    /* ── Panel izquierdo (info/splash) ── */
+    .ls-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 48px;
+      position: relative;
+      z-index: 1;
+      gap: 0;
+    }
+
+    .ls-left::after {
       content: '';
       position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(197, 211, 54, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(197, 211, 54, .05) 1px, transparent 1px);
-      background-size: 48px 48px;
-      pointer-events: none
+      top: 0; right: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(197,211,54,.25) 30%, rgba(197,211,54,.25) 70%, transparent);
+    }
+
+    .ls-orb1 {
+      position: absolute;
+      width: 560px; height: 560px;
+      right: -160px; top: -160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(197,211,54,.10) 0%, transparent 65%);
+      animation: pulse 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .ls-orb2 {
+      position: absolute;
+      width: 380px; height: 380px;
+      left: -90px; bottom: -90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(8,71,163,.35) 0%, transparent 65%);
+      animation: pulse 5s ease-in-out infinite;
+      animation-delay: 2.5s;
+      pointer-events: none;
+    }
+
+    .ls-logo-wrap {
+      background: rgba(255,255,255,.97);
+      border-radius: 22px;
+      padding: 24px 44px;
+      margin-bottom: 32px;
+      box-shadow: 0 20px 56px rgba(0,0,0,.28), 0 4px 14px rgba(0,0,0,.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 220px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp .7s cubic-bezier(.34,1.56,.64,1) both;
+    }
+
+    .ls-logo-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #001D62, #C5D336, #166534, #001D62);
+      background-size: 300% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .ls-logo-wrap img {
+      height: 54px;
+      max-width: 240px;
+      object-fit: contain;
+    }
+
+    .ls-logo-fallback {
+      font-size: 24px;
+      font-weight: 900;
+      color: #001D62;
+      letter-spacing: -1px;
+    }
+
+    .ls-logo-fallback em { color: #166534; font-style: normal; }
+
+    .ls-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(197,211,54,.9);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      text-align: center;
+      animation: fadeUp .6s .1s both;
+    }
+
+    .ls-headline {
+      font-size: 34px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -.8px;
+      margin-bottom: 18px;
+      text-align: center;
+      line-height: 1.18;
+      animation: fadeUp .6s .15s both;
+    }
+
+    .ls-headline span { color: #C5D336; }
+
+    .ls-desc {
+      font-size: 14.5px;
+      color: rgba(255,255,255,.62);
+      text-align: center;
+      line-height: 1.85;
+      margin-bottom: 32px;
+      max-width: 480px;
+      animation: fadeUp .6s .2s both;
+    }
+
+    .ls-sections {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 0;
+      animation: fadeUp .6s .25s both;
+    }
+
+    .ls-tag {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,.82);
+      white-space: nowrap;
+    }
+
+    .ls-tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Panel derecho (formulario) ── */
+    .ls-right {
+      width: 420px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 36px;
+      position: relative;
+      z-index: 1;
+      background: rgba(0,8,35,.30);
+    }
+
+    @media (max-width: 820px) {
+      #login-screen { flex-direction: column; overflow-y: auto; }
+      .ls-left { padding: 40px 24px 28px; }
+      .ls-left::after { display: none; }
+      .ls-right { width: 100%; padding: 28px 20px 48px; }
+      .ls-headline { font-size: 26px; }
+      .lcard { padding: 36px 28px 30px; }
     }
 
     #login {
@@ -233,40 +395,16 @@
       pointer-events: none
     }
 
-    .login-orb {
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: pulse 5s ease-in-out infinite
-    }
-
-    .orb1 {
-      width: 480px;
-      height: 480px;
-      right: -140px;
-      top: -140px;
-      background: radial-gradient(circle, rgba(197, 211, 54, .13) 0%, transparent 70%)
-    }
-
-    .orb2 {
-      width: 320px;
-      height: 320px;
-      left: -80px;
-      bottom: -80px;
-      background: radial-gradient(circle, rgba(197, 211, 54, .08) 0%, transparent 70%);
-      animation-delay: 2.5s
-    }
-
     .lcard {
       background: rgba(255, 255, 255, .97);
       border-radius: 22px;
-      padding: 48px 44px 40px;
-      width: 440px;
-      max-width: 94vw;
+      padding: 44px 40px 36px;
+      width: 100%;
+      max-width: 360px;
       position: relative;
       z-index: 2;
       animation: fadeUp .55s cubic-bezier(.34, 1.56, .64, 1);
-      box-shadow: 0 28px 72px rgba(0, 0, 0, .28), 0 6px 20px rgba(0, 0, 0, .18);
+      box-shadow: 0 28px 72px rgba(0, 0, 0, .32), 0 6px 20px rgba(0, 0, 0, .18);
       overflow: hidden
     }
 
@@ -1848,222 +1986,6 @@
     }
 
     /* ── SPLASH SCREEN ── */
-    #splash {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(135deg, #001D62 0%, #012a84 60%, #0a3bb6 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      transition: opacity .6s ease, visibility .6s ease;
-      overflow: hidden;
-    }
-
-    #splash.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    #splash::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(rgba(197,211,54,.04) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(197,211,54,.04) 1px, transparent 1px);
-      background-size: 56px 56px;
-      pointer-events: none;
-    }
-
-    #splash::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 70% 60% at 15% 25%, rgba(197,211,54,.15) 0%, transparent 55%),
-                  radial-gradient(ellipse 50% 55% at 85% 75%, rgba(197,211,54,.09) 0%, transparent 55%);
-      pointer-events: none;
-    }
-
-    .splash-orb {
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: pulse 5s ease-in-out infinite;
-    }
-
-    .splash-orb1 {
-      width: 600px; height: 600px;
-      right: -180px; top: -180px;
-      background: radial-gradient(circle, rgba(197,211,54,.10) 0%, transparent 65%);
-    }
-
-    .splash-orb2 {
-      width: 400px; height: 400px;
-      left: -100px; bottom: -100px;
-      background: radial-gradient(circle, rgba(8,71,163,.35) 0%, transparent 65%);
-      animation-delay: 2.5s;
-    }
-
-    .splash-content {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0;
-      animation: fadeUp .7s cubic-bezier(.34,1.56,.64,1) both;
-      max-width: 780px;
-      width: 92vw;
-    }
-
-    .splash-logo-wrap {
-      background: rgba(255,255,255,.97);
-      border-radius: 28px;
-      padding: 32px 52px;
-      margin-bottom: 36px;
-      box-shadow: 0 24px 64px rgba(0,0,0,.30), 0 4px 16px rgba(0,0,0,.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 260px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .splash-logo-wrap::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #001D62, #C5D336, #166534, #001D62);
-      background-size: 300% 100%;
-      animation: shimmer 3s linear infinite;
-    }
-
-    .splash-logo-wrap img {
-      height: 64px;
-      max-width: 280px;
-      object-fit: contain;
-    }
-
-    .splash-logo-fallback {
-      font-size: 28px;
-      font-weight: 900;
-      color: #001D62;
-      letter-spacing: -1px;
-    }
-
-    .splash-logo-fallback em {
-      color: #166534;
-      font-style: normal;
-    }
-
-    .splash-title {
-      font-size: 15px;
-      font-weight: 800;
-      color: rgba(197,211,54,.9);
-      letter-spacing: 3.5px;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      text-align: center;
-    }
-
-    .splash-headline {
-      font-size: 42px;
-      font-weight: 900;
-      color: #fff;
-      letter-spacing: -1px;
-      margin-bottom: 22px;
-      text-align: center;
-      line-height: 1.15;
-    }
-
-    .splash-headline span {
-      color: #C5D336;
-    }
-
-    .splash-desc {
-      font-size: 16.5px;
-      color: rgba(255,255,255,.65);
-      text-align: center;
-      line-height: 1.8;
-      margin-bottom: 40px;
-      max-width: 600px;
-    }
-
-    .splash-sections {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 48px;
-    }
-
-    .splash-tag {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 9px 20px;
-      background: rgba(255,255,255,.09);
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 999px;
-      font-size: 13.5px;
-      font-weight: 600;
-      color: rgba(255,255,255,.85);
-      white-space: nowrap;
-    }
-
-    .splash-tag-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .splash-btn {
-      padding: 15px 44px;
-      background: #C5D336;
-      color: #001D62;
-      border: none;
-      border-radius: 14px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      letter-spacing: .3px;
-      box-shadow: 0 8px 28px rgba(197,211,54,.35);
-      transition: all .22s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .splash-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.2), transparent);
-      transform: translateX(-100%);
-      transition: transform .5s;
-    }
-
-    .splash-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 36px rgba(197,211,54,.45);
-    }
-
-    .splash-btn:hover::after { transform: translateX(100%); }
-
-    .splash-btn:active { transform: translateY(0); }
-
-    .splash-footer {
-      margin-top: 22px;
-      font-size: 10.5px;
-      color: rgba(255,255,255,.3);
-      text-align: center;
-      letter-spacing: .5px;
-    }
-
     /* ── BOOT LOADER ── */
     #boot {
       position: fixed;
@@ -2367,63 +2289,65 @@
 
 <body>
 
-  <!-- LOGIN SCREEN -->
+  <!-- LOGIN SCREEN (split: info izquierda + formulario derecha) -->
   <div id="login-screen">
-    <div class="login-orb orb1"></div>
-    <div class="login-orb orb2"></div>
-    <div class="lcard">
-      <div class="llogo" style="margin-bottom:24px">
-        <img src="logo.png" alt="Línea Comunicaciones"
-          style="height:64px;max-width:220px;object-fit:contain;filter:none;"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-        <div style="display:none;font-size:26px;font-weight:900;color:var(--azul);letter-spacing:-.5px">Línea <em>Com.</em></div>
-      </div>
-      <div class="ltitle">Dashboard Producción</div>
-      <div class="ldesc">Acceso exclusivo para cuentas <strong>@lineacom.co</strong>.<br>Inicia sesión con tu cuenta Microsoft corporativa.</div>
-      <div class="lerr" id="login-error"></div>
-      <button class="btn-ms" id="msLoginBtn" onclick="doMicrosoftLogin()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23" style="width:20px;height:20px;flex-shrink:0;">
-          <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
-          <rect x="12" y="1" width="10" height="10" fill="#7fba00"/>
-          <rect x="1" y="12" width="10" height="10" fill="#00a4ef"/>
-          <rect x="12" y="12" width="10" height="10" fill="#ffb900"/>
-        </svg>
-        Iniciar sesión con Microsoft
-      </button>
-      <div class="lfooter">
-        Línea Comunicaciones · Confidencial · Solo uso interno<br>
-        <span style="opacity:.6">v3.0 · 2026</span>
-      </div>
-    </div>
-  </div>
+    <div class="ls-orb1"></div>
+    <div class="ls-orb2"></div>
 
-  <!-- SPLASH SCREEN (post-login) -->
-  <div id="splash" class="hidden">
-    <div class="splash-orb splash-orb1"></div>
-    <div class="splash-orb splash-orb2"></div>
-    <div class="splash-content">
-      <div class="splash-logo-wrap">
+    <!-- ── Panel izquierdo: presentación del dashboard ── -->
+    <div class="ls-left">
+      <div class="ls-logo-wrap">
         <img src="logo.png" alt="Línea Comunicaciones"
           onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-        <div class="splash-logo-fallback" style="display:none">Línea <em>Com.</em></div>
+        <div class="ls-logo-fallback" style="display:none">Línea <em>Com.</em></div>
       </div>
-      <div class="splash-headline">Dashboard Producción <span>Compañía</span></div>
-      <div class="splash-desc">
-        Este reporte presenta el seguimiento de las actividades y metas de producción
-        para las gerencias <strong style="color:#fff">Banca</strong>, <strong style="color:#fff">Cirion</strong>
-        y <strong style="color:#fff">Liberty</strong>, incluyendo cumplimiento, tendencias y análisis detallado.
+      <div class="ls-title">Línea Comunicaciones</div>
+      <div class="ls-headline">Dashboard Producción <span>Compañía</span></div>
+      <div class="ls-desc">
+        Seguimiento integral de actividades y metas de producción para las gerencias
+        <strong style="color:#fff">Banca</strong>, <strong style="color:#fff">Cirion</strong>
+        y <strong style="color:#fff">Liberty</strong>. Cumplimiento, tendencias y análisis detallado en tiempo real.
       </div>
-      <div class="splash-sections">
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#166534"></span>Producción vs. Meta periodo</div>
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#001D62"></span>Análisis diario y acumulado</div>
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#0847a3"></span>Cumplimiento por gerencia</div>
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#C5D336"></span>Proyección anual</div>
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#f59e0b"></span>Detalle de actividades</div>
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#22c55e"></span>Distribución por zonas</div>
-        <div class="splash-tag"><span class="splash-tag-dot" style="background:#6366f1"></span>Inventario</div>
+      <div class="ls-sections">
+        <div class="ls-tag"><span class="ls-tag-dot" style="background:#166534"></span>Producción vs. Meta periodo</div>
+        <div class="ls-tag"><span class="ls-tag-dot" style="background:#001D62"></span>Análisis diario y acumulado</div>
+        <div class="ls-tag"><span class="ls-tag-dot" style="background:#0847a3"></span>Cumplimiento por gerencia</div>
+        <div class="ls-tag"><span class="ls-tag-dot" style="background:#C5D336"></span>Proyección anual</div>
+        <div class="ls-tag"><span class="ls-tag-dot" style="background:#f59e0b"></span>Detalle de actividades</div>
+        <div class="ls-tag"><span class="ls-tag-dot" style="background:#22c55e"></span>Distribución por zonas</div>
+        <div class="ls-tag"><span class="ls-tag-dot" style="background:#6366f1"></span>Inventario</div>
       </div>
-      <button class="splash-btn" onclick="hideSplash()">Ingresar al Dashboard →</button>
-      <div class="splash-footer">Línea Comunicaciones · Confidencial · Solo uso interno</div>
+    </div>
+
+    <!-- ── Panel derecho: formulario de acceso ── -->
+    <div class="ls-right">
+      <div class="lcard">
+        <div class="llogo" style="margin-bottom:20px">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="38" height="38" rx="10" fill="#001D62"/>
+            <rect x="8" y="8" width="9" height="9" rx="2" fill="#f25022"/>
+            <rect x="21" y="8" width="9" height="9" rx="2" fill="#7fba00"/>
+            <rect x="8" y="21" width="9" height="9" rx="2" fill="#00a4ef"/>
+            <rect x="21" y="21" width="9" height="9" rx="2" fill="#ffb900"/>
+          </svg>
+        </div>
+        <div class="ltitle">Acceso al Dashboard</div>
+        <div class="ldesc">Acceso exclusivo para cuentas <strong>@lineacom.co</strong>.<br>Inicia sesión con tu cuenta Microsoft corporativa.</div>
+        <div class="lerr" id="login-error"></div>
+        <button class="btn-ms" id="msLoginBtn" onclick="doMicrosoftLogin()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23" style="width:20px;height:20px;flex-shrink:0;">
+            <rect x="1" y="1" width="10" height="10" fill="#f25022"/>
+            <rect x="12" y="1" width="10" height="10" fill="#7fba00"/>
+            <rect x="1" y="12" width="10" height="10" fill="#00a4ef"/>
+            <rect x="12" y="12" width="10" height="10" fill="#ffb900"/>
+          </svg>
+          Iniciar sesión con Microsoft
+        </button>
+        <div class="lfooter">
+          Línea Comunicaciones · Confidencial · Solo uso interno<br>
+          <span style="opacity:.6">v3.0 · 2026</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -4314,10 +4238,8 @@
     let BANCA_ZONAS = {};
     let LIBERTY_ZONAS = {};
     let META_MES = { BANCA: {}, CIRION: {}, LIBERTY: {} };
-    // ── SPLASH ────────────────────────────────────────────────────
+    // ── SPLASH (ya integrado en login-screen, esta función queda de compatibilidad) ──
     function hideSplash() {
-      const s = document.getElementById('splash');
-      if (s) s.classList.add('hidden');
       document.getElementById('app').classList.add('on');
       initDash().then(() => {
         if (_currentUserPerms) { _applyPermissions(_currentUserPerms); }
@@ -4645,9 +4567,15 @@
         else topbarRight.appendChild(chip);
       }
 
-      // Ocultar login, mostrar splash
+      // Ocultar login, iniciar dashboard directamente
       document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('splash').classList.remove('hidden');
+      // Iniciar app directamente (splash eliminado, ya integrado en login)
+      initDash().then(() => {
+        if (_currentUserPerms) { _applyPermissions(_currentUserPerms); }
+      }).catch(() => {
+        if (_currentUserPerms) { _applyPermissions(_currentUserPerms); }
+      });
+      document.getElementById('app').classList.add('on');
 
       clearTimeout(_sessionTimer);
       _sessionTimer = setTimeout(() => { alert('⏰ Sesión expirada. Inicia sesión nuevamente.'); doLogout(); }, SESSION_DURATION);
@@ -4670,7 +4598,6 @@
         } catch(e) {}
       }
       document.getElementById('app').classList.remove('on');
-      document.getElementById('splash').classList.add('hidden');
       document.getElementById('login-screen').classList.remove('hidden');
       document.getElementById('login-error').style.display = 'none';
       const btn = document.getElementById('msLoginBtn');
