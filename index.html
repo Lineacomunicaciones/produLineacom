@@ -4274,28 +4274,44 @@
     // PERMISOS POR USUARIO
     // Usuarios con acceso restringido a secciones específicas
     // ══════════════════════════════════════════════
+    // Lista blanca: acceso completo
+    const FULL_ACCESS_USERS = [
+      'andrea.hoyos@lineacom.co',
+      'luz.molina@lineacom.co',
+      'yazmin.gil@lineacom.co'
+    ];
+
     const RESTRICTED_USERS = {
       'lini.hernandez@lineacom.co': {
-        allowedTabs: ['detalle'],
-        defaultTab:  'detalle',
+        allowedTabs: ['resumen', 'detalle'],
+        defaultTab:  'resumen',
         forceGerencia: 'BANCA',
-        lockGerencia: true
+        lockGerencia: true,
+        // En Resumen: solo ver estado general + card de su proyecto
+        resumenVisibleGrids: ['res-grid-banca'],
+        resumenHideCharts: true  // ocultar dona y tendencia global
       },
-      'andrea.hoyos@lineacom.co': {
-        allowedTabs: ['detalle'],
-        defaultTab:  'detalle',
-        forceGerencia: 'CIRION',
+      'eduardo.garcia@lineacom.co': {
+        allowedTabs: ['resumen', 'detalle'],
+        defaultTab:  'resumen',
+        forceGerencia: 'LIBERTY',
         lockGerencia: false,
-        allowedGerencias: ['CIRION', 'LIBERTY']
+        allowedGerencias: ['CIRION', 'LIBERTY'],
+        // En Resumen: solo ver estado general + card de su proyecto (Liberty)
+        resumenVisibleGrids: ['res-grid-liberty'],
+        resumenHideCharts: true  // ocultar dona y tendencia global
       }
     };
 
     function _getUserPermissions(email) {
-      return RESTRICTED_USERS[(email || '').toLowerCase()] || null;
+      const e = (email || '').toLowerCase();
+      if (FULL_ACCESS_USERS.includes(e)) return null; // acceso completo
+      if (RESTRICTED_USERS[e]) return RESTRICTED_USERS[e];
+      return 'DENIED'; // no está en ninguna lista
     }
 
     function _applyPermissions(perms) {
-      if (!perms) return; // Usuario normal: sin restricciones
+      if (!perms || perms === 'DENIED') return; // Usuario normal o ya bloqueado
 
       // 1. Ocultar tabs no permitidos en el sidebar
       const allNavBtns = document.querySelectorAll('.nav');
@@ -4308,11 +4324,41 @@
       });
       document.querySelectorAll('.sb-sec').forEach(sec => sec.style.display = 'none');
 
-      // 2. Ir al tab permitido
+      // 2. Aplicar restricciones de Resumen si corresponde
+      if (perms.allowedTabs.includes('resumen') && perms.resumenVisibleGrids) {
+        // Ocultar grids de proyectos que no le corresponden
+        ['res-grid-banca', 'res-grid-cirion', 'res-grid-liberty'].forEach(gridId => {
+          if (!perms.resumenVisibleGrids.includes(gridId)) {
+            const el = document.getElementById(gridId);
+            if (el) el.style.display = 'none';
+          }
+        });
+        // Ocultar gráficas globales (dona distribución y tendencia) si aplica
+        if (perms.resumenHideCharts) {
+          // Ocultar la card de distribución % (dona)
+          const donaCard = document.querySelector('#ch-res-dona')?.closest('.card');
+          if (donaCard) donaCard.style.display = 'none';
+          // Ocultar la card de tendencia mensual
+          const tendCard = document.querySelector('#ch-res-tend')?.closest('.card');
+          if (tendCard) tendCard.style.display = 'none';
+        }
+        // Ajustar el grid del resumen para que la card visible ocupe más espacio
+        const resGrid = document.querySelector('#tp-resumen > div[style*="grid-template-columns"]');
+        if (resGrid) {
+          resGrid.style.gridTemplateColumns = '1fr';
+          resGrid.style.gridTemplateRows = 'auto';
+          resGrid.style.minHeight = 'auto';
+        }
+        // Ocultar botón exportar del resumen (datos completos)
+        const resExportBtn = document.querySelector('#tp-resumen .btn-exp');
+        if (resExportBtn) resExportBtn.style.display = 'none';
+      }
+
+      // 3. Ir al tab por defecto
       gotoTab(perms.defaultTab);
 
-      // 3. Si tiene gerencia forzada o restringida en Detalle
-      if (perms.defaultTab === 'detalle') {
+      // 4. Si tiene gerencia forzada o restringida en Detalle
+      if (perms.allowedTabs.includes('detalle')) {
         const gerSel = document.getElementById('det-ger-sel');
         if (gerSel) {
           if (perms.allowedGerencias) {
@@ -4411,6 +4457,12 @@
 
         // Guardar permisos del usuario
         _currentUserPerms = _getUserPermissions(email);
+
+        if (_currentUserPerms === 'DENIED') {
+          await _msalInstance.logoutPopup({ account: result.account }).catch(() => {});
+          _showLoginError(`Acceso denegado. No tienes permisos para acceder a este tablero.<br><small style="opacity:0.7">Contacta al administrador.</small>`);
+          return;
+        }
 
         if (window.LoginTracker) {
           window.LoginTracker.registrar(window._msUserProfile).catch(() => {});
@@ -5090,6 +5142,22 @@
           datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
         }
       });
+
+      // Re-aplicar restricciones de resumen si el usuario tiene permisos limitados
+      if (_currentUserPerms && _currentUserPerms.resumenVisibleGrids) {
+        ['res-grid-banca', 'res-grid-cirion', 'res-grid-liberty'].forEach(function(gridId) {
+          if (!_currentUserPerms.resumenVisibleGrids.includes(gridId)) {
+            const el = document.getElementById(gridId);
+            if (el) el.style.display = 'none';
+          }
+        });
+        if (_currentUserPerms.resumenHideCharts) {
+          const donaCard = document.querySelector('#ch-res-dona') ? document.querySelector('#ch-res-dona').closest('.card') : null;
+          if (donaCard) donaCard.style.display = 'none';
+          const tendCard = document.querySelector('#ch-res-tend') ? document.querySelector('#ch-res-tend').closest('.card') : null;
+          if (tendCard) tendCard.style.display = 'none';
+        }
+      }
     }
 
     // ── Helpers sub-proyectos Banca (datos reales de proyección y RAW) ──────────
