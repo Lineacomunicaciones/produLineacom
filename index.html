@@ -255,8 +255,8 @@
       align-items: center;
       width: 100%;
       max-width: 1080px;
-      padding: 24px 20px;
-      gap: 32px;
+      padding: 32px 20px;
+      gap: 0;
     }
 
     /* Bloque superior: logo + eslogan */
@@ -321,9 +321,9 @@
       border-radius: 28px;
       overflow: hidden;
       width: 100%;
-      max-width: 920px;
+      max-width: 1020px;
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: 1fr 380px;
       box-shadow:
         0 40px 100px rgba(0,0,0,.45),
         0 12px 32px rgba(0,0,0,.25),
@@ -344,7 +344,7 @@
 
     /* ── Lado izquierdo: info ── */
     .ls-info {
-      padding: 52px 48px;
+      padding: 56px 52px;
       background: #001D62;
       display: flex;
       flex-direction: column;
@@ -404,12 +404,12 @@
     }
 
     .ls-info-title {
-      font-size: clamp(22px, 2.8vw, 32px);
+      font-size: clamp(26px, 3.2vw, 38px);
       font-weight: 900;
       color: #fff;
       letter-spacing: -1px;
       line-height: 1.15;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     .ls-info-title em {
@@ -418,7 +418,7 @@
     }
 
     .ls-info-sub {
-      font-size: 13px;
+      font-size: 15px;
       color: rgba(255,255,255,.5);
       line-height: 1.8;
       margin-bottom: 32px;
@@ -439,7 +439,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 13px;
+      font-size: 14.5px;
       color: rgba(255,255,255,.65);
       font-weight: 500;
     }
@@ -469,7 +469,7 @@
 
     /* ── Lado derecho: formulario ── */
     .ls-form {
-      padding: 52px 40px;
+      padding: 56px 44px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -477,7 +477,7 @@
     }
 
     .ls-form-eyebrow {
-      font-size: 10.5px;
+      font-size: 11.5px;
       font-weight: 700;
       letter-spacing: 2px;
       color: #001D62;
@@ -487,7 +487,7 @@
     }
 
     .ls-form-title {
-      font-size: 22px;
+      font-size: 26px;
       font-weight: 800;
       color: #001D62;
       letter-spacing: -.4px;
@@ -495,7 +495,7 @@
     }
 
     .ls-form-desc {
-      font-size: 12.5px;
+      font-size: 14px;
       color: #718096;
       line-height: 1.65;
       margin-bottom: 32px;
@@ -520,6 +520,39 @@
       border-radius: 2px;
       margin-bottom: 28px;
     }
+
+    /* ── Logo integrado en panel izquierdo ── */
+    .ls-logo-incard {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255,255,255,.95);
+      border-radius: 12px;
+      padding: 10px 28px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .ls-logo-incard::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, #001D62 0%, #C5D336 40%, #166534 70%, #001D62 100%);
+      background-size: 250% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+    .ls-logo-incard img {
+      height: 42px;
+      max-width: 200px;
+      object-fit: contain;
+      display: block;
+    }
+    .ls-logo-incard .ls-logo-fb {
+      font-size: 20px;
+      font-weight: 900;
+      color: #001D62;
+      letter-spacing: -1px;
+    }
+    .ls-logo-incard .ls-logo-fb em { color: #166534; font-style: normal; }
 
     /* ── Breakpoints ── */
 
@@ -592,7 +625,7 @@
 
     .btn-ms {
       width: 100%;
-      padding: 14px 18px;
+      padding: 16px 18px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -602,7 +635,7 @@
       border: none;
       border-radius: 12px;
       font-family: 'Outfit', sans-serif;
-      font-size: 14px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: all .2s;
@@ -2409,28 +2442,24 @@
     <!-- Contenedor central -->
     <div class="ls-wrap">
 
-      <!-- Logo encima -->
-      <div class="ls-header">
-        <div class="ls-logo-pill">
-          <img src="logo.png" alt="Línea Comunicaciones"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-          <span class="ls-logo-fb">Línea <em>Com.</em></span>
-        </div>
-        <div class="ls-tagline">Dashboard de Producción · 2026</div>
-      </div>
-
       <!-- Tarjeta principal -->
       <div class="ls-card">
 
         <!-- Info izquierda -->
         <div class="ls-info">
           <div class="ls-info-inner">
-            <div class="ls-brand-row">
+            <!-- Logo integrado en el panel -->
+            <div class="ls-logo-incard">
+              <img src="logo.png" alt="Línea Comunicaciones"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+              <span class="ls-logo-fb" style="display:none">Línea <em>Com.</em></span>
+            </div>
+            <div class="ls-brand-row" style="margin-top:22px">
               <div class="ls-brand-dot"></div>
               <div class="ls-brand-name">Línea Comunicaciones</div>
             </div>
 
-            <div class="ls-info-title">Seguimiento<br>de <em>Producción</em></div>
+            <div class="ls-info-title">Dashboard<br><em>Producción</em> Compañía</div>
             <div class="ls-info-sub">
               Monitoreo integral para las gerencias
               <strong>Banca</strong>, <strong>Cirion</strong> y <strong>Liberty</strong>.
