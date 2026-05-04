@@ -4245,7 +4245,11 @@
       const s = document.getElementById('splash');
       if (s) s.classList.add('hidden');
       document.getElementById('app').classList.add('on');
-      initDash();
+      initDash().then(() => {
+        if (_currentUserPerms) { _applyPermissions(_currentUserPerms); }
+      }).catch(() => {
+        if (_currentUserPerms) { _applyPermissions(_currentUserPerms); }
+      });
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -4265,6 +4269,58 @@
     const MS_SCOPES        = ['openid','profile','email','User.Read'];
     const ALLOWED_DOMAIN   = 'lineacom.co';
     const SESSION_DURATION = 1 * 60 * 60 * 1000; // 1 hora
+
+    // ══════════════════════════════════════════════
+    // PERMISOS POR USUARIO
+    // Usuarios con acceso restringido a secciones específicas
+    // ══════════════════════════════════════════════
+    const RESTRICTED_USERS = {
+      'andrea.hoyos@lineacom.co': {
+        allowedTabs: ['detalle'],          // Solo puede ver la pestaña Detalle
+        defaultTab:  'detalle',            // Tab inicial al entrar
+        forceGerencia: 'BANCA',            // En Detalle, solo ve Banca
+        lockGerencia: true                 // No puede cambiar la gerencia
+      }
+    };
+
+    function _getUserPermissions(email) {
+      return RESTRICTED_USERS[(email || '').toLowerCase()] || null;
+    }
+
+    function _applyPermissions(perms) {
+      if (!perms) return; // Usuario normal: sin restricciones
+
+      // 1. Ocultar tabs no permitidos en el sidebar
+      const allNavBtns = document.querySelectorAll('.nav');
+      allNavBtns.forEach(btn => {
+        const id = btn.id || ''; // e.g. "n-resumen"
+        const tabName = id.replace('n-', '');
+        if (!perms.allowedTabs.includes(tabName)) {
+          btn.style.display = 'none';
+        }
+      });
+      document.querySelectorAll('.sb-sec').forEach(sec => sec.style.display = 'none');
+
+      // 2. Ir al tab permitido
+      gotoTab(perms.defaultTab);
+
+      // 3. Si tiene gerencia forzada en Detalle
+      if (perms.forceGerencia && perms.defaultTab === 'detalle') {
+        const gerSel = document.getElementById('det-ger-sel');
+        if (gerSel) {
+          gerSel.value = perms.forceGerencia;
+          if (perms.lockGerencia) {
+            gerSel.disabled = true;
+            gerSel.style.opacity = '0.7';
+            gerSel.style.cursor = 'not-allowed';
+          }
+          onDetGerChange();
+        }
+      }
+    }
+
+    // Guardamos permisos del usuario logueado
+    let _currentUserPerms = null;
 
     let _msalInstance = null;
     let _sessionTimer = null;
@@ -4336,6 +4392,9 @@
 
         window._msUserProfile = { nombre: displayName, cargo: jobTitle, email, foto: photo };
 
+        // Guardar permisos del usuario
+        _currentUserPerms = _getUserPermissions(email);
+
         if (window.LoginTracker) {
           window.LoginTracker.registrar(window._msUserProfile).catch(() => {});
         }
@@ -4381,6 +4440,7 @@
     window.doLogout = function() {
       clearTimeout(_sessionTimer);
       window._msUserProfile = null;
+      _currentUserPerms = null;
       const chip = document.getElementById('ms-user-chip');
       if (chip) chip.remove();
       if (_msalInstance) {
@@ -4513,6 +4573,10 @@
     // ── Navigation ──────────────────────────────────────────────
     let _curTab = 'resumen';
     function gotoTab(name) {
+      // Verificar permisos: si el usuario tiene acceso restringido, bloquear tabs no permitidos
+      if (_currentUserPerms && !_currentUserPerms.allowedTabs.includes(name)) {
+        return; // Silenciosamente ignorar la navegación a tabs no permitidos
+      }
       document.querySelectorAll('.tp').forEach(p => p.classList.remove('on'));
       document.querySelectorAll('.nav').forEach(n => n.classList.remove('act'));
       const p = document.getElementById('tp-' + name); if (p) p.classList.add('on');
@@ -5856,6 +5920,11 @@
     const DET_SZ = 50;
 
     function onDetGerChange() {
+      // Si el usuario tiene gerencia bloqueada, forzar el valor correcto
+      if (_currentUserPerms && _currentUserPerms.lockGerencia && _currentUserPerms.forceGerencia) {
+        const gerSel = document.getElementById('det-ger-sel');
+        if (gerSel) gerSel.value = _currentUserPerms.forceGerencia;
+      }
       const g = document.getElementById('det-ger-sel')?.value || 'todos';
       _dGer = g; _dPage = 1;
       renderDetalleHero();
