@@ -4287,8 +4287,10 @@
         defaultTab: 'resumen',
         forceGerencia: 'BANCA',
         lockGerencia: true,
+        // En Resumen: solo ver estado general + card de su proyecto
         resumenVisibleGrids: ['res-grid-banca'],
-        resumenHideCharts: true
+        resumenHideCharts: false,
+        resumenChartGerencia: 'BANCA'  // dona y tendencia filtrados a su proyecto
       },
       'lini.hernandez@lineacom.co': {
         allowedTabs: ['resumen', 'detalle'],
@@ -4297,7 +4299,8 @@
         lockGerencia: true,
         // En Resumen: solo ver estado general + card de su proyecto
         resumenVisibleGrids: ['res-grid-banca'],
-        resumenHideCharts: true  // ocultar dona y tendencia global
+        resumenHideCharts: false,
+        resumenChartGerencia: 'BANCA'  // dona y tendencia filtrados a su proyecto
       },
       'eduardo.garcia@lineacom.co': {
         allowedTabs: ['resumen', 'detalle'],
@@ -4307,7 +4310,8 @@
         allowedGerencias: ['CIRION', 'LIBERTY'],
         // En Resumen: solo ver estado general + card de su proyecto (Liberty)
         resumenVisibleGrids: ['res-grid-liberty'],
-        resumenHideCharts: true  // ocultar dona y tendencia global
+        resumenHideCharts: false,
+        resumenChartGerencia: 'LIBERTY'  // dona y tendencia filtrados a su proyecto
       }
     };
 
@@ -4349,6 +4353,18 @@
           // Ocultar la card de tendencia mensual
           const tendCard = document.querySelector('#ch-res-tend')?.closest('.card');
           if (tendCard) tendCard.style.display = 'none';
+        }
+        // Si tiene gerencia de gráfica restringida, ocultar los pills de tendencia
+        // (los gráficos se muestran pero filtrados a su proyecto vía resumenChartGerencia)
+        if (perms.resumenChartGerencia) {
+          const trendPills = document.getElementById('res-trend-pills');
+          if (trendPills) trendPills.style.display = 'none';
+          // Actualizar título de la dona para reflejar que es de su proyecto
+          const donaTitle = document.querySelector('#ch-res-dona')?.closest('.card')?.querySelector('.ct');
+          if (donaTitle) donaTitle.textContent = 'Distribución % · ' + perms.resumenChartGerencia.charAt(0) + perms.resumenChartGerencia.slice(1).toLowerCase();
+          // Actualizar título de tendencia
+          const tendTitle = document.querySelector('#ch-res-tend')?.closest('.card')?.querySelector('.ct');
+          if (tendTitle) tendTitle.textContent = 'Tendencia Mensual · ' + perms.resumenChartGerencia.charAt(0) + perms.resumenChartGerencia.slice(1).toLowerCase();
         }
         // Ajustar el grid del resumen para que la card visible ocupe más espacio
         const resGrid = document.querySelector('#tp-resumen > div[style*="grid-template-columns"]');
@@ -4994,8 +5010,13 @@
       }
 
       // Tendencia — Siempre 12 meses, filtrable por proyecto
-      const prodM = MONTHS_ISO.map(m => prodReal(_trendGer, m));
-      const metaM = MONTHS_ISO.map(m => metaMes(_trendGer, m));
+      // Si el usuario tiene restricción de gráfica por gerencia, usar esa
+      const _chartGer = (_currentUserPerms && _currentUserPerms.resumenChartGerencia)
+        ? _currentUserPerms.resumenChartGerencia
+        : _trendGer;
+
+      const prodM = MONTHS_ISO.map(m => prodReal(_chartGer, m));
+      const metaM = MONTHS_ISO.map(m => metaMes(_chartGer, m));
       // gapM: cuánto FALTÓ (positivo = faltó, 0 = superó o igualó)
       const gapM = MONTHS_ISO.map((m, i) => Math.max(0, metaM[i] - prodM[i]));
       // excessM: cuánto SOBRÓ (positivo = superó, 0 = no llegó)
@@ -5003,7 +5024,7 @@
       // base para la barra de producción: mínimo entre prod y meta (el segmento "cumplido dentro de meta")
       const baseM = MONTHS_ISO.map((m, i) => Math.min(prodM[i], metaM[i]));
 
-      const tendColor = _trendGer === 'TODOS' ? '#001D62' : GC[_trendGer];
+      const tendColor = _chartGer === 'TODOS' ? '#001D62' : GC[_chartGer];
       const tendColorA = tendColor + 'cc';
 
       function fmtCOPShort(v) {
@@ -5138,10 +5159,13 @@
         }
       });
 
-      const donaProd = GERS.map(g => prodReal(g, range));
+      const _donaGers = (_currentUserPerms && _currentUserPerms.resumenChartGerencia)
+        ? [_currentUserPerms.resumenChartGerencia]
+        : GERS;
+      const donaProd = _donaGers.map(g => prodReal(g, range));
       mkC('ch-res-dona', 'doughnut', {
-        labels: GERS,
-        datasets: [{ data: donaProd, backgroundColor: GERS.map(g => GC[g]), borderWidth: 0, hoverOffset: 10 }]
+        labels: _donaGers,
+        datasets: [{ data: donaProd, backgroundColor: _donaGers.map(g => GC[g]), borderWidth: 0, hoverOffset: 10 }]
       }, {
         cutout: '68%',
         plugins: {
@@ -5164,6 +5188,10 @@
           if (donaCard) donaCard.style.display = 'none';
           const tendCard = document.querySelector('#ch-res-tend') ? document.querySelector('#ch-res-tend').closest('.card') : null;
           if (tendCard) tendCard.style.display = 'none';
+        }
+        if (_currentUserPerms.resumenChartGerencia) {
+          const trendPills = document.getElementById('res-trend-pills');
+          if (trendPills) trendPills.style.display = 'none';
         }
       }
     }
