@@ -4355,11 +4355,30 @@
           const tendCard = document.querySelector('#ch-res-tend')?.closest('.card');
           if (tendCard) tendCard.style.display = 'none';
         }
-        // Si tiene gerencia de gráfica restringida, ocultar los pills de tendencia
-        // (los gráficos se muestran pero filtrados a su proyecto vía resumenChartGerencia)
+        // Si tiene gerencia de gráfica restringida, ajustar pills de tendencia
         if (perms.resumenChartGerencia) {
           const trendPills = document.getElementById('res-trend-pills');
-          if (trendPills) trendPills.style.display = 'none';
+          const hasCL = perms.resumenVisibleGrids && perms.resumenVisibleGrids.includes('res-grid-cirion') && perms.resumenVisibleGrids.includes('res-grid-liberty');
+          if (trendPills) {
+            if (hasCL) {
+              // Mostrar solo pills de Cirion y Liberty, ocultar Consolidado y Banca
+              trendPills.style.display = '';
+              Array.from(trendPills.querySelectorAll('.pill')).forEach(btn => {
+                const txt = btn.textContent.trim().toUpperCase();
+                if (txt === 'CIRION' || txt === 'LIBERTY') {
+                  btn.style.display = '';
+                } else {
+                  btn.style.display = 'none';
+                }
+              });
+              // Activar Cirion por defecto
+              Array.from(trendPills.querySelectorAll('.pill')).forEach(btn => btn.classList.remove('on'));
+              const cirionBtn = Array.from(trendPills.querySelectorAll('.pill')).find(b => b.textContent.trim().toUpperCase() === 'CIRION');
+              if (cirionBtn) cirionBtn.classList.add('on');
+            } else {
+              trendPills.style.display = 'none';
+            }
+          }
           // Actualizar título de la dona para reflejar que es de su proyecto
           const donaTitle = document.querySelector('#ch-res-dona')?.closest('.card')?.querySelector('.ct');
           if (donaTitle) donaTitle.textContent = perms.resumenChartGerencia === 'BANCA'
