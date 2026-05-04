@@ -4275,11 +4275,18 @@
     // Usuarios con acceso restringido a secciones específicas
     // ══════════════════════════════════════════════
     const RESTRICTED_USERS = {
+      'lini.hernandez@lineacom.co': {
+        allowedTabs: ['detalle'],
+        defaultTab:  'detalle',
+        forceGerencia: 'BANCA',
+        lockGerencia: true
+      },
       'andrea.hoyos@lineacom.co': {
-        allowedTabs: ['detalle'],          // Solo puede ver la pestaña Detalle
-        defaultTab:  'detalle',            // Tab inicial al entrar
-        forceGerencia: 'BANCA',            // En Detalle, solo ve Banca
-        lockGerencia: true                 // No puede cambiar la gerencia
+        allowedTabs: ['detalle'],
+        defaultTab:  'detalle',
+        forceGerencia: 'CIRION',
+        lockGerencia: false,
+        allowedGerencias: ['CIRION', 'LIBERTY']
       }
     };
 
@@ -4304,11 +4311,21 @@
       // 2. Ir al tab permitido
       gotoTab(perms.defaultTab);
 
-      // 3. Si tiene gerencia forzada en Detalle
-      if (perms.forceGerencia && perms.defaultTab === 'detalle') {
+      // 3. Si tiene gerencia forzada o restringida en Detalle
+      if (perms.defaultTab === 'detalle') {
         const gerSel = document.getElementById('det-ger-sel');
         if (gerSel) {
-          gerSel.value = perms.forceGerencia;
+          if (perms.allowedGerencias) {
+            Array.from(gerSel.options).forEach(opt => {
+              if (opt.value && !perms.allowedGerencias.includes(opt.value)) {
+                opt.style.display = 'none';
+                opt.disabled = true;
+              }
+            });
+          }
+          if (perms.forceGerencia) {
+            gerSel.value = perms.forceGerencia;
+          }
           if (perms.lockGerencia) {
             gerSel.disabled = true;
             gerSel.style.opacity = '0.7';
