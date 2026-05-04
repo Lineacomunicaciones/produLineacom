@@ -4371,7 +4371,8 @@
                   btn.style.display = 'none';
                 }
               });
-              // Activar Cirion por defecto
+              // Activar Cirion por defecto y sincronizar _trendGer
+              _trendGer = 'CIRION';
               Array.from(trendPills.querySelectorAll('.pill')).forEach(btn => btn.classList.remove('on'));
               const cirionBtn = Array.from(trendPills.querySelectorAll('.pill')).find(b => b.textContent.trim().toUpperCase() === 'CIRION');
               if (cirionBtn) cirionBtn.classList.add('on');
@@ -5044,9 +5045,14 @@
       }
 
       // Tendencia — Siempre 12 meses, filtrable por proyecto
-      // Si el usuario tiene restricción de gráfica por gerencia, usar esa
+      // Andrea / Eduardo tienen acceso a Cirion Y Liberty: respetar la pill activa (_trendGer).
+      // Usuarios restringidos a una sola gerencia: usar siempre su gerencia fija.
+      const _hasCLAccess = _currentUserPerms &&
+                           _currentUserPerms.resumenVisibleGrids &&
+                           _currentUserPerms.resumenVisibleGrids.includes('res-grid-cirion') &&
+                           _currentUserPerms.resumenVisibleGrids.includes('res-grid-liberty');
       const _chartGer = (_currentUserPerms && _currentUserPerms.resumenChartGerencia)
-        ? _currentUserPerms.resumenChartGerencia
+        ? (_hasCLAccess && ['CIRION','LIBERTY'].includes(_trendGer) ? _trendGer : _currentUserPerms.resumenChartGerencia)
         : _trendGer;
 
       const prodM = MONTHS_ISO.map(m => prodReal(_chartGer, m));
@@ -5060,6 +5066,14 @@
 
       const tendColor = _chartGer === 'TODOS' ? '#001D62' : GC[_chartGer];
       const tendColorA = tendColor + 'cc';
+
+      // Actualizar título de tendencia dinámicamente (especialmente para Andrea/Eduardo al cambiar pill)
+      const tendTitle = document.querySelector('#ch-res-tend')?.closest('.card')?.querySelector('.ct');
+      if (tendTitle) {
+        if (_currentUserPerms && _hasCLAccess) {
+          tendTitle.textContent = 'Tendencia Mensual · ' + _chartGer.charAt(0) + _chartGer.slice(1).toLowerCase();
+        }
+      }
 
       function fmtCOPShort(v) {
         if (!v) return '$0';
@@ -5242,7 +5256,28 @@
         }
         if (_currentUserPerms.resumenChartGerencia) {
           const trendPills = document.getElementById('res-trend-pills');
-          if (trendPills) trendPills.style.display = 'none';
+          const hasCL = _currentUserPerms.resumenVisibleGrids &&
+                        _currentUserPerms.resumenVisibleGrids.includes('res-grid-cirion') &&
+                        _currentUserPerms.resumenVisibleGrids.includes('res-grid-liberty');
+          if (trendPills) {
+            if (hasCL) {
+              // Andrea y Eduardo: mostrar pills de Cirion y Liberty solamente
+              trendPills.style.display = '';
+              Array.from(trendPills.querySelectorAll('.pill')).forEach(btn => {
+                const txt = btn.textContent.trim().toUpperCase();
+                btn.style.display = (txt === 'CIRION' || txt === 'LIBERTY') ? '' : 'none';
+              });
+              // Asegurarse de que la pill activa corresponda a la gerencia actual del chart
+              Array.from(trendPills.querySelectorAll('.pill')).forEach(btn => btn.classList.remove('on'));
+              const activeBtn = Array.from(trendPills.querySelectorAll('.pill')).find(b => b.textContent.trim().toUpperCase() === _trendGer.toUpperCase());
+              const fallback  = Array.from(trendPills.querySelectorAll('.pill')).find(b => b.textContent.trim().toUpperCase() === 'CIRION');
+              if (activeBtn) activeBtn.classList.add('on');
+              else if (fallback) fallback.classList.add('on');
+            } else {
+              // Otros usuarios restringidos a una sola gerencia: ocultar las pills
+              trendPills.style.display = 'none';
+            }
+          }
         }
       }
     }
