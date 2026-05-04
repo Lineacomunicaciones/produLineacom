@@ -4361,7 +4361,9 @@
           if (trendPills) trendPills.style.display = 'none';
           // Actualizar título de la dona para reflejar que es de su proyecto
           const donaTitle = document.querySelector('#ch-res-dona')?.closest('.card')?.querySelector('.ct');
-          if (donaTitle) donaTitle.textContent = 'Distribución % · ' + perms.resumenChartGerencia.charAt(0) + perms.resumenChartGerencia.slice(1).toLowerCase();
+          if (donaTitle) donaTitle.textContent = perms.resumenChartGerencia === 'BANCA'
+            ? 'Distribución % · Redeban vs Wompi'
+            : 'Distribución % · ' + perms.resumenChartGerencia.charAt(0) + perms.resumenChartGerencia.slice(1).toLowerCase();
           // Actualizar título de tendencia
           const tendTitle = document.querySelector('#ch-res-tend')?.closest('.card')?.querySelector('.ct');
           if (tendTitle) tendTitle.textContent = 'Tendencia Mensual · ' + perms.resumenChartGerencia.charAt(0) + perms.resumenChartGerencia.slice(1).toLowerCase();
@@ -5159,21 +5161,38 @@
         }
       });
 
-      const _donaGers = (_currentUserPerms && _currentUserPerms.resumenChartGerencia)
-        ? [_currentUserPerms.resumenChartGerencia]
-        : GERS;
-      const donaProd = _donaGers.map(g => prodReal(g, range));
-      mkC('ch-res-dona', 'doughnut', {
-        labels: _donaGers,
-        datasets: [{ data: donaProd, backgroundColor: _donaGers.map(g => GC[g]), borderWidth: 0, hoverOffset: 10 }]
-      }, {
-        cutout: '68%',
-        plugins: {
-          ...CT.plugins,
-          legend: { ...CT.plugins.legend, position: 'bottom' },
-          datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
-        }
-      });
+      // Dona: si el usuario tiene resumenChartGerencia === 'BANCA', mostrar Redeban vs Wompi
+      if (_currentUserPerms && _currentUserPerms.resumenChartGerencia === 'BANCA') {
+        const redebanProd = prodSubReal(isRedeban, range, null, null);
+        const wompiProd   = prodSubReal(isWompi,   range, null, null);
+        mkC('ch-res-dona', 'doughnut', {
+          labels: ['Redeban', 'Wompi'],
+          datasets: [{ data: [redebanProd, wompiProd], backgroundColor: ['#0847a3', '#166534'], borderWidth: 0, hoverOffset: 10 }]
+        }, {
+          cutout: '68%',
+          plugins: {
+            ...CT.plugins,
+            legend: { ...CT.plugins.legend, position: 'bottom' },
+            datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
+          }
+        });
+      } else {
+        const _donaGers = (_currentUserPerms && _currentUserPerms.resumenChartGerencia)
+          ? [_currentUserPerms.resumenChartGerencia]
+          : GERS;
+        const donaProd = _donaGers.map(g => prodReal(g, range));
+        mkC('ch-res-dona', 'doughnut', {
+          labels: _donaGers,
+          datasets: [{ data: donaProd, backgroundColor: _donaGers.map(g => GC[g]), borderWidth: 0, hoverOffset: 10 }]
+        }, {
+          cutout: '68%',
+          plugins: {
+            ...CT.plugins,
+            legend: { ...CT.plugins.legend, position: 'bottom' },
+            datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
+          }
+        });
+      }
 
       // Re-aplicar restricciones de resumen si el usuario tiene permisos limitados
       if (_currentUserPerms && _currentUserPerms.resumenVisibleGrids) {
