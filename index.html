@@ -4447,8 +4447,6 @@
     // Lista blanca: acceso completo
     const FULL_ACCESS_USERS = [
       'andrea.hoyos@lineacom.co',
-      'luz.molina@lineacom.co',
-      'yazmin.gil@lineacom.co',
       'sebastian.gomez@lineacom.co',
       'luis.rincon@lineacom.co',
       'mayer.zapata@lineacom.co',
@@ -4457,6 +4455,18 @@
 
     const RESTRICTED_USERS = {
       
+      'luz.molina@lineacom.co': {
+        allowedTabs: ['resumen', 'detalle', 'inventario'],
+        defaultTab:  'resumen',
+        forceGerencia: 'BANCA',
+        lockGerencia: true,
+        // En Resumen: dona muestra Redeban vs Wompi
+        resumenVisibleGrids: ['res-grid-banca'],
+        resumenHideCharts: false,
+        resumenChartGerencia: 'BANCA',  // dona Redeban vs Wompi, tendencia filtrada a Banca
+        inventarioLinea: 'BANCA',       // inventario filtrado y bloqueado a BANCA
+        inventarioGerente: 'LINI'       // solo proyectos de Lini
+      },
       'lini.hernandez@lineacom.co': {
         allowedTabs: ['resumen', 'detalle', 'inventario'],
         defaultTab:  'resumen',
@@ -4470,6 +4480,19 @@
         inventarioGerente: 'LINI'       // solo proyectos de Lini
       },
       'eduardo.garcia@lineacom.co': {
+        allowedTabs: ['resumen', 'detalle', 'inventario'],
+        defaultTab:  'resumen',
+        forceGerencia: 'CIRION',
+        lockGerencia: true,
+        allowedGerencias: ['CIRION', 'LIBERTY'],
+        // En Resumen: ve Cirion y Liberty (estilo Banca pero con sus proyectos)
+        resumenVisibleGrids: ['res-grid-cirion', 'res-grid-liberty'],
+        resumenHideCharts: false,
+        resumenChartGerencia: 'CIRION',  // dona y tendencia filtrados a Cirion
+        inventarioLinea: 'WIPEN',        // inventario filtrado y bloqueado a WIPEN
+        inventarioGerente: 'EDUARDO'     // solo proyectos de Eduardo
+      },
+      'yazmin.gil@lineacom.co': {
         allowedTabs: ['resumen', 'detalle', 'inventario'],
         defaultTab:  'resumen',
         forceGerencia: 'CIRION',
