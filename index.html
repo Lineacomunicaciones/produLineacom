@@ -7491,7 +7491,6 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       const countEl = document.getElementById('acc-count');
       if (countEl) countEl.textContent = `${registros.length} ingreso${registros.length !== 1 ? 's' : ''}`;
 
-      const tbody = document.getElementById('tbody-accesos');
       if (!tbody) return;
 
       if (!registros.length) {
