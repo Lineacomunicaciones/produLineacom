@@ -3940,7 +3940,7 @@
             <!-- Row 2: Distribution Chart (Col 1) and Trend Graph (Col 2-3) -->
             <div class="card fu fu4" style="display:flex; flex-direction:column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding:10px 14px">
-                <div class="ct" style="font-size:13px">Distribución %</div>
+                <div class="ct" style="font-size:13px">Distribución % · Redeban · Wompi · Cirion · Liberty</div>
               </div>
               <div class="cw" style="flex:1; padding:0 15px 15px; display:flex; align-items:center; justify-content:center">
                 <canvas id="ch-res-dona" style="max-height: 250px"></canvas>
@@ -5559,21 +5559,38 @@
           }
         });
       } else {
-        const _donaGers = (_currentUserPerms && _currentUserPerms.resumenChartGerencia)
-          ? [_currentUserPerms.resumenChartGerencia]
-          : GERS;
-        const donaProd = _donaGers.map(g => prodReal(g, range));
-        mkC('ch-res-dona', 'doughnut', {
-          labels: _donaGers,
-          datasets: [{ data: donaProd, backgroundColor: _donaGers.map(g => GC[g]), borderWidth: 0, hoverOffset: 10 }]
-        }, {
-          cutout: '68%',
-          plugins: {
-            ...CT.plugins,
-            legend: { ...CT.plugins.legend, position: 'bottom' },
-            datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
-          }
-        });
+        // Admin / sin restricción: desglosar Banca en Redeban + Wompi, más Cirion y Liberty
+        const _singleGer = _currentUserPerms && _currentUserPerms.resumenChartGerencia;
+        if (_singleGer && _singleGer !== 'BANCA') {
+          const donaProd = [prodReal(_singleGer, range)];
+          mkC('ch-res-dona', 'doughnut', {
+            labels: [_singleGer],
+            datasets: [{ data: donaProd, backgroundColor: [GC[_singleGer]], borderWidth: 0, hoverOffset: 10 }]
+          }, {
+            cutout: '68%',
+            plugins: {
+              ...CT.plugins,
+              legend: { ...CT.plugins.legend, position: 'bottom' },
+              datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
+            }
+          });
+        } else {
+          const redebanProd = prodSubReal(isRedeban, range, null, null);
+          const wompiProd   = prodSubReal(isWompi,   range, null, null);
+          const cirionProd  = prodReal('CIRION',  range);
+          const libertyProd = prodReal('LIBERTY', range);
+          mkC('ch-res-dona', 'doughnut', {
+            labels: ['Redeban', 'Wompi', 'Cirion', 'Liberty'],
+            datasets: [{ data: [redebanProd, wompiProd, cirionProd, libertyProd], backgroundColor: ['#0847a3', '#166534', '#001D62', '#4472c4'], borderWidth: 0, hoverOffset: 10 }]
+          }, {
+            cutout: '68%',
+            plugins: {
+              ...CT.plugins,
+              legend: { ...CT.plugins.legend, position: 'bottom' },
+              datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return (t && v > 0) ? ((v / t) * 100).toFixed(1) + '%' : ''; } }
+            }
+          });
+        }
       }
 
       // Re-aplicar restricciones de resumen si el usuario tiene permisos limitados
