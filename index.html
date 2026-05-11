@@ -2583,6 +2583,10 @@
             class="nl">Análisis Diario</span></button>
 
         <div class="sb-sec" style="margin-top:6px">Producción</div>
+        <button class="nav" id="n-wompi" onclick="gotoTab('wompi')"> <span class="ni">💳</span><span
+            class="nl">Wompi</span></button>
+        <button class="nav" id="n-wompi-log" onclick="gotoTab('wompi-log')"> <span class="ni">🚚</span><span
+            class="nl">Wompi Logística</span></button>
         <button class="nav" id="n-detalle" onclick="gotoTab('detalle')"> <span class="ni">📋</span><span
             class="nl">Detalle</span></button>
         <button class="nav" id="n-accesos" onclick="gotoTab('accesos')" style="display:none"> <span class="ni">🔐</span><span
@@ -4127,71 +4131,98 @@
         </div>
 
         <!-- ═══ BANCA ═══ -->
-        <div id="tp-banca" class="tp">
+        <!-- ═══ WOMPI ═══ -->
+        <div id="tp-wompi" class="tp">
           <div class="ph fu">
             <div>
-              <div class="pt" style="color:#166534">Banca Seguros</div>
-              <div class="ps">Redeban CB · Redeban POS · Redes · Zonas</div>
+              <div class="pt" style="color:#166534">Wompi</div>
+              <div class="ps">CB · Venta Presente · Rollos (excluye Logística)</div>
             </div>
             <div class="pa">
               <div class="f-group">
                 <label>Desde</label>
-                <input type="date" id="ban-d1" class="f-sel" value="2026-04-01" onchange="renderBanca()">
+                <input type="date" id="wom-d1" class="f-sel" value="2026-04-01" onchange="renderWompi()">
               </div>
               <div class="f-group">
                 <label>Hasta</label>
-                <input type="date" id="ban-d2" class="f-sel" value="2026-04-30" onchange="renderBanca()">
+                <input type="date" id="wom-d2" class="f-sel" value="2026-04-30" onchange="renderWompi()">
               </div>
-              <button class="btn-exp" onclick="exportTab('banca')">📊 Exportar</button>
+              <button class="btn-exp" onclick="exportTab('wompi')">📊 Exportar</button>
             </div>
           </div>
-          <div class="sband fu fu1" id="ban-band" style="background:linear-gradient(135deg,#166534,#22c55e)"></div>
-          <div class="slbl fu fu2">KPIs Banca</div>
-          <div class="kg fu fu2" id="ban-kpis"></div>
+          <div class="sband fu fu1" id="wom-band" style="background:linear-gradient(135deg,#166534,#22c55e)"></div>
+          <div class="slbl fu fu2">KPIs Wompi</div>
+          <div class="kg fu fu2" id="wom-kpis"></div>
           <div class="g3 fu fu3">
             <div class="card">
-              <div class="ch">
-                <div>
-                  <div class="ct">Estado Actividades Banca</div>
-                </div>
-              </div>
-              <div class="cw" style="height:250px"><canvas id="ch-ban-estado"></canvas></div>
+              <div class="ch"><div><div class="ct">Estado Actividades Wompi</div></div></div>
+              <div class="cw" style="height:250px"><canvas id="ch-wom-estado"></canvas></div>
             </div>
             <div class="card">
-              <div class="ch">
-                <div>
-                  <div class="ct">Proyectado vs Real</div>
-                  <div class="cs">Meta periodo vs producción real</div>
-                </div>
-              </div>
-              <div class="cw" style="height:250px"><canvas id="ch-ban-pvr"></canvas></div>
+              <div class="ch"><div><div class="ct">Proyectado vs Real · Wompi</div><div class="cs">Meta periodo vs producción real</div></div></div>
+              <div class="cw" style="height:250px"><canvas id="ch-wom-pvr"></canvas></div>
             </div>
             <div class="card">
-              <div class="ch">
-                <div>
-                  <div class="ct">Tipo de Red</div>
-                </div>
-              </div>
-              <div class="cw" style="height:250px"><canvas id="ch-ban-red"></canvas></div>
+              <div class="ch"><div><div class="ct">Tipo de Negocio · Wompi</div></div></div>
+              <div class="cw" style="height:250px"><canvas id="ch-wom-neg"></canvas></div>
             </div>
           </div>
           <div class="g2 fu fu4">
             <div class="card">
-              <div class="ch">
-                <div>
-                  <div class="ct">Top Zonas Banca</div>
-                  <div class="cs">Por valor proyectado anual</div>
-                </div>
-              </div>
-              <div class="cw" style="height:260px"><canvas id="ch-ban-zona"></canvas></div>
+              <div class="ch"><div><div class="ct">Top Zonas Wompi</div><div class="cs">Por actividades</div></div></div>
+              <div class="cw" style="height:260px"><canvas id="ch-wom-zona"></canvas></div>
             </div>
             <div class="card">
-              <div class="ch">
-                <div>
-                  <div class="ct">Forma de Atención</div>
-                </div>
+              <div class="ch"><div><div class="ct">Forma de Atención · Wompi</div></div></div>
+              <div class="cw" style="height:260px"><canvas id="ch-wom-forma"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ WOMPI LOGÍSTICA ═══ -->
+        <div id="tp-wompi-log" class="tp">
+          <div class="ph fu">
+            <div>
+              <div class="pt" style="color:#9d174d">Wompi Logística</div>
+              <div class="ps">Actividades con TIPO_ACTIVIDAD = ROLLOS TRIM</div>
+            </div>
+            <div class="pa">
+              <div class="f-group">
+                <label>Desde</label>
+                <input type="date" id="wlog-d1" class="f-sel" value="2026-04-01" onchange="renderWompiLog()">
               </div>
-              <div class="cw" style="height:260px"><canvas id="ch-ban-forma"></canvas></div>
+              <div class="f-group">
+                <label>Hasta</label>
+                <input type="date" id="wlog-d2" class="f-sel" value="2026-04-30" onchange="renderWompiLog()">
+              </div>
+              <button class="btn-exp" onclick="exportTab('wompi-log')">📊 Exportar</button>
+            </div>
+          </div>
+          <div class="sband fu fu1" id="wlog-band" style="background:linear-gradient(135deg,#9d174d,#ec4899)"></div>
+          <div class="slbl fu fu2">KPIs Wompi Logística</div>
+          <div class="kg fu fu2" id="wlog-kpis"></div>
+          <div class="g3 fu fu3">
+            <div class="card">
+              <div class="ch"><div><div class="ct">Estado Actividades · Logística</div></div></div>
+              <div class="cw" style="height:250px"><canvas id="ch-wlog-estado"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch"><div><div class="ct">Tendencia Mensual · Logística</div><div class="cs">Actividades por mes</div></div></div>
+              <div class="cw" style="height:250px"><canvas id="ch-wlog-tend"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch"><div><div class="ct">Tipo de Negocio · Logística</div></div></div>
+              <div class="cw" style="height:250px"><canvas id="ch-wlog-neg"></canvas></div>
+            </div>
+          </div>
+          <div class="g2 fu fu4">
+            <div class="card">
+              <div class="ch"><div><div class="ct">Top Zonas · Logística</div></div></div>
+              <div class="cw" style="height:260px"><canvas id="ch-wlog-zona"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="ch"><div><div class="ct">Forma de Atención · Logística</div></div></div>
+              <div class="cw" style="height:260px"><canvas id="ch-wlog-forma"></canvas></div>
             </div>
           </div>
         </div>
@@ -4946,7 +4977,8 @@
       if (name === 'zonas') renderZonas();
       if (name === 'cirion') renderCirion();
       if (name === 'liberty') renderLiberty();
-      if (name === 'banca') renderBanca();
+      if (name === 'wompi') renderWompi();
+      if (name === 'wompi-log') renderWompiLog();
       if (name === 'detalle') { renderDetalleHero(); renderDetalle(); }
       if (name === 'accesos') renderAccesos();
     }
@@ -6265,6 +6297,159 @@
     // ══════════════════════════════════════════════
     // BANCA
     // ══════════════════════════════════════════════
+    // ── Helper: Wompi Logística = TIPO_ACTIVIDAD contiene "ROLLOS TRIM" ──
+    function _isRollosTrim(r) {
+      return /ROLLOS[\s_]*TRIM/i.test(String(r.TIPO_ACTIVIDAD || ''));
+    }
+
+    // ══════════════════════════════════════════════
+    // WOMPI (excluye Logística = ROLLOS TRIM)
+    // ══════════════════════════════════════════════
+    function renderWompi() {
+      const range = getRange('wom-d1', 'wom-d2');
+      const { d1, d2 } = getRangeDates('wom-d1', 'wom-d2');
+      const rows = RAW.filter(r => {
+        if (r.GERENCIA !== 'BANCA') return false;
+        if (!isWompi(r)) return false;
+        if (_isRollosTrim(r)) return false;   // excluir logística
+        const f = r.FECHA_FINALIZACION || '';
+        if (d1 && f < d1) return false;
+        if (d2 && f > d2) return false;
+        return true;
+      });
+
+      const fin = rows.filter(r => (r.ESTADO_ACTIVIDAD || '').toUpperCase().includes('FINAL')).length;
+      const vt  = sumBy(rows, 'VALOR_TOTAL');
+      const prod = prodSubReal(r => isWompi(r) && !_isRollosTrim(r), range, d1, d2);
+      const meta = metaSubMes(r => isWompi(r) && !_isRollosTrim(r), range);
+      const cp   = pct(prod, meta);
+
+      document.getElementById('wom-band').innerHTML = `
+    <div class="si"><span class="sn">${rows.length.toLocaleString()}</span><span class="sl">Actividades Wompi</span></div>
+    <div class="si"><span class="sn lima">${Math.round(fin / (rows.length || 1) * 100)}%</span><span class="sl">Finalizadas</span></div>
+    <div class="si"><span class="sn">${fmtCOP(vt)}</span><span class="sl">Producción real</span></div>
+    <div class="si"><span class="sn">${fmtCOP(meta)}</span><span class="sl">Meta Periodo</span></div>
+    <div class="si"><span class="sn" style="color:${cp >= 95 ? 'var(--ok)' : cp >= 75 ? 'var(--warn)' : 'var(--bad)'}">${cp}%</span><span class="sl">%Cump Periodo</span></div>`;
+
+      // Sub-breakdown: CB / Venta Presente / Rollos (sin logística)
+      const wFilters = [
+        { lbl: 'CB',             rows: rows.filter(r => /CB/i.test(r.TIPO_NEGOCIO || '') && !/PRES/i.test(r.TIPO_NEGOCIO || '')) },
+        { lbl: 'Venta Presente', rows: rows.filter(r => /PRES/i.test(r.TIPO_NEGOCIO || '')) },
+        { lbl: 'Rollos',         rows: rows.filter(r => /OC[\s_]*(ENVIO[\s_]*)?ROLLOS|OC[\s_]*VISITA[\s_]*ROLLOS/i.test(r.ITEM_FACTURACION || '')) },
+      ];
+
+      document.getElementById('wom-kpis').innerHTML = [
+        kpi('Total Actividades', rows.length.toLocaleString(), 'Wompi', '', '💳'),
+        kpi('Finalizadas', fin.toLocaleString(), `${Math.round(fin / (rows.length || 1) * 100)}%`, 'ok', '✅', Math.round(fin / (rows.length || 1) * 100)),
+        kpi('Producción Real', fmtCOP(vt), 'Valor total', '', '💰'),
+        kpi('%Cump Periodo', cp + '%', `${fmtCOP(prod)} / ${fmtCOP(meta)}`, cTClass(cp), '🎯', cp),
+        ...wFilters.map(f => kpi(f.lbl, f.rows.length.toLocaleString(), fmtCOP(sumBy(f.rows, 'VALOR_TOTAL')), 'lima', '📦')),
+      ].join('');
+
+      // Gráficas
+      const estW = cntBy(rows, 'ESTADO_ACTIVIDAD');
+      const estCW = Object.keys(estW).map(k => { const u = k.toUpperCase(); return u.includes('FINAL') ? '#22c55e' : u.includes('EJECUC') ? '#3b82f6' : u.includes('PEND') ? '#f59e0b' : '#e8334a'; });
+      mkC('ch-wom-estado', 'doughnut', { labels: Object.keys(estW), datasets: [{ data: Object.values(estW), backgroundColor: estCW, borderWidth: 0, hoverOffset: 5 }] }, { cutout: '62%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+
+      mkC('ch-wom-pvr', 'bar', {
+        labels: MONTHS_LBL,
+        datasets: [
+          { label: 'Meta', data: MONTHS_ISO.map(m => metaSubMes(r => isWompi(r) && !_isRollosTrim(r), m)), backgroundColor: 'rgba(22,101,52,.18)', borderColor: '#166534', borderWidth: 1.5, borderRadius: 4, borderSkipped: false },
+          { label: 'Real', data: MONTHS_ISO.map(m => prodSubReal(r => isWompi(r) && !_isRollosTrim(r), m)), backgroundColor: '#166534', borderRadius: 4, borderSkipped: false }
+        ]
+      }, {
+        plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'top' }, tooltip: { ...CT.plugins.tooltip, callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtCOP(ctx.raw)}` } } },
+        scales: { y: { ticks: { color: '#5c6b8a', callback: v => fmtCOP(v) }, grid: { color: 'rgba(0,0,0,.05)' } }, x: { ticks: { color: '#5c6b8a' }, grid: { display: false } } }
+      });
+
+      const negW = cntBy(rows, 'TIPO_NEGOCIO');
+      const topNeg = topN(Object.fromEntries(Object.entries(negW).filter(([k]) => k && k !== 'NO APLICA')), 6);
+      mkC('ch-wom-neg', 'bar', {
+        labels: topNeg.map(([k]) => k.length > 16 ? k.slice(0, 16) + '…' : k),
+        datasets: [{ label: 'Actividades', data: topNeg.map(([, v]) => v), backgroundColor: '#166534', borderRadius: 5, borderSkipped: false }]
+      }, { indexAxis: 'y', plugins: { ...CT.plugins, legend: { display: false } }, scales: { x: { ticks: { color: '#5c6b8a' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } } });
+
+      const zonaW = cntBy(rows, 'ZONA');
+      const topZW = topN(Object.fromEntries(Object.entries(zonaW).filter(([k]) => !/^NO\s*APLICA$/i.test(k))), 8);
+      mkC('ch-wom-zona', 'bar', {
+        labels: topZW.map(([k]) => k.length > 16 ? k.slice(0, 16) + '…' : k),
+        datasets: [{ label: 'Actividades', data: topZW.map(([, v]) => v), backgroundColor: '#22c55e', borderRadius: 5, borderSkipped: false }]
+      }, { indexAxis: 'y', plugins: { ...CT.plugins, legend: { display: false } }, scales: { x: { ticks: { color: '#5c6b8a' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } } });
+
+      const formaW = cntBy(rows, 'FORMA_ATENCION');
+      mkC('ch-wom-forma', 'doughnut', {
+        labels: Object.keys(formaW).filter(k => k !== 'NO APLICA'),
+        datasets: [{ data: Object.values(Object.fromEntries(Object.entries(formaW).filter(([k]) => k !== 'NO APLICA'))), backgroundColor: ['#166534', '#22c55e', '#4ade80', '#86efac'], borderWidth: 0, hoverOffset: 5 }]
+      }, { cutout: '60%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+    }
+
+    // ══════════════════════════════════════════════
+    // WOMPI LOGÍSTICA (solo TIPO_ACTIVIDAD = ROLLOS TRIM)
+    // ══════════════════════════════════════════════
+    function renderWompiLog() {
+      const range = getRange('wlog-d1', 'wlog-d2');
+      const { d1, d2 } = getRangeDates('wlog-d1', 'wlog-d2');
+      const rows = RAW.filter(r => {
+        if (r.GERENCIA !== 'BANCA') return false;
+        if (!_isRollosTrim(r)) return false;
+        const f = r.FECHA_FINALIZACION || '';
+        if (d1 && f < d1) return false;
+        if (d2 && f > d2) return false;
+        return true;
+      });
+
+      const fin = rows.filter(r => (r.ESTADO_ACTIVIDAD || '').toUpperCase().includes('FINAL')).length;
+      const vt  = sumBy(rows, 'VALOR_TOTAL');
+
+      document.getElementById('wlog-band').innerHTML = `
+    <div class="si"><span class="sn">${rows.length.toLocaleString()}</span><span class="sl">Actividades Logística</span></div>
+    <div class="si"><span class="sn" style="color:#fce7f3">${Math.round(fin / (rows.length || 1) * 100)}%</span><span class="sl">Finalizadas</span></div>
+    <div class="si"><span class="sn">${fmtCOP(vt)}</span><span class="sl">Producción real</span></div>
+    <div class="si"><span class="sn">${Object.keys(cntBy(rows, 'ZONA')).filter(z => !/^NO\s*APLICA$/i.test(z)).length}</span><span class="sl">Zonas cubiertas</span></div>`;
+
+      document.getElementById('wlog-kpis').innerHTML = [
+        kpi('Total Actividades', rows.length.toLocaleString(), 'Rollos Trim', '', '🚚'),
+        kpi('Finalizadas', fin.toLocaleString(), `${Math.round(fin / (rows.length || 1) * 100)}%`, 'ok', '✅', Math.round(fin / (rows.length || 1) * 100)),
+        kpi('Producción Real', fmtCOP(vt), 'Valor total', '', '💰'),
+        kpi('Zonas', Object.keys(cntBy(rows, 'ZONA')).filter(z => !/^NO\s*APLICA$/i.test(z)).length.toString(), 'Cobertura', 'lima', '📍'),
+      ].join('');
+
+      // Estado
+      const estL = cntBy(rows, 'ESTADO_ACTIVIDAD');
+      const estCL = Object.keys(estL).map(k => { const u = k.toUpperCase(); return u.includes('FINAL') ? '#22c55e' : u.includes('EJECUC') ? '#3b82f6' : u.includes('PEND') ? '#f59e0b' : '#e8334a'; });
+      mkC('ch-wlog-estado', 'doughnut', { labels: Object.keys(estL), datasets: [{ data: Object.values(estL), backgroundColor: estCL, borderWidth: 0, hoverOffset: 5 }] }, { cutout: '62%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+
+      // Tendencia mensual
+      mkC('ch-wlog-tend', 'bar', {
+        labels: MONTHS_LBL,
+        datasets: [{ label: 'Actividades', data: MONTHS_ISO.map(m => RAW.filter(r => r.GERENCIA === 'BANCA' && _isRollosTrim(r) && (r.FECHA_FINALIZACION || '').slice(0, 7) === m).length), backgroundColor: '#9d174d', borderRadius: 4, borderSkipped: false }]
+      }, { plugins: { ...CT.plugins, legend: { display: false } }, scales: { y: { ticks: { color: '#5c6b8a', stepSize: 1 }, grid: { color: 'rgba(0,0,0,.05)' }, beginAtZero: true }, x: { ticks: { color: '#5c6b8a' }, grid: { display: false } } } });
+
+      // Tipo negocio
+      const negL = cntBy(rows, 'TIPO_NEGOCIO');
+      const topNL = topN(Object.fromEntries(Object.entries(negL).filter(([k]) => k && k !== 'NO APLICA')), 6);
+      mkC('ch-wlog-neg', 'bar', {
+        labels: topNL.map(([k]) => k.length > 16 ? k.slice(0, 16) + '…' : k),
+        datasets: [{ label: 'Actividades', data: topNL.map(([, v]) => v), backgroundColor: '#ec4899', borderRadius: 5, borderSkipped: false }]
+      }, { indexAxis: 'y', plugins: { ...CT.plugins, legend: { display: false } }, scales: { x: { ticks: { color: '#5c6b8a' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } } });
+
+      // Top zonas
+      const zonaL = cntBy(rows, 'ZONA');
+      const topZL = topN(Object.fromEntries(Object.entries(zonaL).filter(([k]) => !/^NO\s*APLICA$/i.test(k))), 8);
+      mkC('ch-wlog-zona', 'bar', {
+        labels: topZL.map(([k]) => k.length > 16 ? k.slice(0, 16) + '…' : k),
+        datasets: [{ label: 'Actividades', data: topZL.map(([, v]) => v), backgroundColor: '#9d174d', borderRadius: 5, borderSkipped: false }]
+      }, { indexAxis: 'y', plugins: { ...CT.plugins, legend: { display: false } }, scales: { x: { ticks: { color: '#5c6b8a' } }, y: { ticks: { color: '#5c6b8a', font: { size: 11 } } } } });
+
+      // Forma atención
+      const formaL = cntBy(rows, 'FORMA_ATENCION');
+      const validFL = Object.fromEntries(Object.entries(formaL).filter(([k]) => k !== 'NO APLICA'));
+      mkC('ch-wlog-forma', 'doughnut', {
+        labels: Object.keys(validFL),
+        datasets: [{ data: Object.values(validFL), backgroundColor: ['#9d174d', '#ec4899', '#f9a8d4', '#fce7f3'], borderWidth: 0, hoverOffset: 5 }]
+      }, { cutout: '60%', plugins: { ...CT.plugins, legend: { ...CT.plugins.legend, position: 'bottom' } } });
+    }
+
     function renderBanca() {
       const range = getRange('ban-d1', 'ban-d2');
       const { d1: banD1, d2: banD2 } = getRangeDates('ban-d1', 'ban-d2');
@@ -7142,6 +7327,27 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
         const { d1, d2 } = getRangeDates('ban-d1', 'ban-d2');
         data = RAW.filter(r => {
           if (r.GERENCIA !== 'BANCA') return false;
+          const f = r.FECHA_FINALIZACION || '';
+          if (d1 && f < d1) return false;
+          if (d2 && f > d2) return false;
+          return true;
+        });
+      } else if (tab === 'wompi') {
+        const { d1, d2 } = getRangeDates('wom-d1', 'wom-d2');
+        data = RAW.filter(r => {
+          if (r.GERENCIA !== 'BANCA') return false;
+          if (!isWompi(r)) return false;
+          if (_isRollosTrim(r)) return false;
+          const f = r.FECHA_FINALIZACION || '';
+          if (d1 && f < d1) return false;
+          if (d2 && f > d2) return false;
+          return true;
+        });
+      } else if (tab === 'wompi-log') {
+        const { d1, d2 } = getRangeDates('wlog-d1', 'wlog-d2');
+        data = RAW.filter(r => {
+          if (r.GERENCIA !== 'BANCA') return false;
+          if (!_isRollosTrim(r)) return false;
           const f = r.FECHA_FINALIZACION || '';
           if (d1 && f < d1) return false;
           if (d2 && f > d2) return false;
