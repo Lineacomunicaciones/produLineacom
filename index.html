@@ -4841,8 +4841,9 @@
           return;
         }
 
+        // Registrar acceso en Supabase sin bloquear el login
         if (window.LoginTracker) {
-          window.LoginTracker.registrar(window._msUserProfile).catch(() => {});
+          window.LoginTracker.registrar(window._msUserProfile).catch(e => console.warn('[Tracker]', e));
         }
 
         _enterApp();
@@ -7330,17 +7331,29 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
             mes_key: now.toLocaleString('es-CO', { timeZone:'America/Bogota', year:'numeric', month:'2-digit' })
           };
           await _sbFetch('/rest/v1/accesos', 'POST', entry);
-          _accCache = null; // invalidar cache
-        } catch(e) { console.warn('[LoginTracker]', e); }
+          _accCache = null;
+        } catch(e) {
+          console.warn('[LoginTracker] No se pudo guardar en Supabase (¿tabla creada?):', e);
+          // Fallback: guardar en localStorage mientras se configura Supabase
+          try {
+            const local = JSON.parse(localStorage.getItem('lineacom_accesos_v1') || '[]');
+            local.unshift({ id: Date.now(), nombre: profile.nombre||'', email: profile.email||'', cargo: profile.cargo||'', tipo: _accTipoLabel(_currentUserPerms), fecha: new Date().toLocaleString('es-CO',{timeZone:'America/Bogota'}), mes: new Date().toLocaleString('es-CO',{timeZone:'America/Bogota',month:'long',year:'numeric'}), mesKey: new Date().toLocaleString('es-CO',{timeZone:'America/Bogota',year:'numeric',month:'2-digit'}) });
+            if (local.length > 200) local.splice(200);
+            localStorage.setItem('lineacom_accesos_v1', JSON.stringify(local));
+          } catch(_) {}
+        }
       },
       getAll: async function() {
         if (_accCache) return _accCache;
         try {
           const data = await _sbFetch('/rest/v1/accesos?select=*&order=id.desc&limit=500');
-          // normalizar mes_key → mesKey para compatibilidad con el resto del código
           _accCache = (data || []).map(r => ({ ...r, mesKey: r.mes_key }));
           return _accCache;
-        } catch(e) { console.warn('[LoginTracker]', e); return []; }
+        } catch(e) {
+          console.warn('[LoginTracker] No se pudo leer Supabase (¿tabla creada?):', e);
+          // Fallback: leer localStorage
+          try { return JSON.parse(localStorage.getItem('lineacom_accesos_v1') || '[]'); } catch(_) { return []; }
+        }
       },
       clear: async function() {
         try {
@@ -7348,13 +7361,13 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
           _accCache = null;
         } catch(e) { console.warn('[LoginTracker]', e); }
       },
-      renderPanel: function() {
+      renderPanel: async function() {
         if (!_currentUserPerms) {
           const btn = document.getElementById('n-accesos');
           if (btn) btn.style.display = '';
         }
-        _populateAccMesSel();
-        renderAccesos();
+        await _populateAccMesSel();
+        await renderAccesos();
       }
     };
 
