@@ -4850,7 +4850,10 @@
 
       } catch (err) {
         if (err.errorCode === 'user_cancelled') _showLoginError('Inicio de sesión cancelado.');
-        else { console.error('[Auth]', err); _showLoginError('Error al conectar con Microsoft. Intenta de nuevo.'); }
+        else { console.error('[Auth]', err); _showLoginError('Error al conectar con Microsoft. Intenta de nuevo.<br><small style="opacity:.7">' + (err.message||err) + '</small>'); }
+      } finally {
+        const btn2 = document.getElementById('msLoginBtn');
+        if (btn2 && btn2.disabled) { btn2.disabled = false; btn2.innerHTML = _msBtnHTML(); }
       }
     };
 
