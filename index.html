@@ -5062,6 +5062,30 @@
 
     // ── INIT ──────────────────────────────────────────────────────
     async function initDash() {
+      // Setear fechas al mes actual dinámicamente
+      (function _setCurrentMonthDates() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const d1 = `${y}-${m}-01`;
+        const d2 = `${y}-${m}-${d}`;
+        const pairs = [
+          ['res-d1',      'res-d2'],
+          ['dia-d1',      'dia-d2'],
+          ['cir-d1',      'cir-d2'],
+          ['lib-d1',      'lib-d2'],
+          ['ban-d1',      'ban-d2'],
+          ['det-hero-d1', 'det-hero-d2'],
+        ];
+        pairs.forEach(([id1, id2]) => {
+          const el1 = document.getElementById(id1);
+          const el2 = document.getElementById(id2);
+          if (el1) el1.value = d1;
+          if (el2) el2.value = d2;
+        });
+      })();
+
       try {
         showBoot();
         setBootStep('auth', 'ok');
