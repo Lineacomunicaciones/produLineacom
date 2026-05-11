@@ -2522,17 +2522,14 @@
     /* RESUMEN overflow fix */
     #tp-resumen .kpi-modern { overflow: visible; }
 
-    /* RESUMEN sin scroll — todo entra al 100% zoom */
-    #tp-resumen {
-      height: calc(100vh - 56px); /* 56px = topbar */
-    }
+    /* RESUMEN compacto sin scroll */
     #tp-resumen .estado-hero-metrics { gap: 5px; }
-    #tp-resumen .estado-metric { padding: 5px 10px; }
-    #tp-resumen .estado-metric-val { font-size: clamp(11px, 1.1vw, 15px); }
+    #tp-resumen .estado-metric { padding: 4px 8px; }
+    #tp-resumen .estado-metric-val { font-size: clamp(10px, 1.0vw, 14px); }
     #tp-resumen .estado-metric-lbl { font-size: 8px; }
     #tp-resumen .km-head { padding: 6px 12px !important; }
     #tp-resumen .km-footer { padding: 5px 12px !important; }
-    #tp-resumen .ch { padding: 7px 12px !important; }
+    #tp-resumen .ch { padding: 6px 12px !important; }
   </style>
 </head>
 
@@ -3902,7 +3899,7 @@
         </div>
 
         <!-- ═══ RESUMEN ═══ -->
-        <div id="tp-resumen" class="tp on" style="padding:6px 14px; box-sizing:border-box; overflow-y:hidden; display:flex; flex-direction:column; height:100%">
+        <div id="tp-resumen" class="tp on" style="padding:6px 14px; box-sizing:border-box; overflow-y:auto">
 
           <!-- Section 1: ESTADO GENERAL COMPAÑÍA Hero Banner -->
           <div class="estado-hero fu" style="margin-bottom:5px; padding: 7px 16px; flex-shrink:0">
@@ -3944,7 +3941,7 @@
           </div>
 
           <!-- Section 2: Mosaic Summary Layout -->
-          <div style="display:grid; grid-template-columns: 0.8fr 1.1fr 1.1fr; grid-template-rows: 1fr auto; gap:8px; align-items: stretch; flex:1; min-height:0; margin-bottom:0">
+          <div style="display:grid; grid-template-columns: 0.8fr 1.1fr 1.1fr; grid-template-rows: 1fr auto; gap:8px; align-items: stretch; min-height: clamp(400px, calc(100vh - 175px), 700px); margin-bottom:0">
             <div id="res-grid-banca"></div>
             <div id="res-grid-cirion"></div>
             <div id="res-grid-liberty"></div>
