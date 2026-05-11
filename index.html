@@ -5098,6 +5098,7 @@
         setBootStep('idx', 'ok');
         setBootProgress(100, 'Dashboard listo');
         setTimeout(hideBoot, 350);
+        startAutoRefresh();
       } catch (err) {
         console.error('[boot]', err);
         fatalBoot(err.message || 'No fue posible cargar los archivos reales.');
@@ -5323,12 +5324,59 @@
     function loadData(data, proyeccion) {
       RAW = data;
       buildProjectionIndexes(proyeccion);
-      document.getElementById('lupd').textContent = `Actualizado: ${new Date().toLocaleDateString('es-CO')}`;
+      document.getElementById('lupd').textContent = `Actualizado: ${new Date().toLocaleString('es-CO', { timeZone:'America/Bogota', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })}`;
       document.getElementById('sb-rows').textContent = `${RAW.length.toLocaleString()} registros`;
       const estats = [...new Set(RAW.map(r => r.ESTADO_ACTIVIDAD).filter(Boolean))].sort();
       const se = document.getElementById('det-est'); if (se) se.innerHTML = '<option value="">Todos</option>' + estats.map(e => `<option>${e}</option>`).join('');
       renderResumen();
     }
+
+    // ══════════════════════════════════════════════
+    // AUTO-REFRESCO cada 5 minutos
+    // ══════════════════════════════════════════════
+    let _autoRefreshTimer = null;
+
+    async function _autoRefresh() {
+      try {
+        // Cache-busting: agrega timestamp para forzar descarga nueva desde GitHub
+        const ts = Date.now();
+        const consolidadoRaw = await fetchJSONGzStrict(`./consolidado.json.gz?_=${ts}`);
+        const consolidado = normalizeConsolidado(consolidadoRaw);
+        if (!consolidado.length) return;
+
+        const proyeccionRaw = await fetchJSONGzStrict(`./proyeccion.json.gz?_=${ts}`);
+        const proyeccion = normalizeProyeccion(proyeccionRaw);
+        if (!proyeccion.length) return;
+
+        loadData(consolidado, proyeccion);
+
+        // Mostrar notificación sutil
+        const lupd = document.getElementById('lupd');
+        if (lupd) {
+          lupd.style.transition = 'color .3s';
+          lupd.style.color = '#22c55e';
+          setTimeout(() => { lupd.style.color = ''; }, 2000);
+        }
+      } catch(e) {
+        console.warn('[AutoRefresh]', e.message);
+      }
+    }
+
+    function startAutoRefresh() {
+      if (_autoRefreshTimer) clearInterval(_autoRefreshTimer);
+      _autoRefreshTimer = setInterval(_autoRefresh, 5 * 60 * 1000); // 5 minutos
+      console.log('[AutoRefresh] Activo — refresca cada 5 min');
+    }
+
+    function stopAutoRefresh() {
+      if (_autoRefreshTimer) { clearInterval(_autoRefreshTimer); _autoRefreshTimer = null; }
+    }
+
+    // Pausar cuando la pestaña no está visible (ahorra recursos)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopAutoRefresh();
+      else startAutoRefresh();
+    });
 
     // ══════════════════════════════════════════════
     // RESUMEN
