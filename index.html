@@ -1039,7 +1039,8 @@
     }
 
     .tp.on {
-      display: block;
+      display: flex;
+      flex-direction: column;
       animation: fadeIn .28s ease
     }
 
@@ -2277,40 +2278,6 @@
       }
     }
 
-    /* ── Pantallas PC medianas: ajuste del resumen ── */
-    @media(max-height: 800px) {
-      #tp-resumen [style*="grid-template-columns: 0.8fr"] {
-        min-height: clamp(400px, calc(100vh - 200px), 620px) !important;
-      }
-      #tp-resumen .km-value {
-        font-size: 15px;
-      }
-      #tp-resumen .km-body {
-        padding: 7px 10px;
-        gap: 6px;
-      }
-      #tp-resumen .km-main {
-        gap: 7px;
-        margin-bottom: 6px;
-      }
-    }
-
-    @media(max-height: 700px) {
-      #tp-resumen [style*="grid-template-columns: 0.8fr"] {
-        min-height: clamp(360px, calc(100vh - 170px), 560px) !important;
-      }
-      #tp-resumen .km-value {
-        font-size: 13px;
-      }
-    }
-
-    /* ── Pantallas PC anchas pero cortas (landscape laptops) ── */
-    @media(min-width: 1024px) and (max-height: 750px) {
-      #tp-resumen {
-        overflow-y: auto !important;
-      }
-    }
-
     /* ── ESTADO GENERAL HERO ── */
     .estado-hero {
       background: linear-gradient(135deg, #001D62 0%, #0a3bb6 60%, #0847a3 100%);
@@ -2456,27 +2423,104 @@
       text-overflow: ellipsis;
     }
 
-    /* ── RESUMEN overflow fix ── */
-    #tp-resumen .kpi-modern {
-      overflow: visible;
+    /* ══════════════════════════════════════════════════════
+       RESPONSIVE GLOBAL — todas las secciones del tablero
+       Evita que las gráficas se corten en pantallas de PC
+       con zoom al 100% y distintas resoluciones de altura.
+       ══════════════════════════════════════════════════════ */
+
+    /* Todos los tabs son scrollables por defecto */
+    .tp.on {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-height: 0;
+      flex: 1;
     }
 
-    /* ── RESUMEN: valores con tamaño fluido para que no se corten ── */
+    /* Excepciones con su propio scroll ya definido */
+    #tp-detalle.on,
+    #tp-accesos.on {
+      display: block;
+    }
+
+    /* ── Alturas de canvas fluidas con clamp() ──
+       clamp(mínimo, preferido-en-vh, máximo)
+       Pantalla 768px alto  → ~220px
+       Pantalla 900px alto  → ~265px
+       Pantalla 1080px alto → ~300px          */
+    /* ══════════════════════════════════════════════════════
+       RESPONSIVE GLOBAL — todas las secciones del tablero
+       Alturas fluidas con clamp() para zoom 100% en PC
+       ══════════════════════════════════════════════════════ */
+
+    /* Todos los tabs activos son scrollables */
+    .tp.on {
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-height: 0;
+      flex: 1;
+    }
+    /* Tabs con scroll propio ya definido en el HTML */
+    #tp-detalle.on, #tp-accesos.on {
+      display: block;
+      flex: none;
+    }
+
+    /* Canvas fijos → fluidos:
+       clamp(min, vh-proporcional, max)
+       800px alto → ~216px | 1080px → ~291px | 1440px → ~389px  */
+    .cw[style*="height:250px"],
+    .cw[style*="height: 250px"] { height: clamp(180px, 27vh, 320px) !important; }
+
+    .cw[style*="height:260px"],
+    .cw[style*="height: 260px"] { height: clamp(190px, 28vh, 330px) !important; }
+
+    .cw[style*="height:300px"],
+    .cw[style*="height: 300px"] { height: clamp(210px, 30vh, 360px) !important; }
+
+    .cw[style*="height:320px"],
+    .cw[style*="height: 320px"] { height: clamp(220px, 32vh, 390px) !important; }
+
+    /* Resumen: texto fluido para no desbordar cards angostas */
     #tp-resumen .km-value {
-      font-size: clamp(12px, 1.4vw, 18px);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: clamp(12px, 1.3vw, 18px);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    #tp-resumen .km-label {
-      font-size: clamp(8px, 0.6vw, 9px);
-    }
+    #tp-resumen .km-label   { font-size: clamp(8px, 0.55vw, 9px); }
     #tp-resumen .km-sub-val {
-      font-size: clamp(10px, 1vw, 12.5px);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: clamp(10px, 0.9vw, 12.5px);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+    #tp-resumen .km-body  { padding: clamp(6px,1vh,18px) clamp(8px,1vw,18px); gap: clamp(5px,0.8vh,12px); }
+    #tp-resumen .km-main  { gap: clamp(6px,0.8vh,16px); margin-bottom: clamp(4px,0.6vh,12px); }
+
+    /* Pantallas cortas ≤700px alto: compactar headers y bandas */
+    @media (max-height: 700px) {
+      .ph           { margin-bottom: 10px; }
+      .slbl         { padding: 4px 0; font-size: 10px; }
+      .sband        { gap: 8px; margin-bottom: 14px; }
+      .si           { padding: 10px 12px; }
+      .sn           { font-size: 13px; }
+      .sl           { font-size: 9px; }
+      .estado-hero  { padding: 8px 14px; }
+      .estado-hero-metrics { gap: 6px; }
+      #tp-resumen .km-body { padding: 5px 8px; gap: 4px; }
+    }
+
+    /* Pantallas muy cortas ≤620px alto: canvas aún más compactos */
+    @media (max-height: 620px) {
+      .cw[style*="height:250px"], .cw[style*="height: 250px"],
+      .cw[style*="height:260px"], .cw[style*="height: 260px"],
+      .cw[style*="height:300px"], .cw[style*="height: 300px"],
+      .cw[style*="height:320px"], .cw[style*="height: 320px"] {
+        height: clamp(120px, 22vh, 190px) !important;
+      }
+    }
+
+    /* RESUMEN overflow fix */
+    #tp-resumen .kpi-modern { overflow: visible; }
   </style>
 </head>
 
@@ -3846,10 +3890,10 @@
         </div>
 
         <!-- ═══ RESUMEN ═══ -->
-        <div id="tp-resumen" class="tp on" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto; min-height:0; flex:1">
+        <div id="tp-resumen" class="tp on" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
 
           <!-- Section 1: ESTADO GENERAL COMPAÑÍA Hero Banner -->
-          <div class="estado-hero fu" style="margin-bottom:8px; padding: 12px 20px">
+          <div class="estado-hero fu" style="margin-bottom:8px; padding: 12px 20px; flex-shrink:0">
             <div class="estado-hero-header">
               <div class="estado-hero-title">
                 <div class="estado-hero-dot"></div>
@@ -3888,7 +3932,7 @@
           </div>
 
           <!-- Section 2: Mosaic Summary Layout -->
-          <div style="display:grid; grid-template-columns: 0.8fr 1.1fr 1.1fr; grid-template-rows: auto 1fr; gap:12px; align-items: stretch; flex: 1; min-height: clamp(480px, calc(100vh - 220px), 700px); margin-bottom: 10px">
+          <div style="display:grid; grid-template-columns: 0.8fr 1.1fr 1.1fr; grid-template-rows: auto 1fr; gap:12px; align-items: stretch; flex: 1; min-height: clamp(440px, calc(100vh - 200px), 720px); margin-bottom: 10px">
             <div id="res-grid-banca"></div>
             <div id="res-grid-cirion"></div>
             <div id="res-grid-liberty"></div>
@@ -3915,13 +3959,13 @@
                   </div>
                 </div>
               </div>
-              <div class="cw" style="flex:1; padding:5px 15px 15px; min-height:clamp(200px, calc(100vh - 480px), 340px)"><canvas id="ch-res-tend"></canvas></div>
+              <div class="cw" style="flex:1; padding:5px 15px 15px; min-height:clamp(180px, calc(100vh - 490px), 340px)"><canvas id="ch-res-tend"></canvas></div>
             </div>
           </div>
         </div>
 
         <!-- ═══ DIARIO ═══ -->
-        <div id="tp-diario" class="tp" style="padding:10px 18px; box-sizing:border-box">
+        <div id="tp-diario" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
           
           <!-- Banner Superior Compacto -->
           <div class="estado-hero fu fu1" style="display: flex; flex-direction: column; gap: 10px; padding: 12px 18px; margin-bottom: 10px">
@@ -3965,7 +4009,7 @@
             <div id="dia-metrics" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px"></div>
           </div>
 
-          <div style="flex: 1; min-height: 540px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px">
+          <div style="flex: 1; min-height: clamp(380px, calc(100vh - 240px), 640px); display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px">
             <!-- Gráfica Día a Día -->
             <div class="card fu fu2" style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding: 6px 14px">
@@ -3980,7 +4024,7 @@
                   <span style="display:flex;align-items:center;gap:4px"><span style="width:18px;height:2px;background:#C5D336;display:inline-block"></span>Meta</span>
                 </div>
               </div>
-              <div class="cw" style="flex: 1; min-height: 0"><canvas id="ch-dia-main"></canvas></div>
+              <div class="cw" style="flex: 1; min-height: clamp(160px, 22vh, 280px)"><canvas id="ch-dia-main"></canvas></div>
             </div>
 
             <!-- Gráfica Acumulada -->
@@ -3990,13 +4034,13 @@
                   <div class="ct" style="font-size: 11px">Producción Acumulada vs Meta Acumulada</div>
                 </div>
               </div>
-              <div class="cw" style="flex: 1; min-height: 0"><canvas id="ch-dia-acum"></canvas></div>
+              <div class="cw" style="flex: 1; min-height: clamp(160px, 22vh, 280px)"><canvas id="ch-dia-acum"></canvas></div>
             </div>
           </div>
         </div>
 
         <!-- ═══ ZONAS ═══ -->
-        <div id="tp-zonas" class="tp">
+        <div id="tp-zonas" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
           <div class="ph fu">
             <div>
               <div class="pt">Distribución por Zona</div>
@@ -4041,7 +4085,7 @@
         </div>
 
         <!-- ═══ CIRION ═══ -->
-        <div id="tp-cirion" class="tp">
+        <div id="tp-cirion" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
           <div class="ph fu">
             <div>
               <div class="pt" style="color:#001D62">Cirion</div>
@@ -4117,7 +4161,7 @@
         </div>
 
         <!-- ═══ LIBERTY ═══ -->
-        <div id="tp-liberty" class="tp">
+        <div id="tp-liberty" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
           <div class="ph fu">
             <div>
               <div class="pt" style="color:#0847a3">Liberty</div>
@@ -4179,7 +4223,7 @@
         </div>
 
         <!-- ═══ BANCA ═══ -->
-        <div id="tp-banca" class="tp">
+        <div id="tp-banca" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
           <div class="ph fu">
             <div>
               <div class="pt" style="color:#166534">Banca Seguros</div>
