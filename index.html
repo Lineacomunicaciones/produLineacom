@@ -7285,9 +7285,25 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
     }
 
     // ══════════════════════════════════════════════
-    // LOGIN TRACKER — registro de accesos
+    // LOGIN TRACKER — registro de accesos (Supabase)
     // ══════════════════════════════════════════════
-    const ACC_KEY = 'lineacom_accesos_v1';
+    const SB_URL = 'https://svjpwabugdsccsoqzyxf.supabase.co';
+    const SB_KEY = 'sb_publishable_ulaxS_4-zgBswdvFI3MZnA_AkMHIslQ';
+
+    async function _sbFetch(path, method, body) {
+      const res = await fetch(SB_URL + path, {
+        method: method || 'GET',
+        headers: {
+          'apikey': SB_KEY,
+          'Authorization': 'Bearer ' + SB_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': method === 'POST' ? 'return=minimal' : ''
+        },
+        body: body ? JSON.stringify(body) : undefined
+      });
+      if (!res.ok) { const t = await res.text(); throw new Error(t); }
+      return method === 'POST' ? null : res.json();
+    }
 
     function _accTipoLabel(perms) {
       if (!perms) return 'GENERAL';
@@ -7296,32 +7312,41 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       return 'GENERAL';
     }
 
+    // Cache local para no consultar Supabase en cada render
+    let _accCache = null;
+
     window.LoginTracker = {
       registrar: async function(profile) {
         if (!profile) return;
         try {
-          const existing = JSON.parse(localStorage.getItem(ACC_KEY) || '[]');
           const now = new Date();
           const entry = {
-            id:       now.getTime(),
-            nombre:   profile.nombre || '',
-            email:    profile.email  || '',
-            cargo:    profile.cargo  || '',
-            tipo:     _accTipoLabel(_currentUserPerms),
-            fecha:    now.toLocaleString('es-CO', { timeZone:'America/Bogota', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }),
-            mes:      now.toLocaleString('es-CO', { timeZone:'America/Bogota', month:'long', year:'numeric' }),
-            mesKey:   now.toLocaleString('es-CO', { timeZone:'America/Bogota', year:'numeric', month:'2-digit' }) // "MM/YYYY"
+            nombre:  profile.nombre || '',
+            email:   profile.email  || '',
+            cargo:   profile.cargo  || '',
+            tipo:    _accTipoLabel(_currentUserPerms),
+            fecha:   now.toLocaleString('es-CO', { timeZone:'America/Bogota', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }),
+            mes:     now.toLocaleString('es-CO', { timeZone:'America/Bogota', month:'long', year:'numeric' }),
+            mes_key: now.toLocaleString('es-CO', { timeZone:'America/Bogota', year:'numeric', month:'2-digit' })
           };
-          existing.unshift(entry);
-          if (existing.length > 500) existing.splice(500);
-          localStorage.setItem(ACC_KEY, JSON.stringify(existing));
+          await _sbFetch('/rest/v1/accesos', 'POST', entry);
+          _accCache = null; // invalidar cache
         } catch(e) { console.warn('[LoginTracker]', e); }
       },
-      getAll: function() {
-        try { return JSON.parse(localStorage.getItem(ACC_KEY) || '[]'); } catch(e) { return []; }
+      getAll: async function() {
+        if (_accCache) return _accCache;
+        try {
+          const data = await _sbFetch('/rest/v1/accesos?select=*&order=id.desc&limit=500');
+          // normalizar mes_key → mesKey para compatibilidad con el resto del código
+          _accCache = (data || []).map(r => ({ ...r, mesKey: r.mes_key }));
+          return _accCache;
+        } catch(e) { console.warn('[LoginTracker]', e); return []; }
       },
-      clear: function() {
-        try { localStorage.removeItem(ACC_KEY); } catch(e) {}
+      clear: async function() {
+        try {
+          await _sbFetch('/rest/v1/accesos?id=gte.0', 'DELETE');
+          _accCache = null;
+        } catch(e) { console.warn('[LoginTracker]', e); }
       },
       renderPanel: function() {
         if (!_currentUserPerms) {
@@ -7333,10 +7358,10 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       }
     };
 
-    function _populateAccMesSel() {
+    async function _populateAccMesSel() {
       const sel = document.getElementById('acc-mes');
       if (!sel) return;
-      const todos = window.LoginTracker.getAll();
+      const todos = await window.LoginTracker.getAll();
       const meses = [...new Set(todos.map(r => r.mesKey).filter(Boolean))].sort((a,b) => b.localeCompare(a));
       const cur = sel.value;
       sel.innerHTML = '<option value="">Todos los meses</option>' +
@@ -7348,12 +7373,16 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       if (cur && [...sel.options].some(o => o.value === cur)) sel.value = cur;
     }
 
-    function renderAccesos() {
+    async function renderAccesos() {
       const srch  = (document.getElementById('acc-search')?.value || '').toLowerCase();
       const tipo  = document.getElementById('acc-tipo')?.value   || '';
       const mesK  = document.getElementById('acc-mes')?.value    || '';
 
-      const todos = window.LoginTracker.getAll();
+      // Mostrar estado de carga
+      const tbody = document.getElementById('tbody-accesos');
+      if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--txl)">Cargando...</td></tr>`;
+
+      const todos = await window.LoginTracker.getAll();
 
       // ── Métricas globales (sin filtro de tabla) ────────────────────
       const totalTodos   = todos.length;
@@ -7475,10 +7504,10 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       renderAccesos();
     }
 
-    function clearAccesos() {
+    async function clearAccesos() {
       if (!confirm('¿Eliminar todos los registros de acceso? Esta acción no se puede deshacer.')) return;
-      window.LoginTracker.clear();
-      _populateAccMesSel();
+      await window.LoginTracker.clear();
+      await _populateAccMesSel();
       renderAccesos();
     }
   </script>
