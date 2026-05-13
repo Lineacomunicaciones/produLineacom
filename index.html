@@ -4323,6 +4323,16 @@
                     <option value="LIBERTY" style="color:#001D62">Liberty</option>
                   </select>
                 </div>
+                <!-- Filtro Proyecto (solo BANCA) -->
+                <div id="hero-fg-proyecto" class="f-group"
+                  style="display:none; padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
+                  <label style="font-size:8px; color:rgba(255,255,255,0.5)">Proyecto</label>
+                  <select id="det-red" class="f-sel" style="font-size:10px; color:#fff; background:transparent; border:none; outline:none; font-weight:700; cursor:pointer" onchange="renderDetalle()">
+                    <option value="" style="color:#001D62">Todos</option>
+                    <option value="REDEBAN" style="color:#001D62">Redeban</option>
+                    <option value="WOMPI" style="color:#001D62">Wompi</option>
+                  </select>
+                </div>
                 <!-- Filtro Fechas -->
                 <div class="f-group"
                   style="padding:1px 8px; border-radius:6px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15)">
@@ -4360,11 +4370,6 @@
                 </select></div>
               <div class="fg" id="fg-negocio" style="display:none"><label>Tipo Negocio</label><select id="det-negocio" onchange="renderDetalle()">
                   <option value="">Todos</option>
-                </select></div>
-              <div class="fg" id="fg-red" style="display:none"><label>Red (Redeban / Wompi)</label><select id="det-red" onchange="renderDetalle()">
-                  <option value="">Todas</option>
-                  <option value="REDEBAN">Redeban</option>
-                  <option value="WOMPI">Wompi</option>
                 </select></div>
               <div class="fg" id="fg-base" style="display:none"><label>Base Operativa</label><select id="det-base" onchange="renderDetalle()">
                   <option value="">Todos</option>
@@ -4556,7 +4561,7 @@
     // ══════════════════════════════════════════════
     // Lista blanca: acceso completo
     const FULL_ACCESS_USERS = [
-      
+      'andrea.hoyos@lineacom.co',
       'luz.molina@lineacom.co',
       'yazmin.gil@lineacom.co',
       'luis.rincon@lineacom.co',
@@ -7154,9 +7159,9 @@
       showFn('fg-zona',    !isTodos && !isBanca && !isCirion);
       showFn('fg-cc',      true);
       showFn('fg-tipo',    !isBanca);
-      showFn('fg-negocio', isBanca);
-      showFn('fg-red',     isBanca);
-      showFn('fg-forma',   isBanca);
+      showFn('fg-negocio',        isBanca);
+      showFn('fg-forma',          isBanca);
+      showFn('hero-fg-proyecto',  isBanca);
       showFn('fg-base',    isCirion || isLiberty);
       showFn('fg-coord',   isCirion || isLiberty);
 
