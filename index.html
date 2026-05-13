@@ -1039,8 +1039,7 @@
     }
 
     .tp.on {
-      display: flex;
-      flex-direction: column;
+      display: block;
       animation: fadeIn .28s ease
     }
 
@@ -1423,8 +1422,7 @@
       background: var(--bg);
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
-      overflow-x: hidden;
+      overflow: hidden;
       width: 100%;
       height: calc(100vh - 64px);
     }
@@ -2423,113 +2421,10 @@
       text-overflow: ellipsis;
     }
 
-    /* ══════════════════════════════════════════════════════
-       RESPONSIVE GLOBAL — todas las secciones del tablero
-       Evita que las gráficas se corten en pantallas de PC
-       con zoom al 100% y distintas resoluciones de altura.
-       ══════════════════════════════════════════════════════ */
-
-    /* Todos los tabs son scrollables por defecto */
-    .tp.on {
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      overflow-x: hidden;
-      min-height: 0;
-      flex: 1;
+    /* ── RESUMEN overflow fix ── */
+    #tp-resumen .kpi-modern {
+      overflow: visible;
     }
-
-    /* Excepciones con su propio scroll ya definido */
-    #tp-detalle.on,
-    #tp-accesos.on {
-      display: block;
-    }
-
-    /* ── Alturas de canvas fluidas con clamp() ──
-       clamp(mínimo, preferido-en-vh, máximo)
-       Pantalla 768px alto  → ~220px
-       Pantalla 900px alto  → ~265px
-       Pantalla 1080px alto → ~300px          */
-    /* ══════════════════════════════════════════════════════
-       RESPONSIVE GLOBAL — todas las secciones del tablero
-       Alturas fluidas con clamp() para zoom 100% en PC
-       ══════════════════════════════════════════════════════ */
-
-    /* Todos los tabs activos son scrollables */
-    .tp.on {
-      overflow-y: auto;
-      overflow-x: hidden;
-      min-height: 0;
-      flex: 1;
-    }
-    /* Tabs con scroll propio ya definido en el HTML */
-    #tp-detalle.on, #tp-accesos.on {
-      display: block;
-      flex: none;
-    }
-
-    /* Canvas fijos → fluidos:
-       clamp(min, vh-proporcional, max)
-       800px alto → ~216px | 1080px → ~291px | 1440px → ~389px  */
-    .cw[style*="height:250px"],
-    .cw[style*="height: 250px"] { height: clamp(180px, 27vh, 320px) !important; }
-
-    .cw[style*="height:260px"],
-    .cw[style*="height: 260px"] { height: clamp(190px, 28vh, 330px) !important; }
-
-    .cw[style*="height:300px"],
-    .cw[style*="height: 300px"] { height: clamp(210px, 30vh, 360px) !important; }
-
-    .cw[style*="height:320px"],
-    .cw[style*="height: 320px"] { height: clamp(220px, 32vh, 390px) !important; }
-
-    /* Resumen: texto fluido para no desbordar cards angostas */
-    #tp-resumen .km-value {
-      font-size: clamp(12px, 1.3vw, 18px);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    #tp-resumen .km-label   { font-size: clamp(8px, 0.55vw, 9px); }
-    #tp-resumen .km-sub-val {
-      font-size: clamp(10px, 0.9vw, 12.5px);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    #tp-resumen .km-body  { padding: clamp(6px,1vh,18px) clamp(8px,1vw,18px); gap: clamp(5px,0.8vh,12px); }
-    #tp-resumen .km-main  { gap: clamp(6px,0.8vh,16px); margin-bottom: clamp(4px,0.6vh,12px); }
-
-    /* Pantallas cortas ≤700px alto: compactar headers y bandas */
-    @media (max-height: 700px) {
-      .ph           { margin-bottom: 10px; }
-      .slbl         { padding: 4px 0; font-size: 10px; }
-      .sband        { gap: 8px; margin-bottom: 14px; }
-      .si           { padding: 10px 12px; }
-      .sn           { font-size: 13px; }
-      .sl           { font-size: 9px; }
-      .estado-hero  { padding: 8px 14px; }
-      .estado-hero-metrics { gap: 6px; }
-      #tp-resumen .km-body { padding: 5px 8px; gap: 4px; }
-    }
-
-    /* Pantallas muy cortas ≤620px alto: canvas aún más compactos */
-    @media (max-height: 620px) {
-      .cw[style*="height:250px"], .cw[style*="height: 250px"],
-      .cw[style*="height:260px"], .cw[style*="height: 260px"],
-      .cw[style*="height:300px"], .cw[style*="height: 300px"],
-      .cw[style*="height:320px"], .cw[style*="height: 320px"] {
-        height: clamp(120px, 22vh, 190px) !important;
-      }
-    }
-
-    /* RESUMEN overflow fix */
-    #tp-resumen .kpi-modern { overflow: visible; }
-
-    /* RESUMEN compacto sin scroll */
-    #tp-resumen .estado-hero-metrics { gap: 5px; }
-    #tp-resumen .estado-metric { padding: 4px 8px; }
-    #tp-resumen .estado-metric-val { font-size: clamp(10px, 1.0vw, 14px); }
-    #tp-resumen .estado-metric-lbl { font-size: 8px; }
-    #tp-resumen .km-head { padding: 6px 12px !important; }
-    #tp-resumen .km-footer { padding: 5px 12px !important; }
-    #tp-resumen .ch { padding: 6px 12px !important; }
   </style>
 </head>
 
@@ -3899,10 +3794,10 @@
         </div>
 
         <!-- ═══ RESUMEN ═══ -->
-        <div id="tp-resumen" class="tp on" style="padding:6px 14px; box-sizing:border-box; overflow-y:auto">
+        <div id="tp-resumen" class="tp on" style="padding:10px 18px; box-sizing:border-box">
 
           <!-- Section 1: ESTADO GENERAL COMPAÑÍA Hero Banner -->
-          <div class="estado-hero fu" style="margin-bottom:5px; padding: 7px 16px; flex-shrink:0">
+          <div class="estado-hero fu" style="margin-bottom:8px; padding: 12px 20px">
             <div class="estado-hero-header">
               <div class="estado-hero-title">
                 <div class="estado-hero-dot"></div>
@@ -3941,7 +3836,7 @@
           </div>
 
           <!-- Section 2: Mosaic Summary Layout -->
-          <div style="display:grid; grid-template-columns: 0.8fr 1.1fr 1.1fr; grid-template-rows: 1fr auto; gap:8px; align-items: stretch; min-height: clamp(400px, calc(100vh - 175px), 700px); margin-bottom:0">
+          <div style="display:grid; grid-template-columns: 0.8fr 1.1fr 1.1fr; grid-template-rows: auto 1fr; gap:12px; align-items: stretch; flex: 1; min-height: 520px; margin-bottom: 10px">
             <div id="res-grid-banca"></div>
             <div id="res-grid-cirion"></div>
             <div id="res-grid-liberty"></div>
@@ -3949,10 +3844,10 @@
             <!-- Row 2: Distribution Chart (Col 1) and Trend Graph (Col 2-3) -->
             <div class="card fu fu4" style="display:flex; flex-direction:column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding:10px 14px">
-                <div class="ct" style="font-size:13px">Distribución % · Redeban · Wompi · Cirion · Liberty</div>
+                <div class="ct" style="font-size:13px">Distribución %</div>
               </div>
-              <div class="cw" style="flex:1; padding:0 10px 8px; display:flex; align-items:center; justify-content:center">
-                <canvas id="ch-res-dona" style="max-height: 200px"></canvas>
+              <div class="cw" style="flex:1; padding:0 15px 15px; display:flex; align-items:center; justify-content:center">
+                <canvas id="ch-res-dona" style="max-height: 250px"></canvas>
               </div>
             </div>
             
@@ -3968,13 +3863,13 @@
                   </div>
                 </div>
               </div>
-              <div class="cw" style="flex:1; padding:4px 12px 36px; min-height:0"><canvas id="ch-res-tend"></canvas></div>
+              <div class="cw" style="flex:1; padding:5px 15px 15px; min-height:320px"><canvas id="ch-res-tend"></canvas></div>
             </div>
           </div>
         </div>
 
         <!-- ═══ DIARIO ═══ -->
-        <div id="tp-diario" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
+        <div id="tp-diario" class="tp" style="padding:10px 18px; box-sizing:border-box">
           
           <!-- Banner Superior Compacto -->
           <div class="estado-hero fu fu1" style="display: flex; flex-direction: column; gap: 10px; padding: 12px 18px; margin-bottom: 10px">
@@ -4018,7 +3913,7 @@
             <div id="dia-metrics" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px"></div>
           </div>
 
-          <div style="flex: 1; min-height: clamp(380px, calc(100vh - 240px), 640px); display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px">
+          <div style="flex: 1; min-height: 540px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px">
             <!-- Gráfica Día a Día -->
             <div class="card fu fu2" style="flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0">
               <div class="ch" style="padding: 6px 14px">
@@ -4033,7 +3928,7 @@
                   <span style="display:flex;align-items:center;gap:4px"><span style="width:18px;height:2px;background:#C5D336;display:inline-block"></span>Meta</span>
                 </div>
               </div>
-              <div class="cw" style="flex: 1; min-height: clamp(160px, 22vh, 280px)"><canvas id="ch-dia-main"></canvas></div>
+              <div class="cw" style="flex: 1; min-height: 0"><canvas id="ch-dia-main"></canvas></div>
             </div>
 
             <!-- Gráfica Acumulada -->
@@ -4043,13 +3938,13 @@
                   <div class="ct" style="font-size: 11px">Producción Acumulada vs Meta Acumulada</div>
                 </div>
               </div>
-              <div class="cw" style="flex: 1; min-height: clamp(160px, 22vh, 280px)"><canvas id="ch-dia-acum"></canvas></div>
+              <div class="cw" style="flex: 1; min-height: 0"><canvas id="ch-dia-acum"></canvas></div>
             </div>
           </div>
         </div>
 
         <!-- ═══ ZONAS ═══ -->
-        <div id="tp-zonas" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
+        <div id="tp-zonas" class="tp">
           <div class="ph fu">
             <div>
               <div class="pt">Distribución por Zona</div>
@@ -4094,7 +3989,7 @@
         </div>
 
         <!-- ═══ CIRION ═══ -->
-        <div id="tp-cirion" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
+        <div id="tp-cirion" class="tp">
           <div class="ph fu">
             <div>
               <div class="pt" style="color:#001D62">Cirion</div>
@@ -4170,7 +4065,7 @@
         </div>
 
         <!-- ═══ LIBERTY ═══ -->
-        <div id="tp-liberty" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
+        <div id="tp-liberty" class="tp">
           <div class="ph fu">
             <div>
               <div class="pt" style="color:#0847a3">Liberty</div>
@@ -4232,7 +4127,7 @@
         </div>
 
         <!-- ═══ BANCA ═══ -->
-        <div id="tp-banca" class="tp" style="padding:10px 18px; box-sizing:border-box; overflow-y:auto">
+        <div id="tp-banca" class="tp">
           <div class="ph fu">
             <div>
               <div class="pt" style="color:#166534">Banca Seguros</div>
@@ -4557,9 +4452,10 @@
       'luis.rincon@lineacom.co',
       'mayer.zapata@lineacom.co',
       'yudy.jimenez@lineacom.co',
-      'susana.arboleda@lineacom.co',
-      'sebastian.gomez@lineacom.co'
+      'susana.arboleda@lineacom.co'
     ];
+
+
 
 
     
@@ -4567,10 +4463,8 @@
 
     
     const RESTRICTED_USERS = {
-
-       
       
-      'juliana.gil@lineacom.co': {
+      'sebastian.gomez@lineacom.co': {
         allowedTabs: ['resumen', 'detalle', 'inventario'],
         defaultTab:  'resumen',
         forceGerencia: 'BANCA',
@@ -4687,7 +4581,7 @@
           // Actualizar título de la dona para reflejar que es de su proyecto
           const donaTitle = document.querySelector('#ch-res-dona')?.closest('.card')?.querySelector('.ct');
           if (donaTitle) donaTitle.textContent = perms.resumenChartGerencia === 'BANCA'
-            ? 'Distribución % · Banca · Cirion · Liberty'
+            ? 'Distribución % · Redeban vs Wompi'
             : 'Distribución % · ' + perms.resumenChartGerencia.charAt(0) + perms.resumenChartGerencia.slice(1).toLowerCase();
           // Actualizar título de tendencia
           const tendTitle = document.querySelector('#ch-res-tend')?.closest('.card')?.querySelector('.ct');
@@ -4851,19 +4745,15 @@
           return;
         }
 
-        // Registrar acceso en Supabase sin bloquear el login
         if (window.LoginTracker) {
-          window.LoginTracker.registrar(window._msUserProfile).catch(e => console.warn('[Tracker]', e));
+          window.LoginTracker.registrar(window._msUserProfile).catch(() => {});
         }
 
         _enterApp();
 
       } catch (err) {
         if (err.errorCode === 'user_cancelled') _showLoginError('Inicio de sesión cancelado.');
-        else { console.error('[Auth]', err); _showLoginError('Error al conectar con Microsoft. Intenta de nuevo.<br><small style="opacity:.7">' + (err.message||err) + '</small>'); }
-      } finally {
-        const btn2 = document.getElementById('msLoginBtn');
-        if (btn2 && btn2.disabled) { btn2.disabled = false; btn2.innerHTML = _msBtnHTML(); }
+        else { console.error('[Auth]', err); _showLoginError('Error al conectar con Microsoft. Intenta de nuevo.'); }
       }
     };
 
@@ -5063,30 +4953,6 @@
 
     // ── INIT ──────────────────────────────────────────────────────
     async function initDash() {
-      // Setear fechas al mes actual dinámicamente
-      (function _setCurrentMonthDates() {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, '0');
-        const d = String(now.getDate()).padStart(2, '0');
-        const d1 = `${y}-${m}-01`;
-        const d2 = `${y}-${m}-${d}`;
-        const pairs = [
-          ['res-d1',      'res-d2'],
-          ['dia-d1',      'dia-d2'],
-          ['cir-d1',      'cir-d2'],
-          ['lib-d1',      'lib-d2'],
-          ['ban-d1',      'ban-d2'],
-          ['det-hero-d1', 'det-hero-d2'],
-        ];
-        pairs.forEach(([id1, id2]) => {
-          const el1 = document.getElementById(id1);
-          const el2 = document.getElementById(id2);
-          if (el1) el1.value = d1;
-          if (el2) el2.value = d2;
-        });
-      })();
-
       try {
         showBoot();
         setBootStep('auth', 'ok');
@@ -5099,7 +4965,6 @@
         setBootStep('idx', 'ok');
         setBootProgress(100, 'Dashboard listo');
         setTimeout(hideBoot, 350);
-        startAutoRefresh();
       } catch (err) {
         console.error('[boot]', err);
         fatalBoot(err.message || 'No fue posible cargar los archivos reales.');
@@ -5325,59 +5190,12 @@
     function loadData(data, proyeccion) {
       RAW = data;
       buildProjectionIndexes(proyeccion);
-      document.getElementById('lupd').textContent = `Actualizado: ${new Date().toLocaleString('es-CO', { timeZone:'America/Bogota', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })}`;
+      document.getElementById('lupd').textContent = `Actualizado: ${new Date().toLocaleDateString('es-CO')}`;
       document.getElementById('sb-rows').textContent = `${RAW.length.toLocaleString()} registros`;
       const estats = [...new Set(RAW.map(r => r.ESTADO_ACTIVIDAD).filter(Boolean))].sort();
       const se = document.getElementById('det-est'); if (se) se.innerHTML = '<option value="">Todos</option>' + estats.map(e => `<option>${e}</option>`).join('');
       renderResumen();
     }
-
-    // ══════════════════════════════════════════════
-    // AUTO-REFRESCO cada 5 minutos
-    // ══════════════════════════════════════════════
-    let _autoRefreshTimer = null;
-
-    async function _autoRefresh() {
-      try {
-        // Cache-busting: agrega timestamp para forzar descarga nueva desde GitHub
-        const ts = Date.now();
-        const consolidadoRaw = await fetchJSONGzStrict(`./consolidado.json.gz?_=${ts}`);
-        const consolidado = normalizeConsolidado(consolidadoRaw);
-        if (!consolidado.length) return;
-
-        const proyeccionRaw = await fetchJSONGzStrict(`./proyeccion.json.gz?_=${ts}`);
-        const proyeccion = normalizeProyeccion(proyeccionRaw);
-        if (!proyeccion.length) return;
-
-        loadData(consolidado, proyeccion);
-
-        // Mostrar notificación sutil
-        const lupd = document.getElementById('lupd');
-        if (lupd) {
-          lupd.style.transition = 'color .3s';
-          lupd.style.color = '#22c55e';
-          setTimeout(() => { lupd.style.color = ''; }, 2000);
-        }
-      } catch(e) {
-        console.warn('[AutoRefresh]', e.message);
-      }
-    }
-
-    function startAutoRefresh() {
-      if (_autoRefreshTimer) clearInterval(_autoRefreshTimer);
-      _autoRefreshTimer = setInterval(_autoRefresh, 5 * 60 * 1000); // 5 minutos
-      console.log('[AutoRefresh] Activo — refresca cada 5 min');
-    }
-
-    function stopAutoRefresh() {
-      if (_autoRefreshTimer) { clearInterval(_autoRefreshTimer); _autoRefreshTimer = null; }
-    }
-
-    // Pausar cuando la pestaña no está visible (ahorra recursos)
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stopAutoRefresh();
-      else startAutoRefresh();
-    });
 
     // ══════════════════════════════════════════════
     // RESUMEN
@@ -5606,78 +5424,52 @@
           },
           datalabels: {}
         },
-        layout: { padding: { top: 24, bottom: 4 } },
+        layout: { padding: { top: 28 } },
         scales: {
           y: {
             stacked: true,
-            ticks: { color: '#5c6b8a', callback: v => fmtCOPShort(v), font: { size: 10 }, maxTicksLimit: 5 },
+            ticks: { color: '#5c6b8a', callback: v => fmtCOPShort(v) },
             grid: { color: 'rgba(0,0,0,.04)' }
           },
           x: {
             stacked: true,
-            ticks: {
-              color: '#5c6b8a',
-              font: { size: 10, family: "'Outfit', sans-serif" },
-              maxRotation: 0,
-              minRotation: 0,
-              autoSkip: false,
-              padding: 4
-            },
+            ticks: { color: '#5c6b8a' },
             grid: { display: false }
           }
         }
       });
 
-      // Dona: si el usuario tiene resumenChartGerencia === 'BANCA', mostrar Redeban / Wompi / Cirion / Liberty
+      // Dona: si el usuario tiene resumenChartGerencia === 'BANCA', mostrar Redeban vs Wompi
       if (_currentUserPerms && _currentUserPerms.resumenChartGerencia === 'BANCA') {
         const redebanProd = prodSubReal(isRedeban, range, null, null);
         const wompiProd   = prodSubReal(isWompi,   range, null, null);
-        const cirionProd  = prodReal('CIRION',  range);
-        const libertyProd = prodReal('LIBERTY', range);
         mkC('ch-res-dona', 'doughnut', {
-          labels: ['Redeban', 'Wompi', 'Cirion', 'Liberty'],
-          datasets: [{ data: [redebanProd, wompiProd, cirionProd, libertyProd], backgroundColor: ['#0847a3', '#166534', '#001D62', '#4f46e5'], borderWidth: 0, hoverOffset: 10 }]
+          labels: ['Redeban', 'Wompi'],
+          datasets: [{ data: [redebanProd, wompiProd], backgroundColor: ['#0847a3', '#166534'], borderWidth: 0, hoverOffset: 10 }]
         }, {
           cutout: '68%',
           plugins: {
             ...CT.plugins,
             legend: { ...CT.plugins.legend, position: 'bottom' },
-            datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return (t && v > 0) ? ((v / t) * 100).toFixed(1) + '%' : ''; } }
+            datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
           }
         });
       } else {
-        // Admin / sin restricción: desglosar Banca en Redeban + Wompi, más Cirion y Liberty
-        const _singleGer = _currentUserPerms && _currentUserPerms.resumenChartGerencia;
-        if (_singleGer && _singleGer !== 'BANCA') {
-          const donaProd = [prodReal(_singleGer, range)];
-          mkC('ch-res-dona', 'doughnut', {
-            labels: [_singleGer],
-            datasets: [{ data: donaProd, backgroundColor: [GC[_singleGer]], borderWidth: 0, hoverOffset: 10 }]
-          }, {
-            cutout: '68%',
-            plugins: {
-              ...CT.plugins,
-              legend: { ...CT.plugins.legend, position: 'bottom' },
-              datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
-            }
-          });
-        } else {
-          const redebanProd = prodSubReal(isRedeban, range, null, null);
-          const wompiProd   = prodSubReal(isWompi,   range, null, null);
-          const cirionProd  = prodReal('CIRION',  range);
-          const libertyProd = prodReal('LIBERTY', range);
-          mkC('ch-res-dona', 'doughnut', {
-            labels: ['Redeban', 'Wompi', 'Cirion', 'Liberty'],
-            datasets: [{ data: [redebanProd, wompiProd, cirionProd, libertyProd], backgroundColor: ['#0847a3', '#166534', '#001D62', '#4472c4'], borderWidth: 0, hoverOffset: 10 }]
-          }, {
-            cutout: '68%',
-            plugins: {
-              ...CT.plugins,
-              legend: { ...CT.plugins.legend, position: 'bottom' },
-              datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return (t && v > 0) ? ((v / t) * 100).toFixed(1) + '%' : ''; } }
-            }
-          });
-        }
+        const _donaGers = (_currentUserPerms && _currentUserPerms.resumenChartGerencia)
+          ? [_currentUserPerms.resumenChartGerencia]
+          : GERS;
+        const donaProd = _donaGers.map(g => prodReal(g, range));
+        mkC('ch-res-dona', 'doughnut', {
+          labels: _donaGers,
+          datasets: [{ data: donaProd, backgroundColor: _donaGers.map(g => GC[g]), borderWidth: 0, hoverOffset: 10 }]
+        }, {
+          cutout: '68%',
+          plugins: {
+            ...CT.plugins,
+            legend: { ...CT.plugins.legend, position: 'bottom' },
+            datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: (v, ctx) => { const d = ctx.chart.data.datasets[0].data; const t = d.reduce((a, b) => a + b, 0); return t ? ((v / t) * 100).toFixed(1) + '%' : '0%'; } }
+          }
+        });
       }
 
       // Re-aplicar restricciones de resumen si el usuario tiene permisos limitados
@@ -7372,25 +7164,9 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
     }
 
     // ══════════════════════════════════════════════
-    // LOGIN TRACKER — registro de accesos (Supabase)
+    // LOGIN TRACKER — registro de accesos
     // ══════════════════════════════════════════════
-    const SB_URL = 'https://svjpwabugdsccsoqzyxf.supabase.co';
-    const SB_KEY = 'sb_publishable_ulaxS_4-zgBswdvFI3MZnA_AkMHIslQ';
-
-    async function _sbFetch(path, method, body) {
-      const res = await fetch(SB_URL + path, {
-        method: method || 'GET',
-        headers: {
-          'apikey': SB_KEY,
-          'Authorization': 'Bearer ' + SB_KEY,
-          'Content-Type': 'application/json',
-          'Prefer': method === 'POST' ? 'return=minimal' : ''
-        },
-        body: body ? JSON.stringify(body) : undefined
-      });
-      if (!res.ok) { const t = await res.text(); throw new Error(t); }
-      return method === 'POST' ? null : res.json();
-    }
+    const ACC_KEY = 'lineacom_accesos_v1';
 
     function _accTipoLabel(perms) {
       if (!perms) return 'GENERAL';
@@ -7399,68 +7175,47 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       return 'GENERAL';
     }
 
-    // Cache local para no consultar Supabase en cada render
-    let _accCache = null;
-
     window.LoginTracker = {
       registrar: async function(profile) {
         if (!profile) return;
         try {
+          const existing = JSON.parse(localStorage.getItem(ACC_KEY) || '[]');
           const now = new Date();
           const entry = {
-            nombre:  profile.nombre || '',
-            email:   profile.email  || '',
-            cargo:   profile.cargo  || '',
-            tipo:    _accTipoLabel(_currentUserPerms),
-            fecha:   now.toLocaleString('es-CO', { timeZone:'America/Bogota', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }),
-            mes:     now.toLocaleString('es-CO', { timeZone:'America/Bogota', month:'long', year:'numeric' }),
-            mes_key: now.toLocaleString('es-CO', { timeZone:'America/Bogota', year:'numeric', month:'2-digit' })
+            id:       now.getTime(),
+            nombre:   profile.nombre || '',
+            email:    profile.email  || '',
+            cargo:    profile.cargo  || '',
+            tipo:     _accTipoLabel(_currentUserPerms),
+            fecha:    now.toLocaleString('es-CO', { timeZone:'America/Bogota', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' }),
+            mes:      now.toLocaleString('es-CO', { timeZone:'America/Bogota', month:'long', year:'numeric' }),
+            mesKey:   now.toLocaleString('es-CO', { timeZone:'America/Bogota', year:'numeric', month:'2-digit' }) // "MM/YYYY"
           };
-          await _sbFetch('/rest/v1/accesos', 'POST', entry);
-          _accCache = null;
-        } catch(e) {
-          console.warn('[LoginTracker] No se pudo guardar en Supabase (¿tabla creada?):', e);
-          // Fallback: guardar en localStorage mientras se configura Supabase
-          try {
-            const local = JSON.parse(localStorage.getItem('lineacom_accesos_v1') || '[]');
-            local.unshift({ id: Date.now(), nombre: profile.nombre||'', email: profile.email||'', cargo: profile.cargo||'', tipo: _accTipoLabel(_currentUserPerms), fecha: new Date().toLocaleString('es-CO',{timeZone:'America/Bogota'}), mes: new Date().toLocaleString('es-CO',{timeZone:'America/Bogota',month:'long',year:'numeric'}), mesKey: new Date().toLocaleString('es-CO',{timeZone:'America/Bogota',year:'numeric',month:'2-digit'}) });
-            if (local.length > 200) local.splice(200);
-            localStorage.setItem('lineacom_accesos_v1', JSON.stringify(local));
-          } catch(_) {}
-        }
-      },
-      getAll: async function() {
-        if (_accCache) return _accCache;
-        try {
-          const data = await _sbFetch('/rest/v1/accesos?select=*&order=id.desc&limit=500');
-          _accCache = (data || []).map(r => ({ ...r, mesKey: r.mes_key }));
-          return _accCache;
-        } catch(e) {
-          console.warn('[LoginTracker] No se pudo leer Supabase (¿tabla creada?):', e);
-          // Fallback: leer localStorage
-          try { return JSON.parse(localStorage.getItem('lineacom_accesos_v1') || '[]'); } catch(_) { return []; }
-        }
-      },
-      clear: async function() {
-        try {
-          await _sbFetch('/rest/v1/accesos?id=gte.0', 'DELETE');
-          _accCache = null;
+          existing.unshift(entry);
+          if (existing.length > 500) existing.splice(500);
+          localStorage.setItem(ACC_KEY, JSON.stringify(existing));
         } catch(e) { console.warn('[LoginTracker]', e); }
       },
-      renderPanel: async function() {
+      getAll: function() {
+        try { return JSON.parse(localStorage.getItem(ACC_KEY) || '[]'); } catch(e) { return []; }
+      },
+      clear: function() {
+        try { localStorage.removeItem(ACC_KEY); } catch(e) {}
+      },
+      renderPanel: function() {
         if (!_currentUserPerms) {
           const btn = document.getElementById('n-accesos');
           if (btn) btn.style.display = '';
         }
-        await _populateAccMesSel();
-        await renderAccesos();
+        _populateAccMesSel();
+        renderAccesos();
       }
     };
 
-    async function _populateAccMesSel() {
+    function _populateAccMesSel() {
       const sel = document.getElementById('acc-mes');
       if (!sel) return;
-      const todos = await window.LoginTracker.getAll();
+      const todos = window.LoginTracker.getAll();
       const meses = [...new Set(todos.map(r => r.mesKey).filter(Boolean))].sort((a,b) => b.localeCompare(a));
       const cur = sel.value;
       sel.innerHTML = '<option value="">Todos los meses</option>' +
@@ -7472,16 +7227,12 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       if (cur && [...sel.options].some(o => o.value === cur)) sel.value = cur;
     }
 
-    async function renderAccesos() {
+    function renderAccesos() {
       const srch  = (document.getElementById('acc-search')?.value || '').toLowerCase();
       const tipo  = document.getElementById('acc-tipo')?.value   || '';
       const mesK  = document.getElementById('acc-mes')?.value    || '';
 
-      // Mostrar estado de carga
-      const tbody = document.getElementById('tbody-accesos');
-      if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--txl)">Cargando...</td></tr>`;
-
-      const todos = await window.LoginTracker.getAll();
+      const todos = window.LoginTracker.getAll();
 
       // ── Métricas globales (sin filtro de tabla) ────────────────────
       const totalTodos   = todos.length;
@@ -7574,6 +7325,7 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       const countEl = document.getElementById('acc-count');
       if (countEl) countEl.textContent = `${registros.length} ingreso${registros.length !== 1 ? 's' : ''}`;
 
+      const tbody = document.getElementById('tbody-accesos');
       if (!tbody) return;
 
       if (!registros.length) {
@@ -7602,10 +7354,10 @@ ${sl.map((r, i) => `<tr style="background:${i%2?'':'rgba(0,29,98,.018)'}">
       renderAccesos();
     }
 
-    async function clearAccesos() {
+    function clearAccesos() {
       if (!confirm('¿Eliminar todos los registros de acceso? Esta acción no se puede deshacer.')) return;
-      await window.LoginTracker.clear();
-      await _populateAccMesSel();
+      window.LoginTracker.clear();
+      _populateAccMesSel();
       renderAccesos();
     }
   </script>
